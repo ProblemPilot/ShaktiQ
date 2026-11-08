@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" class="light scroll-smooth">
 <head>
+  <script>
+    // Force HTTPS & canonical apex domain (shaktiq.com)
+    if (location.hostname === 'www.shaktiq.com' || (location.protocol !== 'https:' && location.hostname === 'shaktiq.com')) {
+      location.replace('https://shaktiq.com' + location.pathname + location.search + location.hash);
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BPSC 72nd/73rd, BSSC CGL 4 &amp; AEDO Exam Portal • 2,500+ PYQs &amp; 10 Mock Tests</title>
