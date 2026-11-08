@@ -4347,19 +4347,16 @@ summary:focus-visible,
     }
 
     function openBpscQuestionBank() {
-      requireAspirant(() => {
-        const portal = document.getElementById('page-portal-view');
-        const qb = document.getElementById('page-bpsc-pyq-view');
-        if (portal && qb) {
-          portal.classList.add('hidden');
-          qb.classList.remove('hidden');
-          switchMainMode('pyq');
-          safeScrollToTop();
-          initIcons();
-          try { history.pushState(null, null, '#practice-bpsc-pyq'); } catch(e){}
-          showToast('Welcome to the 2,500+ PYQ Question Bank!', 'success');
-        }
-      }, 'Please sign in with your name, email, mobile number, and district to access the 2,500+ PYQ Question Bank.');
+      const portal = document.getElementById('page-portal-view');
+      const qb = document.getElementById('page-bpsc-pyq-view');
+      if (portal && qb) {
+        portal.classList.add('hidden');
+        qb.classList.remove('hidden');
+        switchMainMode('pyq');
+        safeScrollToTop();
+        initIcons();
+        try { history.pushState(null, null, '#practice-bpsc-pyq'); } catch(e){}
+      }
     }
 
     function openPortalView() {
@@ -5345,7 +5342,6 @@ summary:focus-visible,
 
     function handleBulkPasteImport() {
       const raw = (document.getElementById("bulkPasteTextarea").value || "").trim();
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('opacity-60', 'cursor-not-allowed'); }
       if (!raw) {
         showToast("Please paste questions or JSON array first.", "⚠");
         return;
@@ -5510,13 +5506,11 @@ summary:focus-visible,
     }
 
     function jumpToSubjectPractice(subjectName) {
-      requireAspirant(() => {
-        openPyqBankMode();
-        setTimeout(() => {
-          const pill = document.querySelector(`[data-subject="${subjectName}"]`);
-          if (pill) pill.click();
-        }, 200);
-      }, `Please sign in to practice ${subjectName} previous year questions.`);
+      openPyqBankMode();
+      setTimeout(() => {
+        const pill = document.querySelector(`[data-subject="${subjectName}"]`);
+        if (pill) pill.click();
+      }, 200);
     }
 
     // Daily Abhyas Goal & Progress Tracker
@@ -5581,40 +5575,32 @@ summary:focus-visible,
     let currentAppMode = 'testseries'; // 'testseries' or 'pyq'
 
     function openTestSeriesMode() {
-      requireAspirant(() => {
-        const portal = document.getElementById('page-portal-view');
-        const qb = document.getElementById('page-bpsc-pyq-view');
-        if (portal && qb) {
-          portal.classList.add('hidden');
-          qb.classList.remove('hidden');
-          switchMainMode('testseries');
-          safeScrollToTop();
-          initIcons();
-          try { history.pushState(null, null, '#test-series'); } catch(e){}
-        }
-      }, 'Please sign in with your name, email, phone, and district to access the 10 Full-Length Mock Tests.');
+      const portal = document.getElementById('page-portal-view');
+      const qb = document.getElementById('page-bpsc-pyq-view');
+      if (portal && qb) {
+        portal.classList.add('hidden');
+        qb.classList.remove('hidden');
+        switchMainMode('testseries');
+        safeScrollToTop();
+        initIcons();
+        try { history.pushState(null, null, '#test-series'); } catch(e){}
+      }
     }
 
     function openPyqBankMode() {
-      requireAspirant(() => {
-        const portal = document.getElementById('page-portal-view');
-        const qb = document.getElementById('page-bpsc-pyq-view');
-        if (portal && qb) {
-          portal.classList.add('hidden');
-          qb.classList.remove('hidden');
-          switchMainMode('pyq');
-          safeScrollToTop();
-          initIcons();
-          try { history.pushState(null, null, '#pyq-bank'); } catch(e){}
-        }
-      }, 'Please sign in with your name, email, phone, and district to access the 2,500+ Subject-Wise PYQ Question Bank.');
+      const portal = document.getElementById('page-portal-view');
+      const qb = document.getElementById('page-bpsc-pyq-view');
+      if (portal && qb) {
+        portal.classList.add('hidden');
+        qb.classList.remove('hidden');
+        switchMainMode('pyq');
+        safeScrollToTop();
+        initIcons();
+        try { history.pushState(null, null, '#pyq-bank'); } catch(e){}
+      }
     }
 
     function switchMainMode(mode) {
-      if (!getCurrentAspirant()) {
-        openAspirantRegModal("Please sign in with your name, email, phone, and district to access the PYQ Bank and Mock Tests.");
-        return;
-      }
       currentAppMode = mode;
       const btnTS = document.getElementById('workspace-mode-btn-testseries');
       const btnPYQ = document.getElementById('workspace-mode-btn-pyq');
@@ -6966,8 +6952,7 @@ summary:focus-visible,
           questions = allMcq.filter(q => q.exam.toLowerCase().includes(test.examMatch.toLowerCase().split(' ')[0]));
         }
 
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('opacity-60', 'cursor-not-allowed'); }
-      if (questions.length === 0) {
+        if (questions.length === 0) {
           showToast("Questions for this test are loading...", "info");
           return;
         }
