@@ -6038,10 +6038,17 @@ summary:focus-visible,
     function handleAspirantRegistration(e) {
       if (e) e.preventDefault();
 
+      const submitBtn = document.getElementById('reg-submit-btn');
+      const resetBtn = () => {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        }
+      };
+
       // 1. SPAM PROTECTION: Honeypot check
       const honeypot = document.getElementById('reg-website-hp');
       if (honeypot && honeypot.value.trim() !== '') {
-        // Silently reject bot submission
         closeAspirantRegModal();
         return;
       }
@@ -6053,17 +6060,10 @@ summary:focus-visible,
       }
 
       const consentCheck = document.getElementById('reg-consent-check');
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('opacity-60', 'cursor-not-allowed'); }
       if (!consentCheck || !consentCheck.checked) {
+        resetBtn();
         showToast('Please check the consent box to agree to Terms and Privacy Policy before proceeding.', 'error');
         return;
-      }
-
-      const submitBtn = document.getElementById('reg-submit-btn');
-      if (submitBtn) {
-        if (submitBtn.disabled) return;
-        submitBtn.disabled = true;
-        submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
       }
 
       const name = (document.getElementById('reg-student-name').value || '').trim();
@@ -6071,38 +6071,43 @@ summary:focus-visible,
       const phone = (document.getElementById('reg-student-phone').value || '').trim().replace(/\D/g, '');
       const targetExam = document.getElementById('reg-target-exam').value || '72nd BPSC CCE';
       const district = (document.getElementById('reg-student-district').value || '').trim();
-      const consentAccepted = true;
 
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('opacity-60', 'cursor-not-allowed'); }
       if (!name || name.length < 2) {
+        resetBtn();
         showToast('Please enter your full name.', 'error');
         return;
       }
 
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        resetBtn();
         showToast('Please enter a valid email address.', 'error');
         return;
       }
 
       if (!/^[6-9]\d{9}$/.test(phone)) {
+        resetBtn();
         showToast('Please enter a valid 10-digit Indian mobile number.', 'error');
         return;
       }
 
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('opacity-60', 'cursor-not-allowed'); }
       if (!district) {
+        resetBtn();
         showToast('Please select your home district in Bihar.', 'error');
         return;
       }
 
-
-
       // 3. SPAM PROTECTION: Rate limit check
       const rateCheck = checkRegistrationRateLimit();
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('opacity-60', 'cursor-not-allowed'); }
       if (!rateCheck.allowed) {
+        resetBtn();
         showToast(rateCheck.reason, 'error');
         return;
+      }
+
+      if (submitBtn) {
+        if (submitBtn.disabled) return;
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
       }
 
       const aspirant = {
@@ -6126,7 +6131,7 @@ summary:focus-visible,
 
       // 4. Save locally (localStorage + IndexedDB fallback) AND sync to Google Sheets
       PrepBackendEngine.auth.saveUserSession(aspirant).then(() => {
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('opacity-60', 'cursor-not-allowed'); }
+        resetBtn();
         syncAspirantToGoogleSheets({
           event: 'student_registered',
           name: aspirant.name,
@@ -6142,13 +6147,28 @@ summary:focus-visible,
           website_hp: ''
         });
 
-        closeAspirantRegModal();
+        // Add to local all aspirants directory if not present
+        const allAspirants = getAllAspirants();
+        const existingIdx = allAspirants.findIndex(a => a.email.toLowerCase() === aspirant.email.toLowerCase());
+        if (existingIdx !== -1) {
+          allAspirants[existingIdx] = Object.assign(allAspirants[existingIdx], aspirant);
+        } else {
+          allAspirants.push(aspirant);
+        }
+        try {
+          localStorage.setItem('pwa_all_aspirants', JSON.stringify(allAspirants));
+        } catch(e) {}
+
         updateAspirantNavUI();
+        closeAspirantRegModal();
         showToast(`Welcome, ${name}! Access to 2,500+ PYQs & 10 Mock Tests unlocked.`, 'success');
 
         if (savedCallback) {
-          savedCallback(aspirant);
+          try { savedCallback(aspirant); } catch(e) {}
         }
+      }).catch((err) => {
+        resetBtn();
+        showToast('Registration failed: ' + (err.message || 'Storage error'), 'error');
       });
     }
 
