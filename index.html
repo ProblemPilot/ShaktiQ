@@ -5983,7 +5983,7 @@ summary:focus-visible,
     // ASPIRANT REGISTRATION, DPDP CONSENT & GOOGLE SHEETS LEAD COLLECTION ENGINE
     // ==========================================
     // PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL BELOW:
-    const GOOGLE_SHEETS_WEB_APP_URL = "https://script.google.com/macros/s/YOUR_GOOGLE_APPS_SCRIPT_DEPLOYMENT_ID/exec";
+    const GOOGLE_SHEETS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwNLhgnbVhYOC-EtQgb3hMih_i2Kpcu0lH9J-bGFxsAG1p8pJae3jN1Bh2jCUY4d5gR/exec";
     const RATE_LIMIT_STORAGE_KEY = "pwa_reg_rate_limit_v1";
     const PENDING_LEADS_QUEUE_KEY = "pwa_pending_sheets_queue_v1";
 
@@ -6097,31 +6097,7 @@ summary:focus-visible,
 
 
     // ADMIN: Google Sheets Integration & Lead Management
-    function openAdminLeadsModal() {
-      const modal = document.getElementById('admin-leads-modal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        const countEl = document.getElementById('admin-lead-count');
-        const queueEl = document.getElementById('admin-queue-count');
-        const urlInput = document.getElementById('admin-sheets-url-input');
-        
-        const all = getAllAspirants();
-        const rawQueue = localStorage.getItem(PENDING_LEADS_QUEUE_KEY);
-        const queue = rawQueue ? JSON.parse(rawQueue) : [];
-        
-        if (countEl) countEl.textContent = all.length;
-        if (queueEl) queueEl.textContent = queue.length;
-        if (urlInput) {
-          urlInput.value = localStorage.getItem('pwa_webhook_url') || (GOOGLE_SHEETS_WEB_APP_URL.includes('YOUR_GOOGLE_APPS_SCRIPT') ? '' : GOOGLE_SHEETS_WEB_APP_URL);
-        }
-        initIcons();
-      }
-    }
-
-    function closeAdminLeadsModal() {
-      const modal = document.getElementById('admin-leads-modal');
-      if (modal) modal.classList.add('hidden');
-    }
+    
 
     function saveGoogleSheetsWebhookUrl() {
       const urlInput = document.getElementById('admin-sheets-url-input');
