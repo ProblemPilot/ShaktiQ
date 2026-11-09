@@ -3289,7 +3289,7 @@ summary:focus-visible,
             <div class="h-6 w-px bg-[#DCE6DF] hidden sm:block"></div>
 
             <div class="flex items-center gap-3">
-              <img src="/logo.png" alt="ShaktiQ Logo" class="h-9 sm:h-10 w-auto object-contain shrink-0 logo-white" style="filter: brightness(0) invert(1) !important; -webkit-filter: brightness(0) invert(1) !important;">
+              <img src="/logo-white.png" alt="ShaktiQ Logo" class="h-9 sm:h-10 w-auto object-contain shrink-0" style="filter: brightness(0) invert(1) !important; -webkit-filter: brightness(0) invert(1) !important;">
               <div class="hidden sm:block pl-3 border-l border-white/25">
                 <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#FCE27B] text-[#111C15]">2,500+ PYQs &amp; 10 Full Mocks</span>
                 <p class="text-[11px] text-white/90 mt-0.5" style="color: #EBF3E6 !important;">Attempt-First Active Recall: Select an option to test yourself</p>
@@ -3410,7 +3410,7 @@ summary:focus-visible,
             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">LIVE MOCK TEST</span>
             <span id="tt-exam-name" class="font-extrabold text-[#111C15] text-base sm:text-lg">71st BPSC CCE Prelims Mock</span>
           </div>
-          <p class="text-xs text-[#526056] mt-0.5">Marking Scheme: <span class="text-[#10402D] font-bold">+1.0</span> for correct • <span class="text-rose-600 font-bold">-1/3</span> for wrong</p>
+          <p class="text-xs text-[#526056] mt-0.5">BPSC Marking Scheme: <span class="text-[#10402D] font-bold">+1.0</span> for correct • <span class="text-rose-600 font-bold">-1/3</span> for wrong / blank • <span class="text-[#10402D] font-bold">0</span> for Option E (Safe Skip)</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -3526,24 +3526,50 @@ summary:focus-visible,
           <p id="tt-result-exam-title" class="text-sm text-[#3B493F]">71st BPSC CCE Prelims Mock Test</p>
         </div>
 
-        <!-- 4 Stat Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-          <div class="p-3.5 rounded-2xl bg-[#F8FAF7] border border-[#DCE6DF]">
-            <span class="text-xs text-[#526056] block mb-1">Attempted</span>
-            <span id="tt-result-attempted" class="text-xl font-bold text-[#111C15]">0</span>
+        <!-- 5 Stat Cards (BPSC New Rule) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 text-center">
+          <div class="p-3 rounded-2xl bg-[#F8FAF7] border border-[#DCE6DF]">
+            <span class="text-[11px] font-semibold text-[#526056] block mb-1">Attempted (A-D)</span>
+            <span id="tt-result-attempted" class="text-lg font-bold text-[#111C15]">0</span>
           </div>
-          <div class="p-3.5 rounded-2xl bg-[#ECF6E7] border border-[#C5DEC0]">
-            <span class="text-xs text-[#10402D] block mb-1">Correct</span>
-            <span id="tt-result-correct" class="text-xl font-bold text-[#10402D]">0</span>
+          <div class="p-3 rounded-2xl bg-[#ECF6E7] border border-[#C5DEC0]">
+            <span class="text-[11px] font-semibold text-[#10402D] block mb-1">Correct (+1.0)</span>
+            <span id="tt-result-correct" class="text-lg font-bold text-[#10402D]">0</span>
           </div>
-          <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200">
-            <span class="text-xs text-rose-700 block mb-1">Incorrect</span>
-            <span id="tt-result-wrong" class="text-xl font-bold text-rose-800">0</span>
+          <div class="p-3 rounded-2xl bg-rose-50 border border-rose-200">
+            <span class="text-[11px] font-semibold text-rose-700 block mb-1">Incorrect (-1/3)</span>
+            <span id="tt-result-wrong" class="text-lg font-bold text-rose-800">0</span>
           </div>
-          <div class="p-3.5 rounded-2xl bg-[#FEF6D6] border border-[#F5DF8B]">
-            <span class="text-xs text-[#785600] block mb-1">Net Score</span>
-            <span id="tt-result-score" class="text-xl font-bold text-[#785600]">0.00</span>
+          <div class="p-3 rounded-2xl bg-[#EBF3E6] border border-[#C6DEC0]">
+            <span class="text-[11px] font-semibold text-[#10402D] block mb-1">Opt E Safe Skip (0)</span>
+            <span id="tt-result-safe-skip" class="text-lg font-bold text-[#10402D]">0</span>
           </div>
+          <div class="p-3 rounded-2xl bg-rose-50/80 border border-rose-300">
+            <span class="text-[11px] font-semibold text-rose-800 block mb-1">Blank / No Bubble (-1/3)</span>
+            <span id="tt-result-blank" class="text-lg font-bold text-rose-800">0</span>
+          </div>
+        </div>
+
+        <!-- Net Score Hero Card -->
+        <div class="p-4 rounded-2xl bg-[#FEF6D6] border border-[#F5DF8B] flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#785600] block">Official BPSC Net Score</span>
+            <span class="text-xs text-[#526056]">Score = Correct - (Wrong ÷ 3) - (Blank ÷ 3)</span>
+          </div>
+          <div class="text-right">
+            <span id="tt-result-score" class="text-3xl font-display font-black text-[#785600]">0.00</span>
+            <span class="text-xs text-[#785600] font-semibold block" id="tt-result-total-label">/ 150 Marks</span>
+          </div>
+        </div>
+
+        <!-- BPSC Rule Notice -->
+        <div class="p-3.5 rounded-2xl bg-[#F8FAF7] border border-[#DCE6DF] text-xs text-[#3B493F] space-y-1">
+          <div class="font-bold text-[#111C15] flex items-center gap-1.5">
+            <i data-lucide="info" class="w-4 h-4 text-[#10402D] shrink-0"></i>
+            <span>BPSC New Marking Protocol Notice:</span>
+          </div>
+          <p>• <strong>Option (E) Safe Skip:</strong> 0 penalty. When unsure, bubble Option E so no marks are deducted.</p>
+          <p>• <strong>Unattempted Blank Penalty:</strong> If a row is left completely blank without darkening Option E, a <strong>-1/3 (-0.33)</strong> deduction is strictly applied.</p>
         </div>
 
         
@@ -6827,11 +6853,11 @@ summary:focus-visible,
 
     // Google Sheets Web App Sync (with localStorage offline queue fallback)
     function getGoogleSheetsEndpoint() {
-      const customUrl = localStorage.getItem('pwa_webhook_url');
-      if (customUrl && customUrl.startsWith('https://script.google.com/')) return customUrl;
       if (GOOGLE_SHEETS_WEB_APP_URL && !GOOGLE_SHEETS_WEB_APP_URL.includes('YOUR_GOOGLE_APPS_SCRIPT_DEPLOYMENT_ID')) {
         return GOOGLE_SHEETS_WEB_APP_URL;
       }
+      const customUrl = localStorage.getItem('pwa_webhook_url');
+      if (customUrl && customUrl.startsWith('https://script.google.com/')) return customUrl;
       return '';
     }
 
@@ -6855,6 +6881,7 @@ summary:focus-visible,
         fetch(endpoint, {
           method: 'POST',
           mode: 'no-cors',
+          keepalive: true,
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         }).catch(() => {
@@ -7170,22 +7197,52 @@ summary:focus-visible,
       const container = document.getElementById('tt-options-container');
       const chosen = mockUserAnswers[currentMockIndex];
 
-      let optsHtml = '';
-      if (item.options && item.options.length > 0) {
-        item.options.forEach((optText, oIdx) => {
-          const letter = ["A", "B", "C", "D", "E"][oIdx] || "A";
-          const isSelected = (chosen === letter);
+      // Prepare 5 options following BPSC New OMR Rule:
+      // A, B, C, D are potential answers; Option E is official Safe Skip
+      const baseOpts = item.options ? [...item.options] : [];
+      const displayOpts = [
+        { letter: 'A', text: baseOpts[0] || '(A)' },
+        { letter: 'B', text: baseOpts[1] || '(B)' },
+        { letter: 'C', text: baseOpts[2] || '(C)' },
+        { letter: 'D', text: baseOpts[3] || '(D)' },
+        { letter: 'E', text: 'Option (E) — Not Attempted / अनुत्तरित प्रश्न (Safe Skip • 0 Penalty)', isSafeSkip: true }
+      ];
 
-          optsHtml += `
-            <div onclick="ttSelectOption('${letter}')" class="p-3.5 rounded-2xl border ${isSelected ? 'border-[#10402D] bg-[#ECF6E7] text-[#10402D] font-bold' : 'border-[#DCE6DF] bg-[#F8FAF7] hover:border-[#10402D] hover:bg-[#EBF3E6]/60 text-[#111C15]'} flex items-start gap-3 cursor-pointer transition">
-              <span class="w-6 h-6 rounded-full border ${isSelected ? 'border-[#10402D] bg-[#10402D] text-white' : 'border-[#95A79A] text-[#3B493F] bg-white'} flex items-center justify-center font-bold text-xs shrink-0">
-                ${letter}
-              </span>
-              <span class="text-sm leading-relaxed">${escapeHtml(optText)}</span>
-            </div>
-          `;
-        });
-      }
+      let optsHtml = '';
+      displayOpts.forEach((optItem) => {
+        const letter = optItem.letter;
+        const optText = optItem.text;
+        const isSelected = (chosen === letter);
+
+        let borderBgClass = 'border-[#DCE6DF] bg-[#F8FAF7] hover:border-[#10402D] hover:bg-[#EBF3E6]/60 text-[#111C15]';
+        let circleClass = 'border-[#95A79A] text-[#3B493F] bg-white';
+        let badgeHtml = '';
+
+        if (optItem.isSafeSkip) {
+          if (isSelected) {
+            borderBgClass = 'border-[#10402D] bg-[#ECF6E7] text-[#10402D] font-bold shadow-xs';
+            circleClass = 'border-[#10402D] bg-[#10402D] text-white font-bold';
+            badgeHtml = '<span class="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#10402D] text-white">Safe Skip Selected (0 Deduction)</span>';
+          } else {
+            borderBgClass = 'border-[#C6DEC0] bg-[#F4F9F2] hover:border-[#10402D] text-[#223127]';
+            circleClass = 'border-[#7AA975] text-[#10402D] bg-white';
+            badgeHtml = '<span class="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">Safe Skip (0 Penalty)</span>';
+          }
+        } else if (isSelected) {
+          borderBgClass = 'border-[#10402D] bg-[#ECF6E7] text-[#10402D] font-bold shadow-xs';
+          circleClass = 'border-[#10402D] bg-[#10402D] text-white font-bold';
+        }
+
+        optsHtml += `
+          <div onclick="ttSelectOption('${letter}')" class="p-3.5 rounded-2xl border ${borderBgClass} flex items-start gap-3 cursor-pointer transition">
+            <span class="w-6 h-6 rounded-full border ${circleClass} flex items-center justify-center font-bold text-xs shrink-0">
+              ${letter}
+            </span>
+            <span class="text-sm leading-relaxed">${escapeHtml(optText)}</span>
+            ${badgeHtml}
+          </div>
+        `;
+      });
       container.innerHTML = optsHtml;
       renderQuestionPalette();
     }
@@ -7283,25 +7340,49 @@ summary:focus-visible,
 
       let correct = 0;
       let wrong = 0;
+      let safeSkip = 0;
+      let blank = 0;
       let attempted = 0;
 
-      currentMockQuestions.forEach((q, idx) => {
-        if (isMainsDescriptiveQuestion(q)) return;
+      const validQuestions = (currentMockQuestions || []).filter(q => !isMainsDescriptiveQuestion(q));
+
+      validQuestions.forEach((q, idx) => {
         const userOpt = mockUserAnswers[idx];
-        if (userOpt) {
+        if (!userOpt) {
+          // Left completely blank without bubbling Option E -> -1/3 penalty under BPSC New Rule!
+          blank += 1;
+        } else if (userOpt === 'E') {
+          // Darkened Option E (Not Attempted) -> 0 deduction (Safe Skip)
+          safeSkip += 1;
+        } else {
+          // Attempted options A, B, C, or D
           attempted += 1;
-          if (userOpt === q.ans) correct += 1;
-          else wrong += 1;
+          if (userOpt === q.ans) {
+            correct += 1;
+          } else {
+            wrong += 1;
+          }
         }
       });
 
-      const netScore = attempted === 0 ? "0.00" : ((correct * 3 - wrong) / 3).toFixed(2);
+      // Official BPSC New Rule Score Formula:
+      // Correct: +1.0
+      // Wrong (A-D): -1/3 (-0.33)
+      // Option E: 0 (Safe Skip)
+      // Blank (Unattempted row): -1/3 (-0.33 penalty)
+      const netScore = ((correct * 3 - wrong - blank) / 3).toFixed(2);
 
       document.getElementById('tt-result-exam-title').textContent = activeMockTest ? activeMockTest.title : "BPSC Mock Test";
-      document.getElementById('tt-result-attempted').textContent = `${attempted} / ${currentMockQuestions.length}`;
+      document.getElementById('tt-result-attempted').textContent = `${attempted} / ${validQuestions.length}`;
       document.getElementById('tt-result-correct').textContent = `${correct}`;
       document.getElementById('tt-result-wrong').textContent = `${wrong}`;
+      const safeSkipEl = document.getElementById('tt-result-safe-skip');
+      if (safeSkipEl) safeSkipEl.textContent = `${safeSkip}`;
+      const blankEl = document.getElementById('tt-result-blank');
+      if (blankEl) blankEl.textContent = `${blank}`;
       document.getElementById('tt-result-score').textContent = netScore;
+      const totalLabelEl = document.getElementById('tt-result-total-label');
+      if (totalLabelEl) totalLabelEl.textContent = `/ ${validQuestions.length} Marks`;
 
       // Record Student Test Attempt & Sync to Google Sheets IMMEDIATELY
       const currentStudent = getCurrentAspirant() || { name: "Aspirant", email: "aspirant@shaktiq.com", phone: "", district: "Bihar", targetExam: "71st BPSC CCE Prelims" };
@@ -7316,8 +7397,10 @@ summary:focus-visible,
         score: netScore,
         correct: correct,
         wrong: wrong,
+        safeSkip: safeSkip,
+        blank: blank,
         attempted: attempted,
-        totalQ: currentMockQuestions.length,
+        totalQ: validQuestions.length,
         timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
       };
       
@@ -7334,6 +7417,8 @@ summary:focus-visible,
         score: attemptLog.score,
         correct: attemptLog.correct,
         wrong: attemptLog.wrong,
+        safeSkip: attemptLog.safeSkip,
+        blank: attemptLog.blank,
         attempted: attemptLog.attempted,
         totalQ: attemptLog.totalQ,
         timestamp: attemptLog.timestamp,
@@ -7409,12 +7494,15 @@ summary:focus-visible,
     function updateSolutionStatsAndCounts() {
       let correct = 0;
       let wrong = 0;
-      let unattempted = 0;
+      let safeSkip = 0;
+      let blank = 0;
 
       reviewMockQuestions.forEach((q, idx) => {
         const uPick = reviewUserAnswers[idx];
         if (!uPick) {
-          unattempted += 1;
+          blank += 1;
+        } else if (uPick === 'E') {
+          safeSkip += 1;
         } else if (uPick === q.ans) {
           correct += 1;
         } else {
@@ -7423,9 +7511,7 @@ summary:focus-visible,
       });
 
       const total = reviewMockQuestions.length;
-      const positiveMarks = correct * 1.0;
-      const negativeMarks = wrong / 3;
-      const netScore = ((correct * 3 - wrong) / 3).toFixed(2);
+      const netScore = ((correct * 3 - wrong - blank) / 3).toFixed(2);
       const attempted = correct + wrong;
       const accuracy = attempted > 0 ? ((correct / attempted) * 100).toFixed(1) : "0";
 
@@ -7439,7 +7525,7 @@ summary:focus-visible,
       if (countAll) countAll.textContent = total;
       if (countCor) countCor.textContent = correct;
       if (countWrn) countWrn.textContent = wrong;
-      if (countUna) countUna.textContent = unattempted;
+      if (countUna) countUna.textContent = `${blank} blank (${safeSkip} safe skipped)`;
       if (statScore) statScore.textContent = `${netScore} / ${total}`;
       if (statAcc) statAcc.textContent = `${accuracy}%`;
     }
@@ -7497,21 +7583,25 @@ summary:focus-visible,
       if (!q) return;
 
       const userPick = reviewUserAnswers[currentReviewIndex];
-      const isCorrect = (userPick === q.ans);
-      const isUnattempted = !userPick;
+      const isOptionE = (userPick === 'E');
+      const isBlank = !userPick;
+      const isCorrect = (userPick === q.ans && !isOptionE);
 
       // Index label
       document.getElementById('sol-q-index-label').textContent = `Question ${currentReviewIndex + 1} of ${reviewMockQuestions.length}`;
       document.getElementById('sol-q-subject-badge').textContent = q.subject || 'General Studies';
 
-      // Status badge
+      // Status badge (BPSC New Rule)
       const statusBadge = document.getElementById('sol-q-status-badge');
       if (isCorrect) {
         statusBadge.className = 'px-2.5 py-0.5 rounded-lg font-bold bg-[#ECF6E7] text-[#10402D] border border-[#C5DEC0] text-xs';
         statusBadge.textContent = '✓ Correct (+1.00)';
-      } else if (isUnattempted) {
-        statusBadge.className = 'px-2.5 py-0.5 rounded-lg font-bold bg-[#F6F7F2] text-[#3B493F] border border-[#DCE6DF] text-xs';
-        statusBadge.textContent = '○ Unattempted (0.00)';
+      } else if (isOptionE) {
+        statusBadge.className = 'px-2.5 py-0.5 rounded-lg font-bold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0] text-xs';
+        statusBadge.textContent = 'Option (E) Marked • Safe Skip (0 Penalty)';
+      } else if (isBlank) {
+        statusBadge.className = 'px-2.5 py-0.5 rounded-lg font-bold bg-rose-50 text-rose-800 border border-rose-200 text-xs';
+        statusBadge.textContent = 'Blank / Unbubbled (-1/3 Penalty) • Did not mark Option E';
       } else {
         statusBadge.className = 'px-2.5 py-0.5 rounded-lg font-bold bg-rose-50 text-rose-700 border border-rose-200 text-xs';
         statusBadge.textContent = `✗ Incorrect (-1/3) • You picked Option ${userPick}`;
@@ -7520,45 +7610,63 @@ summary:focus-visible,
       // Question text
       document.getElementById('sol-question-text').textContent = q.q;
 
-      // Render Options
+      // Render Options with BPSC 5-option structure
       const container = document.getElementById('sol-options-container');
       let optsHtml = '';
 
-      if (q.options && q.options.length > 0) {
-        q.options.forEach((optText, oIdx) => {
-          const letter = ["A", "B", "C", "D", "E"][oIdx] || "A";
-          const isOfficialAns = (letter === q.ans);
-          const isUserChoice = (letter === userPick);
+      const baseOpts = q.options ? [...q.options] : [];
+      const reviewOpts = [
+        { letter: 'A', text: baseOpts[0] || '(A)' },
+        { letter: 'B', text: baseOpts[1] || '(B)' },
+        { letter: 'C', text: baseOpts[2] || '(C)' },
+        { letter: 'D', text: baseOpts[3] || '(D)' },
+        { letter: 'E', text: 'Option (E) — Not Attempted / अनुत्तरित प्रश्न (Safe Skip • 0 Penalty)', isSafeSkip: true }
+      ];
 
-          let borderBgClass = 'border-[#DCE6DF] bg-[#F8FAF7] text-[#111C15]';
-          let letterCircleClass = 'border-[#95A79A] text-[#3B493F] bg-white';
-          let badgeHtml = '';
+      reviewOpts.forEach((optItem) => {
+        const letter = optItem.letter;
+        const optText = optItem.text;
+        const isOfficialAns = (letter === q.ans);
+        const isUserChoice = (letter === userPick);
 
-          if (isOfficialAns && isUserChoice) {
+        let borderBgClass = 'border-[#DCE6DF] bg-[#F8FAF7] text-[#111C15]';
+        let letterCircleClass = 'border-[#95A79A] text-[#3B493F] bg-white';
+        let badgeHtml = '';
+
+        if (optItem.isSafeSkip) {
+          if (isUserChoice) {
             borderBgClass = 'border-[#10402D] bg-[#ECF6E7] text-[#10402D] font-bold';
             letterCircleClass = 'border-[#10402D] bg-[#10402D] text-white font-bold';
-            badgeHtml = `<span class="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-[#10402D] border border-[#C5DEC0]">✓ Your Answer (Correct)</span>`;
-          } else if (isOfficialAns) {
-            borderBgClass = 'border-[#10402D] bg-[#ECF6E7] text-[#10402D] font-bold';
-            letterCircleClass = 'border-[#10402D] bg-[#10402D] text-white font-bold';
-            badgeHtml = `<span class="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-[#10402D] border border-[#C5DEC0]">✓ Correct Answer</span>`;
-          } else if (isUserChoice) {
-            borderBgClass = 'border-rose-500 bg-rose-50 text-rose-900 font-bold';
-            letterCircleClass = 'border-rose-600 bg-rose-600 text-white font-bold';
-            badgeHtml = `<span class="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-rose-700 border border-rose-200">✗ Your Answer (Incorrect)</span>`;
+            badgeHtml = `<span class="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-[#10402D] border border-[#C5DEC0]">Your Choice (Safe Skip • 0 Penalty)</span>`;
+          } else {
+            borderBgClass = 'border-[#DCE6DF] bg-[#FAFAF8] text-[#526056]';
+            letterCircleClass = 'border-[#95A79A] text-[#526056] bg-white';
+            badgeHtml = `<span class="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#EBF3E6] text-[#10402D]">Safe Skip (0 Penalty)</span>`;
           }
+        } else if (isOfficialAns && isUserChoice) {
+          borderBgClass = 'border-[#10402D] bg-[#ECF6E7] text-[#10402D] font-bold';
+          letterCircleClass = 'border-[#10402D] bg-[#10402D] text-white font-bold';
+          badgeHtml = `<span class="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-[#10402D] border border-[#C5DEC0]">✓ Your Answer (Correct +1.0)</span>`;
+        } else if (isOfficialAns) {
+          borderBgClass = 'border-[#10402D] bg-[#ECF6E7] text-[#10402D] font-bold';
+          letterCircleClass = 'border-[#10402D] bg-[#10402D] text-white font-bold';
+          badgeHtml = `<span class="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-[#10402D] border border-[#C5DEC0]">✓ Correct Answer</span>`;
+        } else if (isUserChoice) {
+          borderBgClass = 'border-rose-500 bg-rose-50 text-rose-900 font-bold';
+          letterCircleClass = 'border-rose-600 bg-rose-600 text-white font-bold';
+          badgeHtml = `<span class="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-rose-700 border border-rose-200">✗ Your Choice (Incorrect -1/3)</span>`;
+        }
 
-          optsHtml += `
-            <div class="p-3.5 rounded-2xl border ${borderBgClass} flex items-center gap-3 transition">
-              <span class="w-6 h-6 rounded-full border ${letterCircleClass} flex items-center justify-center font-bold text-xs shrink-0">
-                ${letter}
-              </span>
-              <span class="text-sm leading-relaxed">${escapeHtml(optText)}</span>
-              ${badgeHtml}
-            </div>
-          `;
-        });
-      }
+        optsHtml += `
+          <div class="p-3.5 rounded-2xl border ${borderBgClass} flex items-center gap-3 transition">
+            <span class="w-6 h-6 rounded-full border ${letterCircleClass} flex items-center justify-center font-bold text-xs shrink-0">
+              ${letter}
+            </span>
+            <span class="text-sm leading-relaxed">${escapeHtml(optText)}</span>
+            ${badgeHtml}
+          </div>
+        `;
+      });
       container.innerHTML = optsHtml;
 
       // Explanation Box
