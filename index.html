@@ -1433,6 +1433,16 @@ summary:focus-visible,
           <span>REQUIRED SIGN IN FOR PYQ BANK &amp; MOCK TESTS</span>
         </div>
         <h3 id="reg-modal-heading" class="text-2xl font-display font-extrabold text-[#111C15]">Sign In to Access PYQs &amp; Mocks</h3>
+      <div id="quick-resume-card" class="hidden p-3.5 rounded-2xl bg-[#EBF3E6] border border-[#C6DEC0] flex items-center justify-between gap-3 text-left">
+        <div class="min-w-0">
+          <div class="text-[11px] uppercase tracking-wider font-bold text-[#10402D]">Saved Account Found</div>
+          <div id="quick-resume-user-text" class="text-sm font-bold text-[#111C15] truncate">Returning Aspirant</div>
+        </div>
+        <button type="button" onclick="quickResumeAspirant()" class="px-3.5 py-2 rounded-xl bg-[#0A3826] text-white font-bold text-xs hover:bg-[#17593F] transition shrink-0 cursor-pointer shadow-sm flex items-center gap-1.5">
+          <i data-lucide="check" class="w-3.5 h-3.5"></i>
+          <span>1-Tap Resume</span>
+        </button>
+      </div>
         <p id="reg-modal-intent-banner" class="text-xs sm:text-sm text-[#3B493F] max-w-md mx-auto">
           Please enter your details below to unlock the 2,500+ Subject-Wise PYQ Bank and 10 Full-Length Mock Tests.
         </p>
@@ -5985,7 +5995,8 @@ summary:focus-visible,
         const raw = localStorage.getItem('pwa_current_aspirant');
         if (!raw) return null;
         const parsed = JSON.parse(raw);
-        if (parsed && parsed.email && parsed.name && parsed.phone && parsed.district) {
+        if (parsed && (parsed.email || parsed.phone) && parsed.name) {
+          if (!parsed.district) parsed.district = 'Patna';
           return parsed;
         }
         return null;
@@ -6012,6 +6023,23 @@ summary:focus-visible,
       }
     }
 
+    function quickResumeAspirant() {
+      const all = getAllAspirants();
+      const existing = getCurrentAspirant() || (all.length > 0 ? all[0] : null);
+      if (existing) {
+        PrepBackendEngine.auth.saveUserSession(existing).then(() => {
+          updateAspirantNavUI();
+          closeAspirantRegModal();
+          showToast(`Welcome back, ${existing.name}! Resumed your session.`, 'success');
+          if (pendingAspirantCallback) {
+            const cb = pendingAspirantCallback;
+            pendingAspirantCallback = null;
+            try { cb(existing); } catch(e){}
+          }
+        });
+      }
+    }
+
     function openAspirantRegModal(intentNote) {
       const modal = document.getElementById('aspirant-reg-modal');
       if (modal) {
@@ -6022,11 +6050,38 @@ summary:focus-visible,
         if (banner && intentNote) {
           banner.textContent = intentNote;
         }
+
+        // Check for returning user
+        const all = getAllAspirants();
+        const existing = getCurrentAspirant() || (all.length > 0 ? all[0] : null);
+        const resumeCard = document.getElementById('quick-resume-card');
+        const resumeText = document.getElementById('quick-resume-user-text');
+        
+        if (existing && resumeCard && resumeText) {
+          resumeText.textContent = `${existing.name || 'Aspirant'} (${existing.phone || existing.email || ''})`;
+          resumeCard.classList.remove('hidden');
+          // Pre-fill form fields
+          const nameInp = document.getElementById('reg-student-name');
+          const emailInp = document.getElementById('reg-student-email');
+          const phoneInp = document.getElementById('reg-student-phone');
+          const distInp = document.getElementById('reg-student-district');
+          const examInp = document.getElementById('reg-target-exam');
+          const consentInp = document.getElementById('reg-consent-check');
+          if (nameInp && existing.name) nameInp.value = existing.name;
+          if (emailInp && existing.email) emailInp.value = existing.email;
+          if (phoneInp && existing.phone) phoneInp.value = existing.phone;
+          if (distInp && existing.district) distInp.value = existing.district;
+          if (examInp && existing.targetExam) examInp.value = existing.targetExam;
+          if (consentInp) consentInp.checked = true;
+        } else if (resumeCard) {
+          resumeCard.classList.add('hidden');
+        }
+
         modal.classList.remove('hidden');
         initIcons();
         setTimeout(() => {
           const nameInput = document.getElementById('reg-student-name');
-          if (nameInput) nameInput.focus();
+          if (nameInput && (!existing || !existing.name)) nameInput.focus();
         }, 50);
         if (intentNote) {
           showToast(intentNote, 'info');
@@ -6039,6 +6094,82 @@ summary:focus-visible,
       if (modal) modal.classList.add('hidden');
       pendingAspirantCallback = null;
     }
+
+
+    // ADMIN: Google Sheets Integration & Lead Management
+    function openAdminLeadsModal() {
+      const modal = document.getElementById('admin-leads-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        const countEl = document.getElementById('admin-lead-count');
+        const queueEl = document.getElementById('admin-queue-count');
+        const urlInput = document.getElementById('admin-sheets-url-input');
+        
+        const all = getAllAspirants();
+        const rawQueue = localStorage.getItem(PENDING_LEADS_QUEUE_KEY);
+        const queue = rawQueue ? JSON.parse(rawQueue) : [];
+        
+        if (countEl) countEl.textContent = all.length;
+        if (queueEl) queueEl.textContent = queue.length;
+        if (urlInput) {
+          urlInput.value = localStorage.getItem('pwa_webhook_url') || (GOOGLE_SHEETS_WEB_APP_URL.includes('YOUR_GOOGLE_APPS_SCRIPT') ? '' : GOOGLE_SHEETS_WEB_APP_URL);
+        }
+        initIcons();
+      }
+    }
+
+    function closeAdminLeadsModal() {
+      const modal = document.getElementById('admin-leads-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveGoogleSheetsWebhookUrl() {
+      const urlInput = document.getElementById('admin-sheets-url-input');
+      const url = (urlInput ? urlInput.value : '').trim();
+      if (!url) {
+        showToast('Please paste a valid Google Apps Script Web App URL.', 'error');
+        return;
+      }
+      if (!url.startsWith('https://script.google.com/')) {
+        showToast('URL must start with https://script.google.com/macros/s/...', 'error');
+        return;
+      }
+      localStorage.setItem('pwa_webhook_url', url);
+      showToast('Google Sheets Web App connected successfully!', 'success');
+      // Flush any queued leads to the new sheet
+      flushPendingSheetsQueue();
+      closeAdminLeadsModal();
+    }
+
+    function exportAllAspirantsCSV() {
+      const all = getAllAspirants();
+      if (!all || all.length === 0) {
+        showToast('No registered aspirants found yet.', 'info');
+        return;
+      }
+      const headers = ['ID', 'Name', 'Phone', 'Email', 'District', 'Target Exam', 'Registered At', 'Tests Attempted', 'PYQ Count'];
+      const rows = all.map(a => [
+        a.id || '',
+        '"' + (a.name || '').replace(/"/g, '""') + '"',
+        a.phone || '',
+        a.email || '',
+        '"' + (a.district || '').replace(/"/g, '""') + '"',
+        '"' + (a.targetExam || '').replace(/"/g, '""') + '"',
+        '"' + (a.registeredAt || '').replace(/"/g, '""') + '"',
+        a.testsAttempted || 0,
+        a.pyqCount || 0
+      ]);
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', 'ShaktiQ_Student_Leads_' + new Date().toISOString().slice(0, 10) + '.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Student leads downloaded successfully!', 'success');
+    }
+
 
     // Simple Client-Side Rate Limit Check (Max 3 sign-up submissions per 10 mins, min 20s between attempts)
     function checkRegistrationRateLimit() {
@@ -7650,5 +7781,56 @@ summary:focus-visible,
     }
 
   </script>
+
+  <!-- ADMIN LEADS & GOOGLE SHEETS SYNC MODAL -->
+  <div id="admin-leads-modal" role="dialog" aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300">
+    <div class="relative w-full max-w-lg rounded-3xl bg-white border border-[#DCE6DF] p-6 sm:p-8 shadow-2xl space-y-5 text-[#111C15]">
+      <button type="button" onclick="closeAdminLeadsModal()" aria-label="Close" class="absolute top-5 right-5 text-[#36443A] hover:text-[#111C15] p-2 rounded-xl hover:bg-[#EBF3E6] transition cursor-pointer">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="space-y-1">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#EBF3E6] border border-[#C6DEC0] text-[#10402D]">
+          <i data-lucide="database" class="w-3.5 h-3.5"></i>
+          <span>LEADS &amp; GOOGLE SHEETS SYNC</span>
+        </div>
+        <h3 class="text-xl font-display font-bold text-[#111C15]">Aspirant Data &amp; Webhook Setup</h3>
+        <p class="text-xs text-[#3B493F]">Manage your registered student leads or connect live sync to your personal Google Sheet.</p>
+      </div>
+
+      <!-- Stats Box -->
+      <div class="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-[#F8FAF7] border border-[#DCE6DF]">
+        <div>
+          <div class="text-[11px] text-[#3B493F] font-medium">Registered Aspirants</div>
+          <div id="admin-lead-count" class="text-2xl font-display font-extrabold text-[#10402D]">0</div>
+        </div>
+        <div>
+          <div class="text-[11px] text-[#3B493F] font-medium">Pending Sync Queue</div>
+          <div id="admin-queue-count" class="text-2xl font-display font-extrabold text-[#995900]">0</div>
+        </div>
+      </div>
+
+      <!-- Google Sheets Webhook Input -->
+      <div class="space-y-2 text-left">
+        <label for="admin-sheets-url-input" class="block text-xs font-bold text-[#223127]">
+          Google Sheets Web App URL
+        </label>
+        <input type="url" id="admin-sheets-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-4 py-2.5 rounded-xl bg-[#F8FAF7] border border-[#DCE6DF] focus:border-[#10402D] text-[#111C15] text-xs font-mono transition">
+        <p class="text-[11px] text-[#55695C]">Every student sign up and test attempt will immediately appear as a new row in your Google Sheet.</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <button type="button" onclick="saveGoogleSheetsWebhookUrl()" class="flex-1 py-2.5 px-4 rounded-xl bg-[#0A3826] text-white font-bold text-xs hover:bg-[#17593F] transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
+          <i data-lucide="link" class="w-4 h-4"></i>
+          <span>Save &amp; Connect Google Sheet</span>
+        </button>
+        <button type="button" onclick="exportAllAspirantsCSV()" class="py-2.5 px-4 rounded-xl bg-white border border-[#DCE6DF] text-[#10402D] font-bold text-xs hover:bg-[#EBF3E6] transition flex items-center justify-center gap-2 cursor-pointer">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Export CSV</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
