@@ -3253,7 +3253,7 @@ summary:focus-visible,
           <!-- Minimal "Created by" + Logo Only -->
           <a href="https://www.youtube.com/@Prep_with_Ankit" target="_blank" rel="noopener noreferrer" id="footer-creator-badge" class="group inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-white hover:bg-[#F8FAF7] border border-[#DCE6DF] hover:border-[#10402D]/40 shadow-2xs hover:shadow-sm transition-all duration-200 cursor-pointer" title="ShaktiQ">
             <span class="text-xs font-semibold text-[#36443A]">Created by</span>
-            <img src="/logo.png" alt="ShaktiQ Logo" class="h-8 sm:h-9 w-auto object-contain group-hover:scale-105 transition-transform duration-200 shrink-0">
+            <img src="/yt-logo.png" alt="Prep with Ankit" class="h-8 sm:h-9 w-auto object-contain rounded-md group-hover:scale-105 transition-transform duration-200 shrink-0">
           </a>
 
           <a href="#top" class="px-3.5 py-2 rounded-xl bg-white border border-[#DCE6DF] text-xs text-[#223127] hover:text-[#10402D] font-bold transition-colors flex items-center gap-1.5 shadow-2xs">
@@ -3284,7 +3284,7 @@ summary:focus-visible,
             <div class="h-6 w-px bg-[#DCE6DF] hidden sm:block"></div>
 
             <div class="flex items-center gap-3">
-              <img src="/logo.png" alt="ShaktiQ Logo" class="h-9 sm:h-10 w-auto object-contain shrink-0">
+              <img src="/logo.png" alt="ShaktiQ Logo" class="h-9 sm:h-10 w-auto object-contain shrink-0 brightness-0 invert">
               <div class="hidden sm:block pl-3 border-l border-white/25">
                 <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#FCE27B] text-[#111C15]">2,500+ PYQs &amp; 10 Full Mocks</span>
                 <p class="text-[11px] text-white/90 mt-0.5" style="color: #EBF3E6 !important;">Attempt-First Active Recall: Select an option to test yourself</p>
@@ -4151,7 +4151,7 @@ summary:focus-visible,
             <button type="button" onclick="openLegalModal('contact')" class="font-bold text-[#10402D] hover:underline cursor-pointer">Contact</button>
             <a href="https://www.youtube.com/@Prep_with_Ankit" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-white border border-[#DCE6DF] hover:border-[#10402D]/40 shadow-2xs transition" title="ShaktiQ">
               <span class="text-xs font-semibold text-[#36443A]">Created by</span>
-              <img src="/logo.png" alt="ShaktiQ Logo" class="h-6 sm:h-7 w-auto object-contain group-hover:scale-105 transition-transform duration-200 shrink-0">
+              <img src="/yt-logo.png" alt="Prep with Ankit" class="h-6 sm:h-7 w-auto object-contain rounded-md group-hover:scale-105 transition-transform duration-200 shrink-0">
             </a>
           </div>
         </div>
@@ -7234,7 +7234,11 @@ summary:focus-visible,
     }
 
     function ttSelectOption(letter) {
-      mockUserAnswers[currentMockIndex] = letter;
+      if (mockUserAnswers[currentMockIndex] === letter) {
+        delete mockUserAnswers[currentMockIndex];
+      } else {
+        mockUserAnswers[currentMockIndex] = letter;
+      }
       renderCurrentQuestion();
     }
 
@@ -7286,7 +7290,7 @@ summary:focus-visible,
         }
       });
 
-      const netScore = ((correct * 3 - wrong) / 3).toFixed(2);
+      const netScore = attempted === 0 ? "0.00" : ((correct * 3 - wrong) / 3).toFixed(2);
 
       document.getElementById('tt-result-exam-title').textContent = activeMockTest ? activeMockTest.title : "BPSC Mock Test";
       document.getElementById('tt-result-attempted').textContent = `${attempted} / ${currentMockQuestions.length}`;
@@ -7294,15 +7298,15 @@ summary:focus-visible,
       document.getElementById('tt-result-wrong').textContent = `${wrong}`;
       document.getElementById('tt-result-score').textContent = netScore;
 
-      // Record Student Test Attempt & Sync to Google Sheets
-      const currentStudent = getCurrentAspirant() || { name: "Registered Aspirant", email: "student@bpsc.local", phone: "", district: "Bihar", targetExam: "72nd/73rd BPSC" };
+      // Record Student Test Attempt & Sync to Google Sheets IMMEDIATELY
+      const currentStudent = getCurrentAspirant() || { name: "Aspirant", email: "aspirant@shaktiq.com", phone: "", district: "Bihar", targetExam: "71st BPSC CCE Prelims" };
       const attemptLog = {
         attemptId: 'att_' + Date.now(),
         studentName: currentStudent.name,
         studentEmail: currentStudent.email,
         studentPhone: currentStudent.phone || "",
         studentDistrict: currentStudent.district || "",
-        targetExam: currentStudent.targetExam || "72nd BPSC",
+        targetExam: currentStudent.targetExam || "71st BPSC",
         examTitle: activeMockTest ? activeMockTest.title : "BPSC Mock Test",
         score: netScore,
         correct: correct,
@@ -7311,6 +7315,26 @@ summary:focus-visible,
         totalQ: currentMockQuestions.length,
         timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
       };
+      
+      // Fire Google Sheets sync immediately
+      syncAspirantToGoogleSheets({
+        event: 'test_completed',
+        attemptId: attemptLog.attemptId,
+        name: attemptLog.studentName,
+        phone: attemptLog.studentPhone,
+        email: attemptLog.studentEmail,
+        district: attemptLog.studentDistrict,
+        targetExam: attemptLog.targetExam,
+        examTitle: attemptLog.examTitle,
+        score: attemptLog.score,
+        correct: attemptLog.correct,
+        wrong: attemptLog.wrong,
+        attempted: attemptLog.attempted,
+        totalQ: attemptLog.totalQ,
+        timestamp: attemptLog.timestamp,
+        userAgent: navigator.userAgent
+      });
+
       saveTestAttemptRecord(attemptLog);
 
       document.getElementById('tt-result-modal').classList.remove('hidden');
