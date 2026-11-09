@@ -7782,55 +7782,8 @@ summary:focus-visible,
 
   </script>
 
-  <!-- ADMIN LEADS & GOOGLE SHEETS SYNC MODAL -->
-  <div id="admin-leads-modal" role="dialog" aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300">
-    <div class="relative w-full max-w-lg rounded-3xl bg-white border border-[#DCE6DF] p-6 sm:p-8 shadow-2xl space-y-5 text-[#111C15]">
-      <button type="button" onclick="closeAdminLeadsModal()" aria-label="Close" class="absolute top-5 right-5 text-[#36443A] hover:text-[#111C15] p-2 rounded-xl hover:bg-[#EBF3E6] transition cursor-pointer">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
-
-      <div class="space-y-1">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#EBF3E6] border border-[#C6DEC0] text-[#10402D]">
-          <i data-lucide="database" class="w-3.5 h-3.5"></i>
-          <span>LEADS &amp; GOOGLE SHEETS SYNC</span>
-        </div>
-        <h3 class="text-xl font-display font-bold text-[#111C15]">Aspirant Data &amp; Webhook Setup</h3>
-        <p class="text-xs text-[#3B493F]">Manage your registered student leads or connect live sync to your personal Google Sheet.</p>
-      </div>
-
-      <!-- Stats Box -->
-      <div class="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-[#F8FAF7] border border-[#DCE6DF]">
-        <div>
-          <div class="text-[11px] text-[#3B493F] font-medium">Registered Aspirants</div>
-          <div id="admin-lead-count" class="text-2xl font-display font-extrabold text-[#10402D]">0</div>
-        </div>
-        <div>
-          <div class="text-[11px] text-[#3B493F] font-medium">Pending Sync Queue</div>
-          <div id="admin-queue-count" class="text-2xl font-display font-extrabold text-[#995900]">0</div>
-        </div>
-      </div>
-
-      <!-- Google Sheets Webhook Input -->
-      <div class="space-y-2 text-left">
-        <label for="admin-sheets-url-input" class="block text-xs font-bold text-[#223127]">
-          Google Sheets Web App URL
-        </label>
-        <input type="url" id="admin-sheets-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-4 py-2.5 rounded-xl bg-[#F8FAF7] border border-[#DCE6DF] focus:border-[#10402D] text-[#111C15] text-xs font-mono transition">
-        <p class="text-[11px] text-[#55695C]">Every student sign up and test attempt will immediately appear as a new row in your Google Sheet.</p>
-      </div>
-
-      <div class="flex flex-col sm:flex-row gap-3 pt-2">
-        <button type="button" onclick="saveGoogleSheetsWebhookUrl()" class="flex-1 py-2.5 px-4 rounded-xl bg-[#0A3826] text-white font-bold text-xs hover:bg-[#17593F] transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
-          <i data-lucide="link" class="w-4 h-4"></i>
-          <span>Save &amp; Connect Google Sheet</span>
-        </button>
-        <button type="button" onclick="exportAllAspirantsCSV()" class="py-2.5 px-4 rounded-xl bg-white border border-[#DCE6DF] text-[#10402D] font-bold text-xs hover:bg-[#EBF3E6] transition flex items-center justify-center gap-2 cursor-pointer">
-          <i data-lucide="download" class="w-4 h-4"></i>
-          <span>Export CSV</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-</body>
+  </body>
 </html>
+<script>
+window.exportLeads = function() { if (typeof exportAllAspirantsCSV === 'function') exportAllAspirantsCSV(); };
+</script>
