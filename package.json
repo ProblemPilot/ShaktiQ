@@ -1,0 +1,14 @@
+{
+  "name": "shaktiq-portal",
+  "version": "1.2.0",
+  "description": "ShaktiQ - Bihar Exam Prep Web Portal and Cloudflare Auth Gate",
+  "scripts": {
+    "login": "wrangler login",
+    "deploy-worker": "wrangler deploy",
+    "upload-kv": "node scripts/upload-kv.js",
+    "lock-repo": "node scripts/lock-repo.js"
+  },
+  "devDependencies": {
+    "wrangler": "^4.160.0"
+  }
+}

@@ -4613,14 +4613,65 @@ summary:focus-visible,
     let questionsLoaded = false;
     let questionsLoadPromise = null;
 
-    function loadQuestionsData() {
-      if (questionsLoadPromise) return questionsLoadPromise;
-      questionsLoadPromise = fetch('/questions.json?v=' + Date.now(), { cache: 'no-store' })
+    function getAspirantAuthToken() {
+      try {
+        return localStorage.getItem('shaktiq_auth_token') || '';
+      } catch (e) {
+        return '';
+      }
+    }
+
+    async function requestSessionToken(email, name) {
+      if (!email) return null;
+      try {
+        const res = await fetch('/api/register-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, name: name || 'Aspirant' })
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.token) {
+            localStorage.setItem('shaktiq_auth_token', json.token);
+            return json.token;
+          }
+        }
+      } catch (err) {
+        console.warn('ShaktiQ token registration notice:', err);
+      }
+      return null;
+    }
+
+    function loadQuestionsData(forceReload) {
+      if (!forceReload && questionsLoadPromise) return questionsLoadPromise;
+
+      const token = getAspirantAuthToken();
+      const fetchHeaders = {};
+      if (token) {
+        fetchHeaders['Authorization'] = 'Bearer ' + token;
+      }
+
+      questionsLoadPromise = fetch('/questions.json?v=' + Date.now(), {
+        cache: 'no-store',
+        headers: fetchHeaders
+      })
         .then(function(res) {
+          if (res.status === 401 || res.status === 403) {
+            console.warn('ShaktiQ: Session token required to load question bank.');
+            INITIAL_QUESTIONS = [];
+            questionsLoaded = false;
+            return [];
+          }
           if (!res.ok) throw new Error('HTTP ' + res.status);
           return res.json();
         })
         .then(function(data) {
+          if (!Array.isArray(data)) {
+            console.warn('ShaktiQ: Question bank format not array (likely unauthenticated decoy).');
+            INITIAL_QUESTIONS = [];
+            questionsLoaded = false;
+            return [];
+          }
           INITIAL_QUESTIONS = data;
           questionsLoaded = true;
           try {
@@ -6922,7 +6973,14 @@ summary:focus-visible,
       const all = getAllAspirants();
       const existing = getCurrentAspirant() || (all.length > 0 ? all[0] : null);
       if (existing) {
-        PrepBackendEngine.auth.saveUserSession(existing).then(() => {
+        PrepBackendEngine.auth.saveUserSession(existing).then(async () => {
+          let token = getAspirantAuthToken();
+          if (!token) {
+            token = await requestSessionToken(existing.email, existing.name);
+          }
+          if (!questionsLoaded || INITIAL_QUESTIONS.length === 0) {
+            loadQuestionsData(true);
+          }
           updateAspirantNavUI();
           closeAspirantRegModal();
           showToast(`Welcome back, ${existing.name}! Resumed your session.`, 'success');
@@ -7161,10 +7219,18 @@ summary:focus-visible,
       pendingAspirantCallback = null;
 
       // 4. Save locally (localStorage + IndexedDB fallback) AND sync to Google Sheets
-      PrepBackendEngine.auth.saveUserSession(aspirant).then(() => {
+      PrepBackendEngine.auth.saveUserSession(aspirant).then(async () => {
         resetBtn();
+
+        // Obtain secure session token from Cloudflare Worker
+        const token = await requestSessionToken(aspirant.email, aspirant.name);
+        if (token) {
+          aspirant.token = token;
+        }
+
         syncAspirantToGoogleSheets({
           event: 'student_registered',
+          token: token || '',
           name: aspirant.name,
           email: aspirant.email,
           phone: aspirant.phone,
@@ -7190,6 +7256,11 @@ summary:focus-visible,
           localStorage.setItem('pwa_all_aspirants', JSON.stringify(allAspirants));
         } catch(e) {}
 
+        // Unlock question bank with new session token
+        if (!questionsLoaded || INITIAL_QUESTIONS.length === 0) {
+          loadQuestionsData(true);
+        }
+
         updateAspirantNavUI();
         closeAspirantRegModal();
         showToast(`Welcome, ${name}! Access to 2,800+ PYQs & 22 Full-Length Mock Tests unlocked.`, 'success');
@@ -7206,6 +7277,12 @@ summary:focus-visible,
     function switchAspirantAccount() {
       closeStudentProfileModal();
       PrepBackendEngine.auth.clearUserSession();
+      try {
+        localStorage.removeItem('shaktiq_auth_token');
+      } catch (e) {}
+      INITIAL_QUESTIONS = [];
+      questionsLoaded = false;
+      questionsLoadPromise = null;
       updateAspirantNavUI();
       openPortalView();
       showToast('Signed out of your profile.', 'info');
@@ -8926,9 +9003,17 @@ summary:focus-visible,
       } catch (e) {}
 
       // Initialize High-Capacity Backend Engine & Restore Aspirant Identity
-      PrepBackendEngine.init().then(() => {
+      PrepBackendEngine.init().then(async () => {
         updateAspirantNavUI();
         flushPendingSheetsQueue();
+        const current = getCurrentAspirant();
+        if (current && current.email) {
+          const token = getAspirantAuthToken();
+          if (!token) {
+            await requestSessionToken(current.email, current.name);
+            loadQuestionsData(true);
+          }
+        }
       });
 
       if (window.location.hash === '#practice-bpsc-pyq' || window.location.hash === '#pyq-bank') {

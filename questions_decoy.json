@@ -1,0 +1,4 @@
+{
+  "error": "Unauthorized",
+  "message": "Questions are only accessible with an active session token through https://shaktiq.com. Direct scraping is prohibited."
+}

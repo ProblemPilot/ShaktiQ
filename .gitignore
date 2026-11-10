@@ -1,0 +1,7 @@
+# Private question bank source (never push to public GitHub!)
+questions_bank_source.json
+
+# Node & Wrangler artifacts
+node_modules/
+.wrangler/
+.env*

@@ -1,0 +1,8 @@
+name = "shaktiq-auth-gate"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+# KV Namespace binding: stores tokens, rate limits, and the question bank
+[[kv_namespaces]]
+binding = "SHAKTIQ_KV"
+id = "YOUR_KV_NAMESPACE_ID"
