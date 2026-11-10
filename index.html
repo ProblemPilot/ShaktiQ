@@ -5090,6 +5090,43 @@ summary:focus-visible,
         .replace(/'/g, "&#039;");
     }
 
+    const OPTION_PREFIX_REGEX = /^\s*(?:\((?:[A-Ea-e1-5१-५]|ए|बी|सी|डी|ई|क|ख|ग|घ|ङ)\)|(?:[A-Ea-e1-5१-५]|ए|बी|सी|डी|ई|क|ख|ग|घ|ङ)[\).:-])\s*/i;
+
+    function stripOptionPrefix(text) {
+      if (!text) return "";
+      return String(text).trim().replace(OPTION_PREFIX_REGEX, "");
+    }
+
+    function cleanQuestionStem(text) {
+      if (!text || typeof text !== "string") return "";
+      let s = text.trim();
+      s = s.replace(/^[.\s—–-]+/, "");
+      return s;
+    }
+
+    function formatBilingualOption(optText, index, isHi) {
+      const letters = ["A", "B", "C", "D", "E"];
+      const letter = letters[index] || "A";
+      if (!optText) return `(${letter}) `;
+      const raw = String(optText).trim();
+      let body = stripOptionPrefix(raw);
+
+      if (index === 4 && isHi) {
+        const lower = body.toLowerCase();
+        if (lower.includes("none of the above") && lower.includes("more than one")) {
+          body = "उपर्युक्त में से कोई नहीं / उपर्युक्त में से एक से अधिक";
+        } else if (lower.includes("none of the above")) {
+          body = "उपर्युक्त में से कोई नहीं";
+        } else if (lower.includes("more than one of the above")) {
+          body = "उपर्युक्त में से एक से अधिक";
+        } else if (lower.includes("not attempted")) {
+          body = "अनुत्तरित प्रश्न (सुरक्षित छोड़ें • 0 अंक कटेगा)";
+        }
+      }
+
+      return `(${letter}) ${body}`;
+    }
+
     function formatQuestionText(text) {
       if (!text || typeof text !== "string") return text;
       let q = text.trim();
@@ -5452,12 +5489,13 @@ summary:focus-visible,
       const revealAnswer = showAllAnswers || isAttempted;
       const isGlobalHi = (typeof ShaktiQBilingualEngine !== 'undefined' && ShaktiQBilingualEngine.currentLang === 'hi');
 
-      // Check if this question has a cached Hindi translation
+      // Check if this question has a cached Hindi translation with all options
       const cachedBundle = (typeof ShaktiQBilingualEngine !== 'undefined') ? ShaktiQBilingualEngine.getCachedQuestion(item.id || item.q) : null;
-      const useHindi = isGlobalHi && cachedBundle;
+      const reqOptCount = (item.options || []).length;
+      const useHindi = isGlobalHi && cachedBundle && Array.isArray(cachedBundle.options) && cachedBundle.options.length >= reqOptCount;
 
-      const displayQText = useHindi ? cachedBundle.q : item.q;
-      const displayOptions = useHindi ? (cachedBundle.options || item.options) : (item.options || []);
+      const displayQText = cleanQuestionStem(useHindi ? cachedBundle.q : item.q);
+      const displayOptions = (useHindi ? (cachedBundle.options || item.options) : (item.options || [])).map((opt, i) => formatBilingualOption(opt, i, useHindi));
       const displayExp = useHindi ? (cachedBundle.exp || item.exp) : item.exp;
 
       let optionsHtml = "";
@@ -5568,7 +5606,7 @@ summary:focus-visible,
 
         <!-- Question Text -->
         <h3 class="text-sm sm:text-base font-semibold text-[#111C15] leading-relaxed">
-          <span class="font-extrabold text-[#10402D] mr-1.5 shrink-0">${displayIndex}.</span><span id="pyq-qtext-${escapeHtml(item.id)}" data-lang="${useHindi ? 'hi' : 'en'}">${renderFormattedQuestionHtml(displayQText)}</span>
+          <span class="font-extrabold text-[#10402D] mr-1.5 shrink-0">${displayIndex}. </span><span id="pyq-qtext-${escapeHtml(item.id)}" data-lang="${useHindi ? 'hi' : 'en'}">${renderFormattedQuestionHtml(displayQText)}</span>
         </h3>
 
         ${optionsHtml}
@@ -5588,28 +5626,29 @@ summary:focus-visible,
       const isCurrentHi = (qTextEl.getAttribute('data-lang') === 'hi');
       if (isCurrentHi) {
         // Switch back to English
-        qTextEl.innerHTML = renderFormattedQuestionHtml(q.q);
+        qTextEl.innerHTML = renderFormattedQuestionHtml(cleanQuestionStem(q.q));
         qTextEl.setAttribute('data-lang', 'en');
         if (btn) btn.innerHTML = '<i data-lucide="languages" class="w-3.5 h-3.5"></i> <span>हिन्दी</span>';
-        renderPyqCardOptions(qid, q, q.options || [], false);
+        renderPyqCardOptions(qid, q, (q.options || []).map((o, i) => formatBilingualOption(o, i, false)), false);
         initIcons();
       } else {
         // Switch to Hindi
         const cached = ShaktiQBilingualEngine.getCachedQuestion(qid || q.q);
-        if (cached) {
-          qTextEl.innerHTML = renderFormattedQuestionHtml(cached.q);
+        const reqCount = (q.options || []).length;
+        if (cached && Array.isArray(cached.options) && cached.options.length >= reqCount) {
+          qTextEl.innerHTML = renderFormattedQuestionHtml(cleanQuestionStem(cached.q));
           qTextEl.setAttribute('data-lang', 'hi');
           if (btn) btn.innerHTML = '<i data-lucide="languages" class="w-3.5 h-3.5"></i> <span>English</span>';
-          renderPyqCardOptions(qid, q, cached.options, true);
+          renderPyqCardOptions(qid, q, cached.options.map((o, i) => formatBilingualOption(o, i, true)), true);
           initIcons();
         } else {
           if (btn) btn.innerHTML = '<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> <span>अनुवाद...</span>';
           initIcons();
           ShaktiQBilingualEngine.translateQuestionBundle(qid || q.q, q.q, q.options || [], q.exp || '').then(bundle => {
-            qTextEl.innerHTML = renderFormattedQuestionHtml(bundle.q);
+            qTextEl.innerHTML = renderFormattedQuestionHtml(cleanQuestionStem(bundle.q));
             qTextEl.setAttribute('data-lang', 'hi');
             if (btn) btn.innerHTML = '<i data-lucide="languages" class="w-3.5 h-3.5"></i> <span>English</span>';
-            renderPyqCardOptions(qid, q, bundle.options, true);
+            renderPyqCardOptions(qid, q, (bundle.options || []).map((o, i) => formatBilingualOption(o, i, true)), true);
             initIcons();
           });
         }
@@ -5627,6 +5666,7 @@ summary:focus-visible,
       (optionsArray || []).forEach((optText, oIdx) => {
         const letters = ["A", "B", "C", "D", "E"];
         const letter = letters[oIdx] || "A";
+        const formattedOpt = formatBilingualOption(optText, oIdx, isHi);
         let stateClass = "bg-[#F8FAF7] border-[#DCE6DF] text-[#111C15]";
 
         if (userChoice) {
@@ -5640,7 +5680,7 @@ summary:focus-visible,
         }
 
         html += `<button type="button" data-qid="${escapeHtml(qid)}" data-opt="${letter}" class="option-btn text-left px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm ${stateClass} flex items-start justify-between gap-2 cursor-pointer">
-          <span>${escapeHtml(optText)}</span>
+          <span>${escapeHtml(formattedOpt)}</span>
           ${(revealAnswer && letter === q.ans) ? '<span class="text-emerald-700 font-extrabold shrink-0">✓</span>' : ''}
         </button>`;
       });
@@ -6387,7 +6427,7 @@ summary:focus-visible,
     // ==========================================
     const ShaktiQBilingualEngine = {
       currentLang: localStorage.getItem('shaktiq_preferred_lang') || 'en',
-      cacheKey: 'shaktiq_hi_translations_v1',
+      cacheKey: 'shaktiq_hi_translations_v2',
       cache: {},
 
       init() {
@@ -6415,7 +6455,11 @@ summary:focus-visible,
       getCachedQuestion(idOrText) {
         if (!idOrText) return null;
         const key = 'q_' + String(idOrText).substring(0, 60);
-        return this.cache[key] || null;
+        const item = this.cache[key] || null;
+        if (item && Array.isArray(item.options)) {
+          item.options = item.options.map((opt, i) => formatBilingualOption(opt, i, true));
+        }
+        return item;
       },
 
       setCachedQuestion(idOrText, bundle) {
@@ -6427,11 +6471,15 @@ summary:focus-visible,
 
       async translateQuestionBundle(idOrText, qText, options, exp) {
         const cached = this.getCachedQuestion(idOrText);
-        if (cached) return cached;
+        const expectedCount = (options && options.length) ? options.length : 0;
+        if (cached && Array.isArray(cached.options) && cached.options.length >= expectedCount) {
+          return cached;
+        }
 
-        const safeOpts = (options && options.length) ? options.slice(0, 4) : [];
+        const safeOpts = (options && options.length) ? options.slice(0, 5) : [];
+        const optBodies = safeOpts.map((opt) => stripOptionPrefix(opt));
         const delimiter = '\n|||\n';
-        const combined = [qText || '', ...safeOpts, exp || ''].join(delimiter);
+        const combined = [cleanQuestionStem(qText || ''), ...optBodies, exp || ''].join(delimiter);
 
         try {
           const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=hi&dt=t&q=' + encodeURIComponent(combined);
@@ -6443,9 +6491,15 @@ summary:focus-visible,
           const fullTranslated = data[0].map(x => x[0]).join('');
           const parts = fullTranslated.split(/\n?\|\|\|\n?/);
 
+          const rawTranslatedOpts = parts.slice(1, 1 + safeOpts.length);
+          const finalOpts = safeOpts.map((originalOpt, i) => {
+            const trBody = rawTranslatedOpts[i] || stripOptionPrefix(originalOpt);
+            return formatBilingualOption(trBody, i, true);
+          });
+
           const bundle = {
-            q: parts[0] || qText,
-            options: parts.slice(1, 1 + safeOpts.length),
+            q: cleanQuestionStem(parts[0] || qText),
+            options: finalOpts,
             exp: parts[parts.length - 1] || exp
           };
 
@@ -6453,8 +6507,8 @@ summary:focus-visible,
           return bundle;
         } catch (e) {
           const fallback = {
-            q: qText,
-            options: safeOpts,
+            q: cleanQuestionStem(qText),
+            options: safeOpts.map((o, i) => formatBilingualOption(o, i, true)),
             exp: exp
           };
           return fallback;
@@ -8174,7 +8228,7 @@ summary:focus-visible,
         let optsHtml = '';
         optsArray.forEach((optItem) => {
           const letter = optItem.letter;
-          const optText = optItem.text;
+          const optText = optItem.isSafeSkip ? optItem.text : stripOptionPrefix(optItem.text);
           const isSelected = (chosen === letter);
 
           let borderBgClass = 'border-[#DCE6DF] bg-[#F8FAF7] hover:border-[#10402D] hover:bg-[#EBF3E6]/60 text-[#111C15]';
@@ -8215,7 +8269,7 @@ summary:focus-visible,
 
       if (!isHindi) {
         // English rendering
-        qTextEl.innerHTML = renderFormattedQuestionHtml(item.q);
+        qTextEl.innerHTML = renderFormattedQuestionHtml(cleanQuestionStem(item.q));
         const displayOptsEn = [
           { letter: 'A', text: baseOpts[0] || '(A)' },
           { letter: 'B', text: baseOpts[1] || '(B)' },
@@ -8228,7 +8282,7 @@ summary:focus-visible,
         // Hindi rendering - check cache first
         const cacheBundle = ShaktiQBilingualEngine.getCachedQuestion(item.id || item.q);
         if (cacheBundle) {
-          qTextEl.innerHTML = renderFormattedQuestionHtml(cacheBundle.q);
+          qTextEl.innerHTML = renderFormattedQuestionHtml(cleanQuestionStem(cacheBundle.q));
           const displayOptsHi = [
             { letter: 'A', text: cacheBundle.options[0] || baseOpts[0] || '(A)' },
             { letter: 'B', text: cacheBundle.options[1] || baseOpts[1] || '(B)' },
@@ -8239,7 +8293,7 @@ summary:focus-visible,
           container.innerHTML = renderOptionsHtml(displayOptsHi, true);
         } else {
           // Render English text with Hindi loader badge while fetching translation
-          qTextEl.innerHTML = `<span class="opacity-80">${renderFormattedQuestionHtml(item.q)}</span><span class="block mt-2 text-xs font-semibold text-[#10402D] animate-pulse flex items-center gap-1.5"><i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i>अनुवाद लोड हो रहा है (Translating into Hindi)...</span>`;
+          qTextEl.innerHTML = `<span class="opacity-80">${renderFormattedQuestionHtml(cleanQuestionStem(item.q))}</span><span class="block mt-2 text-xs font-semibold text-[#10402D] animate-pulse flex items-center gap-1.5"><i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i>अनुवाद लोड हो रहा है (Translating into Hindi)...</span>`;
           const displayOptsPlaceholder = [
             { letter: 'A', text: baseOpts[0] || '(A)' },
             { letter: 'B', text: baseOpts[1] || '(B)' },
@@ -8253,7 +8307,7 @@ summary:focus-visible,
           const currentTargetIdx = currentMockIndex;
           ShaktiQBilingualEngine.translateQuestionBundle(item.id || item.q, item.q, baseOpts, item.exp).then(hiBundle => {
             if (currentMockIndex === currentTargetIdx && ShaktiQBilingualEngine.currentLang === 'hi') {
-              qTextEl.innerHTML = renderFormattedQuestionHtml(hiBundle.q);
+              qTextEl.innerHTML = renderFormattedQuestionHtml(cleanQuestionStem(hiBundle.q));
               const displayOptsHiLoaded = [
                 { letter: 'A', text: hiBundle.options[0] || baseOpts[0] || '(A)' },
                 { letter: 'B', text: hiBundle.options[1] || baseOpts[1] || '(B)' },
@@ -8654,7 +8708,7 @@ summary:focus-visible,
         let optsHtml = '';
         optsArray.forEach((optItem) => {
           const letter = optItem.letter;
-          const optText = optItem.text;
+          const optText = optItem.isSafeSkip ? optItem.text : stripOptionPrefix(optItem.text);
           const isOfficialAns = (letter === q.ans);
           const isUserChoice = (letter === userPick);
 
@@ -8704,7 +8758,7 @@ summary:focus-visible,
       const expEl = document.getElementById('sol-explanation-text');
 
       if (!isHindi) {
-        qTextEl.innerHTML = renderFormattedQuestionHtml(q.q);
+        qTextEl.innerHTML = renderFormattedQuestionHtml(cleanQuestionStem(q.q));
         const reviewOptsEn = [
           { letter: 'A', text: baseOpts[0] || '(A)' },
           { letter: 'B', text: baseOpts[1] || '(B)' },
@@ -8720,7 +8774,7 @@ summary:focus-visible,
       } else {
         const cached = ShaktiQBilingualEngine.getCachedQuestion(q.id || q.q);
         if (cached) {
-          qTextEl.innerHTML = renderFormattedQuestionHtml(cached.q);
+          qTextEl.innerHTML = renderFormattedQuestionHtml(cleanQuestionStem(cached.q));
           const reviewOptsHi = [
             { letter: 'A', text: cached.options[0] || baseOpts[0] || '(A)' },
             { letter: 'B', text: cached.options[1] || baseOpts[1] || '(B)' },
@@ -8731,7 +8785,7 @@ summary:focus-visible,
           container.innerHTML = renderSolutionOpts(reviewOptsHi, true);
           if (expEl) expEl.innerHTML = `<p>${escapeHtml(cached.exp || q.exp || '')}</p>`;
         } else {
-          qTextEl.innerHTML = `<span class="opacity-80">${renderFormattedQuestionHtml(q.q)}</span><span class="block mt-2 text-xs font-semibold text-[#10402D] animate-pulse">हिन्दी व्याख्या लोड हो रही है...</span>`;
+          qTextEl.innerHTML = `<span class="opacity-80">${renderFormattedQuestionHtml(cleanQuestionStem(q.q))}</span><span class="block mt-2 text-xs font-semibold text-[#10402D] animate-pulse">हिन्दी व्याख्या लोड हो रही है...</span>`;
           const reviewOptsPlaceholder = [
             { letter: 'A', text: baseOpts[0] || '(A)' },
             { letter: 'B', text: baseOpts[1] || '(B)' },
@@ -8744,7 +8798,7 @@ summary:focus-visible,
           const currentReviewIdx = currentReviewIndex;
           ShaktiQBilingualEngine.translateQuestionBundle(q.id || q.q, q.q, baseOpts, q.exp).then(hiBundle => {
             if (currentReviewIndex === currentReviewIdx && ShaktiQBilingualEngine.currentLang === 'hi') {
-              qTextEl.innerHTML = renderFormattedQuestionHtml(hiBundle.q);
+              qTextEl.innerHTML = renderFormattedQuestionHtml(cleanQuestionStem(hiBundle.q));
               const reviewOptsHiLoaded = [
                 { letter: 'A', text: hiBundle.options[0] || baseOpts[0] || '(A)' },
                 { letter: 'B', text: hiBundle.options[1] || baseOpts[1] || '(B)' },
