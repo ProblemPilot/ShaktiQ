@@ -5522,7 +5522,6 @@ summary:focus-visible,
                 <span class="font-extrabold text-[#111C15]">Paper Structure & Marks:</span>
                 <span class="font-bold text-[#10402D] ml-1">${escapeHtml(item.ansText || 'BPSC Mains Descriptive Paper')}</span>
               </div>
-              ${item.sourceUrl ? `<a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-[#10402D] underline">Source: ${escapeHtml(item.sourceTitle || 'Official Mains Paper')} ↗</a>` : ''}
             </div>
             <div class="text-[#1E2D23] leading-relaxed">
               <span class="font-bold text-[#10402D]">Model Answer & Evaluation Framework:</span> ${escapeHtml(displayExp)}
@@ -5561,7 +5560,6 @@ summary:focus-visible,
               <span class="font-extrabold text-[#111C15]">Official Answer / Key:</span>
               <span class="font-bold text-[#10402D] ml-1">${escapeHtml(item.ansText)}</span>
             </div>
-            ${item.sourceUrl ? `<a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-[#10402D] underline">Source: ${escapeHtml(item.sourceTitle || 'Official Paper')} ↗</a>` : ''}
           </div>
           <div class="text-[#1E2D23] leading-relaxed">
             <span class="font-bold text-[#10402D]">Decoded Explanation:</span> ${escapeHtml(displayExp)}
@@ -5578,7 +5576,7 @@ summary:focus-visible,
             <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">${escapeHtml(item.subject)}</span>
             <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">${escapeHtml(item.exam)}</span>
             <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">📅 ${escapeHtml(item.date)} (${escapeHtml(item.year)})</span>
-            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs" title="Official Booklet: Q${escapeHtml(item.qno)}">Q${displayIndex} • ${isMains ? 'Descriptive Mains' : escapeHtml(item.type)}</span>
+            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">${isMains ? 'Descriptive Mains' : escapeHtml(item.type)}</span>
             ${item.custom ? '<span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#0A2E20] text-emerald-200 border border-[#17593F]">Custom Added</span>' : ''}
           </div>
 
@@ -8768,7 +8766,7 @@ summary:focus-visible,
         ];
         container.innerHTML = renderSolutionOpts(reviewOptsEn, false);
         if (expEl) {
-          const expContent = q.exp ? escapeHtml(q.exp) : "Official BPSC answer key verified against standard reference sources.";
+          const expContent = q.exp ? escapeHtml(q.exp) : "Official BPSC verified answer and explanation.";
           expEl.innerHTML = `<p>${expContent}</p>`;
         }
       } else {
