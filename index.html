@@ -5287,6 +5287,7 @@ summary:focus-visible,
     }
 
     function buildQuestionCardHtml(item, idx) {
+      const displayIndex = (typeof idx === 'number' && !isNaN(idx)) ? (idx + 1) : 1;
       const subjBadgeClass = SUBJECT_COLORS[item.subject] || "bg-slate-100 text-slate-800 border-slate-200";
       const isBookmarked = !!bookmarkedIds[item.id];
       const isMains = isMainsDescriptiveQuestion(item);
@@ -5377,14 +5378,14 @@ summary:focus-visible,
       const langToggleLabel = useHindi ? 'English' : 'हिन्दी';
 
       return `<article class="question-card bg-white rounded-2xl shadow-sm border border-[#DCE6DF] p-4 sm:p-6 transition hover:border-[#10402D] text-[#111C15]">
-        <!-- Top Metadata Badges -->
+        <!-- Top Metadata Badges: Uniform Dark Green Background with White Text -->
         <div class="flex items-center justify-between gap-2 flex-wrap mb-2.5">
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg border ${subjBadgeClass}">${escapeHtml(item.subject)}</span>
-            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]">${escapeHtml(item.exam)}</span>
-            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">📅 ${escapeHtml(item.date)} (${escapeHtml(item.year)})</span>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${escapeHtml(item.qno)} • ${isMains ? 'Descriptive Mains' : escapeHtml(item.type)}</span>
-            ${item.custom ? '<span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Custom Added</span>' : ''}
+            <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">${escapeHtml(item.subject)}</span>
+            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">${escapeHtml(item.exam)}</span>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">📅 ${escapeHtml(item.date)} (${escapeHtml(item.year)})</span>
+            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs" title="Official Booklet: Q${escapeHtml(item.qno)}">Q${displayIndex} • ${isMains ? 'Descriptive Mains' : escapeHtml(item.type)}</span>
+            ${item.custom ? '<span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#0A2E20] text-emerald-200 border border-[#17593F]">Custom Added</span>' : ''}
           </div>
 
           <div class="flex items-center gap-1.5 no-print flex-wrap">
@@ -5410,8 +5411,8 @@ summary:focus-visible,
         </div>
 
         <!-- Question Text -->
-        <h3 id="pyq-qtext-${escapeHtml(item.id)}" data-lang="${useHindi ? 'hi' : 'en'}" class="text-sm sm:text-base font-semibold text-[#111C15] leading-relaxed">
-          <span class="font-extrabold text-[#10402D] mr-1.5">${escapeHtml(item.qno)}.</span>${escapeHtml(displayQText)}
+        <h3 class="text-sm sm:text-base font-semibold text-[#111C15] leading-relaxed">
+          <span class="font-extrabold text-[#10402D] mr-1.5">${displayIndex}.</span><span id="pyq-qtext-${escapeHtml(item.id)}" data-lang="${useHindi ? 'hi' : 'en'}">${escapeHtml(displayQText)}</span>
         </h3>
 
         ${optionsHtml}
