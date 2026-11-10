@@ -1,8 +1,15 @@
-const CACHE_NAME = 'shaktiq-cache-v6';
+const CACHE_NAME = 'shaktiq-cache-v7';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './logo.png',
+  './favicon.ico',
+  './favicon.png',
+  './favicon-48x48.png',
+  './favicon-96x96.png',
+  './favicon-192x192.png',
+  './favicon-512x512.png',
+  './apple-touch-icon.png',
   './manifest.json'
 ];
 
