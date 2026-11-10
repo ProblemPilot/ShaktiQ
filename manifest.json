@@ -1,7 +1,7 @@
 {
-  "name": "ShaktiQ — Bihar Competitive Exam Prep Portal",
+  "name": "ShaktiQ — Bihar Exam Preparation",
   "short_name": "ShaktiQ",
-  "description": "2,800+ Verified BPSC/BSSC PYQs, 22 Authentic Mock Tests, Rapid Revision Notes & Mnemonics",
+  "description": "ShaktiQ is a free, independent exam-prep platform for Bihar competitive exams. Practise 2,800+ previous-year questions (PYQs) with explanations, take 22 full-length timed mock tests for BPSC, BSSC CGL 4 and AEDO, and revise with quick notes and memory tricks.",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#F8FAF7",
