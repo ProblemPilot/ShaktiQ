@@ -4628,6 +4628,8 @@ summary:focus-visible,
     let questionsLoaded = false;
     let questionsLoadPromise = null;
 
+    const AUTH_BACKEND_ORIGIN = 'https://shaktiq-auth-gate.shaktiq-portal.workers.dev';
+
     function getAspirantAuthToken() {
       try {
         return localStorage.getItem('shaktiq_auth_token') || '';
@@ -4639,7 +4641,7 @@ summary:focus-visible,
     async function requestSessionToken(email, name) {
       if (!email) return null;
       try {
-        const res = await fetch('/api/register-token', {
+        const res = await fetch(AUTH_BACKEND_ORIGIN + '/api/register-token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email, name: name || 'Aspirant' })
@@ -4666,7 +4668,7 @@ summary:focus-visible,
         fetchHeaders['Authorization'] = 'Bearer ' + token;
       }
 
-      questionsLoadPromise = fetch('/questions.json?v=' + Date.now(), {
+      questionsLoadPromise = fetch(AUTH_BACKEND_ORIGIN + '/questions.json?v=' + Date.now(), {
         cache: 'no-store',
         headers: fetchHeaders
       })
