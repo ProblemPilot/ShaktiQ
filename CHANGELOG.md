@@ -186,3 +186,21 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
      - Permanently set `#nav-mock-cta-pill { display: none !important; }` on desktop navigation, and set intermediate collapse for `.nav-extra-link` at 1280px.
      - Verified `Sign In` is 100% visible and unclipped at 90%, 100%, 110%, 125%, and 150% zoom levels.
 - **Verification**: All 38/38 regression tests pass. Full JavaScript syntax compilation succeeds with 0 errors. SHA-256 data checksums byte-identical.
+
+---
+
+## Feature & Clean-up: Subnav Streamlining & Genuine 24-Hour Daily Goal Engine
+- **Status**: PASSED
+- **Changes Implemented**:
+  1. *Subnav Tab Streamlining*:
+     - Removed **Exam Directory** (`#subnav-btn-exams`) and **Scorecard & Option E Calculator** (`#subnav-btn-practice`) from the top subnav bar (`#pyq-subnav`).
+     - Kept the top subnav focused on the primary high-yield tools: **Question Feed**, **My Prep & Weak Areas**, and **+ Add Questions**.
+     - Updated `switchView` `subnavMap` mapping to keep state synchronization clean.
+  2. *Genuine 24-Hour Daily Question Goal & Self-Study Tracker*:
+     - Previously, the tracker computed lifetime question attempts without a rolling 24-hour window or calendar midnight reset.
+     - Upgraded the tracker engine:
+       - Every practice attempt and mock test question submission now logs high-precision millisecond timestamps (`Date.now()`) per student profile.
+       - `getAbhyasSolvedCount()` computes questions attempted within the current local calendar day (since midnight 00:00:00).
+       - Automatically resets daily at midnight local time, operating as an authentic daily study companion.
+       - Added a *"Resets Daily at Midnight (24h)"* indicator badge and dynamic status messages.
+- **Verification**: 38/38 automated regression tests passed. JavaScript compilation checked with 0 syntax errors. SHA-256 question bank checksums byte-identical.

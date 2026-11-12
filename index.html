@@ -2984,7 +2984,13 @@ summary:focus-visible,
             <div class="p-5 rounded-2xl bg-[#F8FAF7] border border-[#DCE6DF] space-y-4">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <span class="text-xs font-bold text-[#526056] uppercase tracking-wider block">Today's Solved Questions</span>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs font-bold text-[#526056] uppercase tracking-wider block">Today's Solved Questions</span>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] px-2 py-0.5 rounded-md">
+                      <i data-lucide="clock" class="w-3 h-3 text-[#10402D]"></i>
+                      <span>Resets Daily at Midnight (24h)</span>
+                    </span>
+                  </div>
                   <div class="flex items-baseline gap-2 mt-0.5">
                     <span id="abhyas-solved-today" class="text-3xl font-display font-black text-[#10402D]">0</span>
                     <span class="text-sm font-bold text-[#526056]">/ <span id="abhyas-daily-target-label">50</span> Questions</span>
@@ -3646,21 +3652,17 @@ summary:focus-visible,
 
           <!-- Secondary Sub-Navigation for PYQ Bank -->
           <div id="pyq-subnav" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            <button type="button" id="subnav-btn-bank" onclick="switchView('bank')" class="subnav-btn subnav-active px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer shadow-2xs">
-              Question Feed
+            <button type="button" id="subnav-btn-bank" onclick="switchView('bank')" class="subnav-btn subnav-active px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer shadow-2xs inline-flex items-center gap-1.5">
+              <i data-lucide="list-filter" class="w-3.5 h-3.5 text-[#10402D]"></i>
+              <span>Question Feed</span>
             </button>
             <button type="button" id="subnav-btn-analytics" onclick="switchView('analytics')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs flex items-center gap-1.5">
               <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-[#10402D]"></i>
               <span>My Prep &amp; Weak Areas</span>
             </button>
-            <button type="button" id="subnav-btn-exams" onclick="switchView('exams')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs">
-              Exam Directory
-            </button>
-            <button type="button" id="subnav-btn-practice" onclick="switchView('practice')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs">
-              Scorecard &amp; Option E Calculator
-            </button>
-            <button type="button" id="subnav-btn-manage" onclick="switchView('manage')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs">
-              + Add Questions
+            <button type="button" id="subnav-btn-manage" onclick="switchView('manage')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#111C15] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs inline-flex items-center gap-1.5">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-[#10402D]"></i>
+              <span>+ Add Questions</span>
             </button>
           </div>
 
@@ -5361,9 +5363,15 @@ summary:focus-visible,
     function saveStudentPracticeAttempt(qid, opt) {
       userAttempts[qid] = opt;
       const prefix = getStudentStoragePrefix();
+      const now = Date.now();
       try {
         localStorage.setItem(prefix + '_practice', JSON.stringify(userAttempts));
         localStorage.setItem('bpsc_practice_attempts_v1', JSON.stringify(userAttempts));
+
+        // Save timestamp for genuine 24-hour daily goal tracking
+        const tsMap = JSON.parse(localStorage.getItem(prefix + '_timestamps') || '{}');
+        tsMap[qid] = now;
+        localStorage.setItem(prefix + '_timestamps', JSON.stringify(tsMap));
       } catch (e) {}
     }
 
@@ -5575,8 +5583,6 @@ summary:focus-visible,
       const subnavMap = {
         'bank': 'subnav-btn-bank',
         'analytics': 'subnav-btn-analytics',
-        'exams': 'subnav-btn-exams',
-        'practice': 'subnav-btn-practice',
         'manage': 'subnav-btn-manage'
       };
       Object.keys(subnavMap).forEach(key => {
@@ -6774,14 +6780,42 @@ summary:focus-visible,
       }, 200);
     }
 
-    // Daily Abhyas Goal & Progress Tracker
+    // Daily Abhyas Goal & Progress Tracker (Genuine 24-Hour Cycle with Midnight Reset)
     let abhyasDailyGoal = parseInt(localStorage.getItem('shaktiq_daily_goal') || '50', 10);
     function getAbhyasSolvedCount() {
       try {
-        const attemptsObj = JSON.parse(localStorage.getItem('bpsc_practice_attempts_v1') || '{}');
+        const prefix = getStudentStoragePrefix();
+        const tsMap = JSON.parse(localStorage.getItem(prefix + '_timestamps') || '{}');
+        const now = Date.now();
+        // Calculate midnight (00:00:00) of current local calendar day
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const startOfTodayMs = startOfToday.getTime();
+
         const allMap = {};
         getAllQuestions().forEach(q => { allMap[q.id] = q; });
-        return Object.keys(attemptsObj).filter(qid => allMap[qid] && !isMainsDescriptiveQuestion(allMap[qid])).length;
+
+        const recordedKeys = Object.keys(tsMap);
+        if (recordedKeys.length > 0) {
+          // Count unique questions solved today (since midnight local time)
+          return recordedKeys.filter(qid => allMap[qid] && !isMainsDescriptiveQuestion(allMap[qid]) && tsMap[qid] >= startOfTodayMs).length;
+        }
+
+        // Seamless migration: If student practiced questions in this session before timestamps existed,
+        // seed their current session's attempts with today's timestamp so progress is preserved
+        const attemptsObj = JSON.parse(localStorage.getItem(prefix + '_practice') || localStorage.getItem('bpsc_practice_attempts_v1') || '{}');
+        const qids = Object.keys(attemptsObj).filter(qid => allMap[qid] && !isMainsDescriptiveQuestion(allMap[qid]));
+        if (qids.length > 0 && !localStorage.getItem(prefix + '_timestamps_seeded')) {
+          const seededMap = {};
+          qids.forEach(qid => { seededMap[qid] = now; });
+          try {
+            localStorage.setItem(prefix + '_timestamps', JSON.stringify(seededMap));
+            localStorage.setItem(prefix + '_timestamps_seeded', 'true');
+          } catch (e) {}
+          return qids.length;
+        }
+
+        return 0;
       } catch (e) {
         return 0;
       }
@@ -6810,11 +6844,11 @@ summary:focus-visible,
 
       if (msgEl) {
         if (solved === 0) {
-          msgEl.textContent = 'Start solving questions in the PYQ Bank or Mock Tests to fill your daily bar!';
+          msgEl.textContent = 'Today\'s 24-hr study cycle is active. Solve questions in the PYQ Bank or Mock Tests to fill today\'s bar!';
         } else if (solved >= abhyasDailyGoal) {
-          msgEl.textContent = `🎉 Incredible! You have completed 100% of your ${abhyasDailyGoal}-question daily target!`;
+          msgEl.textContent = `🎉 Incredible! You reached 100% of today's ${abhyasDailyGoal}-question goal (${solved} solved today)! Resets at midnight.`;
         } else {
-          msgEl.textContent = `Keep going! ${abhyasDailyGoal - solved} more questions to reach your daily study goal (${pct}% done).`;
+          msgEl.textContent = `Today: ${solved} solved (${pct}%). Only ${abhyasDailyGoal - solved} more questions to complete today's target! Resets at midnight.`;
         }
       }
     }
@@ -9508,6 +9542,19 @@ summary:focus-visible,
         }))
       };
       
+      // Record question timestamps for genuine 24-hour daily goal tracking
+      try {
+        const prefix = getStudentStoragePrefix();
+        const tsMap = JSON.parse(localStorage.getItem(prefix + '_timestamps') || '{}');
+        const now = Date.now();
+        (attemptLog.questionResults || []).forEach(qr => {
+          if (qr.userOpt && qr.userOpt !== 'E') {
+            tsMap[qr.id] = now;
+          }
+        });
+        localStorage.setItem(prefix + '_timestamps', JSON.stringify(tsMap));
+      } catch (e) {}
+
       // Fire Google Sheets sync immediately
       syncAspirantToGoogleSheets({
         event: 'test_completed',
