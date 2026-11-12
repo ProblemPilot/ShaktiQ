@@ -78,6 +78,11 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 
+  
+  <!-- Critical Image Preloads for Instant Mobile LCP -->
+  <link rel="preload" as="image" href="/logo.webp" type="image/webp" fetchpriority="high">
+  <link rel="preload" as="image" href="/hero-museum.webp" type="image/webp" fetchpriority="high">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1510,7 +1515,7 @@ summary:focus-visible,
       <!-- Modal Header with User Logo Only -->
       <div class="text-center space-y-2">
         <div class="flex justify-center mb-1">
-          <img src="/logo.png" alt="ShaktiQ Logo" class="h-12 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
+          <picture><source srcset="/logo.webp" type="image/webp"><img src="/logo.png" width="192" height="48" loading="lazy" decoding="async" alt="ShaktiQ Logo" class="h-12 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;"></picture>
         </div>
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#EBF3E6] border border-[#C6DEC0] text-[#10402D]">
           <i data-lucide="lock" class="w-3.5 h-3.5"></i>
@@ -1728,7 +1733,7 @@ summary:focus-visible,
 
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5ECE6] pb-4 pr-10">
         <div class="flex items-center gap-3">
-          <img src="/logo.png" alt="ShaktiQ Logo" class="h-10 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
+          <picture><source srcset="/logo.webp" type="image/webp"><img src="/logo.png" width="160" height="40" loading="lazy" decoding="async" alt="ShaktiQ Logo" class="h-10 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;"></picture>
           <h3 id="legal-modal-title" class="text-xl font-display font-extrabold text-[#111C15]">Privacy Policy, Terms &amp; Contact</h3>
         </div>
         <div class="flex flex-wrap items-center gap-2">
@@ -1838,7 +1843,7 @@ summary:focus-visible,
       
       <!-- Brand Logo Lockup: Attached ShaktiQ Logo Only -->
       <a href="#top" class="brand-logo-link group py-1 shrink-0" style="flex-shrink: 0 !important;" aria-label="ShaktiQ Home">
-        <img src="/logo.png" alt="ShaktiQ Logo" class="brand-logo-img object-contain group-hover:scale-[1.02] transition-transform duration-200 shrink-0" style="flex-shrink: 0 !important;">
+        <picture class="shrink-0"><source srcset="/logo.webp" type="image/webp"><img src="/logo.png" alt="ShaktiQ Logo" width="186" height="62" fetchpriority="high" decoding="async" class="brand-logo-img object-contain group-hover:scale-[1.02] transition-transform duration-200 shrink-0" style="flex-shrink: 0 !important;"></picture>
       </a>
 
       <!-- Center Navigation Links (Clean, No YouTube Promotion) -->
@@ -1977,7 +1982,7 @@ summary:focus-visible,
     <!-- Mobile Drawer Menu -->
     <div id="mobile-menu-drawer" class="hidden md:hidden bg-white border-b border-[#DCE6DF] shadow-xl p-4 transition-all duration-200">
       <div class="flex items-center pb-3 mb-2 border-b border-[#E5ECE6]">
-        <img src="/logo.png" alt="ShaktiQ Logo" class="h-11 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
+        <picture><source srcset="/logo.webp" type="image/webp"><img src="/logo.png" width="176" height="44" loading="lazy" decoding="async" alt="ShaktiQ Logo" class="h-11 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;"></picture>
       </div>
       <div class="flex flex-col gap-1.5">
         <a href="#top" class="mobile-nav-link px-3 py-2 text-sm font-semibold text-[#111C15] bg-[#EBF3E6] rounded-lg">Home</a>
@@ -2059,7 +2064,7 @@ summary:focus-visible,
                 </p>
               </div>
               <!-- Clean Bihar Patna Museum & Rising Golden Sun Illustration -->
-              <img id="hero-main-museum-img" src="/hero-museum.png" fetchpriority="high" decoding="async" alt="या देवी सर्वभूतेषु विद्यारूपेण संस्थिता नमस्तस्यै नमस्तस्यै नमस्तस्यै नमो नमः • Bihar Museum &amp; Rising Sun" class="w-full h-auto object-contain rounded-2xl">
+              <picture><source srcset="/hero-museum.webp" type="image/webp"><img id="hero-main-museum-img" src="/hero-museum.png" width="900" height="530" fetchpriority="high" decoding="async" alt="या देवी सर्वभूतेषु विद्यारूपेण संस्थिता नमस्तस्यै नमस्तस्यै नमस्तस्यै नमो नमः • Bihar Museum &amp; Rising Sun" class="w-full h-auto object-contain rounded-2xl"></picture>
             </div>
           </div>
 
@@ -2088,7 +2093,7 @@ summary:focus-visible,
           <!-- Card 1: BPSC (Active Soft Sage Card with Bodhi Tree) -->
           <div onclick="openPyqBankMode()" class="group rounded-2xl bg-[#ECF6E7] border border-[#C5DEC0] hover:border-[#10402D] p-5 flex items-center justify-between gap-3 transition-all hover:shadow-md cursor-pointer">
             <div class="flex items-center gap-3.5 min-w-0">
-              <img src="/bodhi-tree.png" alt="BPSC Bodhi Tree" class="w-12 h-12 object-contain shrink-0">
+              <picture><source srcset="/bodhi-tree.webp" type="image/webp"><img src="/bodhi-tree.png" width="48" height="48" loading="lazy" decoding="async" alt="BPSC Bodhi Tree" class="w-12 h-12 object-contain shrink-0"></picture>
               <div class="min-w-0">
                 <h3 class="font-display font-extrabold text-lg text-[#111C15]">BPSC</h3>
                 <p class="text-xs text-[#3F5145] leading-snug">Bihar Public Service Commission (72nd/73rd)</p>
@@ -3345,7 +3350,7 @@ summary:focus-visible,
         <!-- Col 1: Brand Logo Only + Description -->
         <div class="md:col-span-2">
           <a href="#top" class="inline-flex items-center mb-4 group">
-            <img src="/logo.png" alt="ShaktiQ Logo" class="h-12 sm:h-14 w-auto object-contain group-hover:scale-[1.02] transition-transform duration-200 shrink-0" style="flex-shrink: 0 !important;">
+            <picture><source srcset="/logo.webp" type="image/webp"><img src="/logo.png" width="168" height="56" loading="lazy" decoding="async" alt="ShaktiQ Logo" class="h-12 sm:h-14 w-auto object-contain group-hover:scale-[1.02] transition-transform duration-200 shrink-0" style="flex-shrink: 0 !important;"></picture>
           </a>
           <p class="text-sm text-[#3B493F] max-w-md mb-5 leading-relaxed">
             Master BPSC (72nd/73rd CCE, ASO, Teacher), BSSC CGL 4, and AEDO with 2,800+ PYQs based on published answer keys, 22 full-length BPSC-pattern mock tests, rapid revision sheets, and exam mnemonics.
@@ -3410,7 +3415,7 @@ summary:focus-visible,
       <!-- Bottom Copyright & Minimal "Created by" + Logo Only -->
       <div class="pt-6 border-t border-[#DCE6DF] flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-3 flex-wrap">
-          <img src="/logo.png" alt="ShaktiQ Logo" class="h-8 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
+          <picture><source srcset="/logo.webp" type="image/webp"><img src="/logo.png" width="96" height="32" loading="lazy" decoding="async" alt="ShaktiQ Logo" class="h-8 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;"></picture>
           <p class="text-xs sm:text-sm text-[#36443A]">© 2026 • Independent Competitive Exam Preparation Platform.</p>
         </div>
 
@@ -3418,7 +3423,7 @@ summary:focus-visible,
           <!-- Minimal "Created by" + Logo Only -->
           <a href="https://www.youtube.com/@Prep_with_Ankit" target="_blank" rel="noopener noreferrer" id="footer-creator-badge" class="group inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-white hover:bg-[#F8FAF7] border border-[#DCE6DF] hover:border-[#10402D]/40 shadow-2xs hover:shadow-sm transition-all duration-200 cursor-pointer" title="ShaktiQ">
             <span class="text-xs font-semibold text-[#36443A]">Created by</span>
-            <img src="/yt-logo.png" alt="Prep with Ankit" class="h-8 sm:h-9 w-auto object-contain rounded-md group-hover:scale-105 transition-transform duration-200 shrink-0">
+            <picture><source srcset="/yt-logo.webp" type="image/webp"><img src="/yt-logo.png" width="36" height="36" loading="lazy" decoding="async" alt="Prep with Ankit" class="h-8 sm:h-9 w-auto object-contain rounded-md group-hover:scale-105 transition-transform duration-200 shrink-0"></picture>
           </a>
 
           <a href="#top" class="px-3.5 py-2 rounded-xl bg-white border border-[#DCE6DF] text-xs text-[#223127] hover:text-[#10402D] font-bold transition-colors flex items-center gap-1.5 shadow-2xs">
@@ -3449,7 +3454,7 @@ summary:focus-visible,
             <div class="h-6 w-px bg-[#DCE6DF] hidden sm:block"></div>
 
             <div class="flex items-center gap-3">
-              <img src="/logo.png" alt="ShaktiQ Logo" class="h-10 sm:h-12 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
+              <picture><source srcset="/logo.webp" type="image/webp"><img src="/logo.png" width="144" height="48" loading="lazy" decoding="async" alt="ShaktiQ Logo" class="h-10 sm:h-12 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;"></picture>
               <div class="hidden sm:block pl-3 border-l border-[#DCE6DF]">
                 <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#FCE27B] text-[#111C15]">2,800+ PYQs &amp; 22 Mock Tests</span>
                 <p class="text-[11px] text-[#3B493F] mt-0.5 font-medium">Attempt-First Active Recall: Select an option to test yourself</p>
@@ -4365,7 +4370,7 @@ summary:focus-visible,
       <div class="max-w-7xl mx-auto space-y-4">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex flex-wrap items-center gap-3">
-            <img src="/logo.png" alt="ShaktiQ Logo" class="h-8 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
+            <picture><source srcset="/logo.webp" type="image/webp"><img src="/logo.png" width="96" height="32" loading="lazy" decoding="async" alt="ShaktiQ Logo" class="h-8 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;"></picture>
             <span class="text-[#36443A]">• 2,800+ Subject-Wise PYQ Bank &amp; 22 Full-Length Mock Tests</span>
           </div>
           <div class="flex flex-wrap items-center gap-3">
@@ -4376,7 +4381,7 @@ summary:focus-visible,
             <button type="button" onclick="openLegalModal('contact')" class="font-bold text-[#10402D] hover:underline cursor-pointer">Contact</button>
             <a href="https://www.youtube.com/@Prep_with_Ankit" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-white border border-[#DCE6DF] hover:border-[#10402D]/40 shadow-2xs transition" title="ShaktiQ">
               <span class="text-xs font-semibold text-[#36443A]">Created by</span>
-              <img src="/yt-logo.png" alt="Prep with Ankit" class="h-6 sm:h-7 w-auto object-contain rounded-md group-hover:scale-105 transition-transform duration-200 shrink-0">
+              <picture><source srcset="/yt-logo.webp" type="image/webp"><img src="/yt-logo.png" width="28" height="28" loading="lazy" decoding="async" alt="Prep with Ankit" class="h-6 sm:h-7 w-auto object-contain rounded-md group-hover:scale-105 transition-transform duration-200 shrink-0"></picture>
             </a>
           </div>
         </div>
