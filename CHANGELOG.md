@@ -151,3 +151,19 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
      - Single-pass $O(N)$ calculations ($<3$ ms computation time).
      - Zero external dependencies; 100% offline-compatible via localStorage.
 - **Verification**: 38/38 automated regression tests passed. Full simulation test on real 2,809 questions bank passed.
+---
+
+## Bugfix: Resolve JS Syntax Error and Navbar Sign-In Visibility at 100% Zoom
+- **Status**: PASSED
+- **Issues Addressed**:
+  1. *JavaScript Execution Halted ("anything is not working")*:
+     - A duplicate `} catch (e) {}` in the initial load block of script #5 caused a `SyntaxError: missing ) after argument list`, which aborted all client-side JavaScript execution on page load (breaking routing, interactive buttons, and modals).
+     - Fixed by removing the orphaned catch block and verifying that all 6 inline script blocks compile with zero syntax errors.
+  2. *Sign In Disappears at 100% Zoom*:
+     - On standard desktop/laptop viewports (1280px–1440px) at 100% browser zoom, the combination of 8 center navigation links plus the redundant 220px-wide "22 Full-Length Mock Tests" button pushed the `#nav-auth-container` ("Sign In") completely off the right edge of the screen.
+     - Added strict protection CSS:
+       - `#nav-auth-container { flex-shrink: 0 !important; min-width: max-content !important; }`
+       - `#nav-signin-btn { flex-shrink: 0 !important; white-space: nowrap !important; }`
+       - Hidden the redundant `#nav-mock-cta-pill` on desktop under 1600px (since "Mock Tests" is already a dedicated link in the center navigation).
+       - Hidden secondary links (`.nav-extra-link`) under 1440px so the primary links ("Home", "Exams", "Practice PYQs", "Mock Tests", Search, and "Sign In") fit effortlessly with zero overflow.
+- **Verification**: 38/38 automated regression tests passed. Full compilation syntax check passed.

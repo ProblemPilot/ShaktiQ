@@ -136,11 +136,29 @@
 
 /* Secondary navigation links hide gracefully on intermediate screens (768px - 1279px) */
 /* so that the header never overflows and never squashes the brand logo */
-@media (max-width: 1279px) {
-  .nav-extra-link {
-    display: none !important;
-  }
+/* Guarantee Sign In and Brand Logo are ALWAYS visible across all screen sizes and zoom levels */
+#nav-auth-container {
+  flex-shrink: 0 !important;
+  min-width: max-content !important;
+}
+#nav-signin-btn {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* Hide redundant 22 Mock Tests pill on desktop navigation unless on ultra-wide screens (1600px+) */
+#nav-mock-cta-pill {
+  display: none !important;
+}
+@media (min-width: 1600px) {
   #nav-mock-cta-pill {
+    display: inline-flex !important;
+  }
+}
+
+/* Under 1440px (standard laptops & 100% zoom with Windows scaling), hide secondary links so Sign In is prominently displayed */
+@media (max-width: 1440px) {
+  .nav-extra-link {
     display: none !important;
   }
 }
@@ -9893,10 +9911,9 @@ summary:focus-visible,
       setupPracticeWorkspace();
       initShaktiQExtras();
 
-      // Restore saved PYQ attempts per student
+            // Restore saved PYQ attempts per student
       try {
         userAttempts = loadStudentPracticeAttempts();
-      } catch (e) {}
       } catch (e) {}
 
       // Initialize High-Capacity Backend Engine & Restore Aspirant Identity
