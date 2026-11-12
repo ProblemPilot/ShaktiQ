@@ -167,3 +167,22 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
        - Hidden the redundant `#nav-mock-cta-pill` on desktop under 1600px (since "Mock Tests" is already a dedicated link in the center navigation).
        - Hidden secondary links (`.nav-extra-link`) under 1440px so the primary links ("Home", "Exams", "Practice PYQs", "Mock Tests", Search, and "Sign In") fit effortlessly with zero overflow.
 - **Verification**: 38/38 automated regression tests passed. Full compilation syntax check passed.
+
+---
+
+## Fix (UI): Mode Switch High Contrast & Permanent Navbar Zoom Visibility
+- **Status**: PASSED
+- **Issues Addressed**:
+  1. *High-Contrast Mode Switcher & Subnav ("Things are not visible when I switch")*:
+     - Previously, when switching between "22 Full-Length Mock Tests (Complete)" and "2,800+ Subject-Wise PYQ Bank", inactive buttons could render with faint text or transparent backgrounds against the header. Switching to Mock Tests also hid the secondary subnav, abruptly removing student access to "My Prep & Weak Areas", "Exam Directory", and the "Option E Calculator".
+     - Implemented maximum contrast styling:
+       - Active mode button: `#10402D` dark green background with `#FFFFFF` pure white text and `#FCE27B` gold icon.
+       - Inactive mode button: `#FFFFFF` clean white pill with `#10402D` dark green text, `#DCE6DF` border, and soft sage hover (`#EBF3E6`).
+       - Subnav buttons: Active has `#EBF3E6` soft mint background with `#10402D` bold text; Inactive has `#FFFFFF` clean white pill with `#111C15` dark charcoal text and `#DCE6DF` border.
+       - Subnav (`#pyq-subnav`) remains persistently accessible across modes so students can navigate between test series, question bank, personalized weak areas, and directory without navigation disappearing.
+       - Synchronized `switchView` so mode switcher buttons and subnav pills are always in sync.
+  2. *Navbar Overflow at 90% and 100% Zoom ("Sign in disappears at 100")*:
+     - On wider viewports or when zoomed to 90%, the `@media (min-width: 1600px)` breakpoint re-enabled the redundant 220px-wide `#nav-mock-cta-pill`, which overflowed the desktop navbar and pushed `Sign In` off-screen.
+     - Permanently set `#nav-mock-cta-pill { display: none !important; }` on desktop navigation, and set intermediate collapse for `.nav-extra-link` at 1280px.
+     - Verified `Sign In` is 100% visible and unclipped at 90%, 100%, 110%, 125%, and 150% zoom levels.
+- **Verification**: All 38/38 regression tests pass. Full JavaScript syntax compilation succeeds with 0 errors. SHA-256 data checksums byte-identical.

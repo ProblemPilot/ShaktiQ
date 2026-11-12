@@ -146,18 +146,13 @@
   white-space: nowrap !important;
 }
 
-/* Hide redundant 22 Mock Tests pill on desktop navigation unless on ultra-wide screens (1600px+) */
+/* Permanently hide redundant mock CTA pill in desktop navbar to guarantee zero navbar overflow at all zoom levels (90%, 100%, 125%) */
 #nav-mock-cta-pill {
   display: none !important;
 }
-@media (min-width: 1600px) {
-  #nav-mock-cta-pill {
-    display: inline-flex !important;
-  }
-}
 
-/* Under 1440px (standard laptops & 100% zoom with Windows scaling), hide secondary links so Sign In is prominently displayed */
-@media (max-width: 1440px) {
+/* On medium/intermediate screens (< 1280px or when zoomed in), hide secondary links to guarantee Sign In never overflows */
+@media (max-width: 1280px) {
   .nav-extra-link {
     display: none !important;
   }
@@ -1527,41 +1522,61 @@ summary:focus-visible,
   #workspace-mode-btn-pyq.mode-active {
     background-color: #10402D !important;
     color: #FFFFFF !important;
+    border: 1px solid #10402D !important;
   }
   #workspace-mode-btn-testseries.mode-active svg,
-  #workspace-mode-btn-pyq.mode-active svg {
+  #workspace-mode-btn-pyq.mode-active svg,
+  #workspace-mode-btn-testseries.mode-active i,
+  #workspace-mode-btn-pyq.mode-active i {
     color: #FCE27B !important;
   }
   #workspace-mode-btn-testseries.mode-inactive,
   #workspace-mode-btn-pyq.mode-inactive {
-    background-color: transparent !important;
-    color: #223127 !important;
+    background-color: #FFFFFF !important;
+    color: #10402D !important;
+    border: 1px solid #DCE6DF !important;
   }
-  #workspace-mode-btn-testseries.mode-inactive svg {
-    color: #B45309 !important;
-  }
-  #workspace-mode-btn-pyq.mode-inactive svg {
+  #workspace-mode-btn-testseries.mode-inactive svg,
+  #workspace-mode-btn-pyq.mode-inactive svg,
+  #workspace-mode-btn-testseries.mode-inactive i,
+  #workspace-mode-btn-pyq.mode-inactive i {
     color: #10402D !important;
   }
   #workspace-mode-btn-testseries.mode-inactive:hover,
   #workspace-mode-btn-pyq.mode-inactive:hover {
     color: #10402D !important;
     background-color: #EBF3E6 !important;
+    border-color: #C6DEC0 !important;
   }
 
   /* Subnav Buttons - High Contrast Guarantee */
   .subnav-btn.subnav-active {
     background-color: #EBF3E6 !important;
     color: #10402D !important;
-    border-color: #C6DEC0 !important;
+    border: 1px solid #C6DEC0 !important;
+    font-weight: 700 !important;
+  }
+  .subnav-btn.subnav-active svg,
+  .subnav-btn.subnav-active i {
+    color: #10402D !important;
   }
   .subnav-btn.subnav-inactive {
     background-color: #FFFFFF !important;
-    color: #223127 !important;
-    border-color: #DCE6DF !important;
+    color: #111C15 !important;
+    border: 1px solid #DCE6DF !important;
+    font-weight: 600 !important;
+  }
+  .subnav-btn.subnav-inactive svg,
+  .subnav-btn.subnav-inactive i {
+    color: #526056 !important;
   }
   .subnav-btn.subnav-inactive:hover {
     background-color: #F8FAF7 !important;
+    color: #10402D !important;
+    border-color: #C6DEC0 !important;
+  }
+  .subnav-btn.subnav-inactive:hover svg,
+  .subnav-btn.subnav-inactive:hover i {
     color: #10402D !important;
   }
 
@@ -3630,7 +3645,7 @@ summary:focus-visible,
           </div>
 
           <!-- Secondary Sub-Navigation for PYQ Bank -->
-          <div id="pyq-subnav" class="hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <div id="pyq-subnav" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
             <button type="button" id="subnav-btn-bank" onclick="switchView('bank')" class="subnav-btn subnav-active px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer shadow-2xs">
               Question Feed
             </button>
@@ -5568,12 +5583,23 @@ summary:focus-visible,
         const btn = document.getElementById(subnavMap[key]);
         if (btn) {
           if (key === viewName) {
-            btn.className = 'subnav-btn subnav-active px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer shadow-2xs';
+            btn.className = 'subnav-btn subnav-active px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer shadow-2xs inline-flex items-center gap-1.5';
           } else {
-            btn.className = 'subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs';
+            btn.className = 'subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#111C15] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs inline-flex items-center gap-1.5';
           }
         }
       });
+
+      // Synchronize workspace mode buttons with viewName
+      const btnTS = document.getElementById('workspace-mode-btn-testseries');
+      const btnPYQ = document.getElementById('workspace-mode-btn-pyq');
+      if (viewName === 'testseries') {
+        if (btnTS) btnTS.className = 'mode-active flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white border border-[#10402D] shadow-sm cursor-pointer';
+        if (btnPYQ) btnPYQ.className = 'mode-inactive flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#10402D] bg-white hover:bg-[#EBF3E6] border border-[#DCE6DF] cursor-pointer';
+      } else {
+        if (btnTS) btnTS.className = 'mode-inactive flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#10402D] bg-white hover:bg-[#EBF3E6] border border-[#DCE6DF] cursor-pointer';
+        if (btnPYQ) btnPYQ.className = 'mode-active flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white border border-[#10402D] shadow-sm cursor-pointer';
+      }
 
       if (viewName === "testseries") {
         renderTestSeriesCards();
@@ -6841,23 +6867,23 @@ summary:focus-visible,
       const btnPYQ = document.getElementById('workspace-mode-btn-pyq');
       const pyqSubNav = document.getElementById('pyq-subnav');
 
+      if (pyqSubNav) pyqSubNav.classList.remove('hidden');
+
       if (mode === 'testseries') {
         if (btnTS) {
-          btnTS.className = 'mode-active flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer';
+          btnTS.className = 'mode-active flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white border border-[#10402D] shadow-sm cursor-pointer';
         }
         if (btnPYQ) {
-          btnPYQ.className = 'mode-inactive flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#223127] hover:text-[#10402D] hover:bg-[#F6F7F2] cursor-pointer';
+          btnPYQ.className = 'mode-inactive flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#10402D] bg-white hover:bg-[#EBF3E6] border border-[#DCE6DF] cursor-pointer';
         }
-        if (pyqSubNav) pyqSubNav.classList.add('hidden');
         switchView('testseries');
       } else {
         if (btnTS) {
-          btnTS.className = 'mode-inactive flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#223127] hover:text-[#10402D] hover:bg-[#F6F7F2] cursor-pointer';
+          btnTS.className = 'mode-inactive flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#10402D] bg-white hover:bg-[#EBF3E6] border border-[#DCE6DF] cursor-pointer';
         }
         if (btnPYQ) {
-          btnPYQ.className = 'mode-active flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer';
+          btnPYQ.className = 'mode-active flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white border border-[#10402D] shadow-sm cursor-pointer';
         }
-        if (pyqSubNav) pyqSubNav.classList.remove('hidden');
         switchView('bank');
       }
       initIcons();
