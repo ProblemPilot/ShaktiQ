@@ -4869,7 +4869,9 @@ summary:focus-visible,
     let questionsLoaded = false;
     let questionsLoadPromise = null;
 
-    const AUTH_BACKEND_ORIGIN = 'https://shaktiq-auth-gate.shaktiq-portal.workers.dev';
+    const AUTH_BACKEND_ORIGIN = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+      ? window.location.origin
+      : 'https://shaktiq-auth-gate.shaktiq-portal.workers.dev';
 
     function getAspirantAuthToken() {
       try {
@@ -7316,36 +7318,39 @@ summary:focus-visible,
       const expJson = document.getElementById("exportJsonBtn"); if (expJson) expJson.onclick = () => showToast("Export disabled.", "error");
 
       // Import JSON
-      document.getElementById("importJsonFile").addEventListener("change", (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          try {
-            const imported = JSON.parse(ev.target.result);
-            if (Array.isArray(imported)) {
-              const existingIds = new Set(getAllQuestions().map(x => x.id));
-              let added = 0;
-              imported.forEach(item => {
-                if (item && item.q && !existingIds.has(item.id)) {
-                  item.custom = true;
-                  customQuestions.push(item);
-                  added += 1;
-                }
-              });
-              saveCustomQuestions();
-              updateHeaderCounters();
-              populateExamDropdowns();
-              renderSubjectPills();
-              renderQuestions();
-              showToast(`Imported ${added} new question(s)!`);
+      const importJsonEl = document.getElementById("importJsonFile");
+      if (importJsonEl) {
+        importJsonEl.addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const imported = JSON.parse(ev.target.result);
+              if (Array.isArray(imported)) {
+                const existingIds = new Set(getAllQuestions().map(x => x.id));
+                let added = 0;
+                imported.forEach(item => {
+                  if (item && item.q && !existingIds.has(item.id)) {
+                    item.custom = true;
+                    customQuestions.push(item);
+                    added += 1;
+                  }
+                });
+                saveCustomQuestions();
+                updateHeaderCounters();
+                populateExamDropdowns();
+                renderSubjectPills();
+                renderQuestions();
+                showToast(`Imported ${added} new question(s)!`);
+              }
+            } catch (err) {
+              showToast("Could not parse JSON file.", "⚠");
             }
-          } catch (err) {
-            showToast("Could not parse JSON file.", "⚠");
-          }
-        };
-        reader.readAsText(file);
-      });
+          };
+          reader.readAsText(file);
+        });
+      }
 
       // Practice Scorecard & Option E Calculator
       document.getElementById("resetPracticeScoreBtn").addEventListener("click", () => {
