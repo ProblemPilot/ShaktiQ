@@ -9,6 +9,7 @@
     "lock-repo": "node scripts/lock-repo.js"
   },
   "devDependencies": {
+    "sharp": "^0.35.5",
     "wrangler": "^4.160.0"
   }
 }

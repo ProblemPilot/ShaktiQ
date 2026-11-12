@@ -1737,9 +1737,9 @@ summary:focus-visible,
           <h3 id="legal-modal-title" class="text-xl font-display font-extrabold text-[#111C15]">Privacy Policy, Terms &amp; Contact</h3>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <button type="button" id="legal-tab-btn-privacy" onclick="switchLegalTab('privacy')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#10402D] text-white cursor-pointer">Privacy Policy</button>
-          <button type="button" id="legal-tab-btn-terms" onclick="switchLegalTab('terms')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#F8FAF7] text-[#223127] border border-[#DCE6DF] cursor-pointer">Terms of Use</button>
-          <button type="button" id="legal-tab-btn-contact" onclick="switchLegalTab('contact')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#F8FAF7] text-[#223127] border border-[#DCE6DF] cursor-pointer">Contact &amp; Grievance</button>
+          <button type="button" id="legal-tab-btn-privacy" role="tab" aria-selected="true" onclick="switchLegalTab('privacy')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#10402D] text-white cursor-pointer">Privacy Policy</button>
+          <button type="button" id="legal-tab-btn-terms" role="tab" aria-selected="false" onclick="switchLegalTab('terms')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#F8FAF7] text-[#223127] border border-[#DCE6DF] cursor-pointer">Terms of Use</button>
+          <button type="button" id="legal-tab-btn-contact" role="tab" aria-selected="false" onclick="switchLegalTab('contact')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#F8FAF7] text-[#223127] border border-[#DCE6DF] cursor-pointer">Contact &amp; Grievance</button>
         </div>
       </div>
 
@@ -2424,13 +2424,13 @@ summary:focus-visible,
 
           <!-- Exam Switcher Tabs -->
           <div class="flex items-center gap-1.5 p-1.5 rounded-2xl bg-[#F6F7F2] border border-[#DCE6DF] shrink-0 overflow-x-auto" role="tablist">
-            <button type="button" id="tab-btn-bpsc" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer" data-exam="bpsc">
+            <button type="button" id="tab-btn-bpsc" role="tab" aria-selected="true" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer" data-exam="bpsc">
               Target: 72nd/73rd BPSC
             </button>
-            <button type="button" id="tab-btn-bssc" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-[#3B493F] hover:text-[#111C15] cursor-pointer" data-exam="bssc">
+            <button type="button" id="tab-btn-bssc" role="tab" aria-selected="false" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-[#3B493F] hover:text-[#111C15] cursor-pointer" data-exam="bssc">
               BSSC CGL 4
             </button>
-            <button type="button" id="tab-btn-aedo" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-[#3B493F] hover:text-[#111C15] cursor-pointer" data-exam="aedo">
+            <button type="button" id="tab-btn-aedo" role="tab" aria-selected="false" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-[#3B493F] hover:text-[#111C15] cursor-pointer" data-exam="aedo">
               AEDO Bihar
             </button>
           </div>
@@ -2580,19 +2580,19 @@ summary:focus-visible,
 
         <!-- Topic Switcher Pills -->
         <div class="flex flex-wrap items-center gap-2" role="tablist">
-          <button type="button" onclick="switchRevisionTab('bihar')" id="rev-tab-btn-bihar" class="rev-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#10402D] text-white shadow-sm transition cursor-pointer">
+          <button type="button" onclick="switchRevisionTab('bihar')" id="rev-tab-btn-bihar" role="tab" aria-selected="true" class="rev-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#10402D] text-white shadow-sm transition cursor-pointer">
             1. Bihar Special &amp; Census
           </button>
-          <button type="button" onclick="switchRevisionTab('history')" id="rev-tab-btn-history" class="rev-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#DCE6DF] text-[#223127] hover:bg-[#EBF3E6] transition cursor-pointer">
+          <button type="button" onclick="switchRevisionTab('history')" id="rev-tab-btn-history" role="tab" aria-selected="false" class="rev-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#DCE6DF] text-[#223127] hover:bg-[#EBF3E6] transition cursor-pointer">
             2. 1857 &amp; Freedom Struggle
           </button>
-          <button type="button" onclick="switchRevisionTab('aedo')" id="rev-tab-btn-aedo" class="rev-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#DCE6DF] text-[#223127] hover:bg-[#EBF3E6] transition cursor-pointer">
+          <button type="button" onclick="switchRevisionTab('aedo')" id="rev-tab-btn-aedo" role="tab" aria-selected="false" class="rev-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#DCE6DF] text-[#223127] hover:bg-[#EBF3E6] transition cursor-pointer">
             3. Panchayati Raj &amp; AEDO
           </button>
-          <button type="button" onclick="switchRevisionTab('polity')" id="rev-tab-btn-polity" class="rev-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#DCE6DF] text-[#223127] hover:bg-[#EBF3E6] transition cursor-pointer">
+          <button type="button" onclick="switchRevisionTab('polity')" id="rev-tab-btn-polity" role="tab" aria-selected="false" class="rev-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#DCE6DF] text-[#223127] hover:bg-[#EBF3E6] transition cursor-pointer">
             4. Constitutional Articles
           </button>
-          <button type="button" onclick="switchRevisionTab('science')" id="rev-tab-btn-science" class="rev-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#DCE6DF] text-[#223127] hover:bg-[#EBF3E6] transition cursor-pointer">
+          <button type="button" onclick="switchRevisionTab('science')" id="rev-tab-btn-science" role="tab" aria-selected="false" class="rev-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#DCE6DF] text-[#223127] hover:bg-[#EBF3E6] transition cursor-pointer">
             5. General Science Boosters
           </button>
         </div>
@@ -3368,7 +3368,7 @@ summary:focus-visible,
 
         <!-- Col 2: Exam Tracks -->
         <div>
-          <h4 class="font-display font-bold text-sm text-[#111C15] uppercase tracking-wider mb-4">Exam Tracks</h4>
+          <h3 class="font-display font-bold text-sm text-[#111C15] uppercase tracking-wider mb-4">Exam Tracks</h3>
           <ul class="space-y-2.5 text-sm">
             <li>
               <a href="#bpsc-segment" class="text-[#10402D] font-semibold hover:underline flex items-center gap-1.5">
@@ -3393,7 +3393,7 @@ summary:focus-visible,
 
         <!-- Col 3: Quick Navigation -->
         <div>
-          <h4 class="font-display font-bold text-sm text-[#111C15] uppercase tracking-wider mb-4">Study Tools</h4>
+          <h3 class="font-display font-bold text-sm text-[#111C15] uppercase tracking-wider mb-4">Study Tools</h3>
           <ul class="space-y-2 text-sm text-[#3B493F]">
             <li><a href="#top" class="hover:text-[#10402D] transition-colors">Home</a></li>
             <li><a href="#about" class="hover:text-[#10402D] transition-colors">About ShaktiQ</a></li>
