@@ -129,6 +129,34 @@ async function runE2ETests() {
       ttSaveAndNext();
     });
 
+    // Test Mobile Sticky Exam Bar (<640px)
+    await page.setViewport({ width: 360, height: 800 });
+    const mobileBarStatus = await page.evaluate(() => {
+      const bar = document.getElementById('tt-mobile-exam-bar');
+      const timer = document.getElementById('tt-mobile-timer')?.textContent.trim();
+      const qIdx = document.getElementById('tt-mobile-q-index')?.textContent.trim();
+      const isVisible = (el) => el && !el.classList.contains('hidden') && el.offsetParent !== null;
+      return {
+        barVisible: isVisible(bar),
+        timer,
+        qIdx
+      };
+    });
+
+    if (!mobileBarStatus.barVisible) {
+      throw new Error('Mobile exam bar (#tt-mobile-exam-bar) not visible at width 360px');
+    }
+    if (!/^\d{2}:\d{2}:\d{2}$/.test(mobileBarStatus.timer)) {
+      throw new Error(`Mobile timer format invalid: "${mobileBarStatus.timer}"`);
+    }
+    if (!mobileBarStatus.qIdx.startsWith('Q: 2/')) {
+      throw new Error(`Mobile Q index invalid: expected "Q: 2/...", got "${mobileBarStatus.qIdx}"`);
+    }
+    console.log(`[PASS] E2E: Mobile mock exam bar (<640px) verified: ${mobileBarStatus.qIdx}, timer ${mobileBarStatus.timer}`);
+
+    // Restore desktop viewport
+    await page.setViewport({ width: 1280, height: 800 });
+
     // On Q2 (index 1), select Option E (Safe Skip)
     await page.evaluate(() => {
       ttSelectOption('E');

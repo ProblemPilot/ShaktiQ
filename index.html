@@ -158,6 +158,16 @@
   }
 }
 
+/* Responsive visibility utilities for mobile exam bar and enhancements */
+@media (min-width: 640px) {
+  .sm\:hidden {
+    display: none !important;
+  }
+  .sm\:flex {
+    display: flex !important;
+  }
+}
+
 /* Anti-Scraping & Copy Protection */
 .no-copy,
 #page-bpsc-pyq-view,
@@ -3743,8 +3753,28 @@ summary:focus-visible,
     <!-- TIMED MOCK TEST TAKING WORKSPACE -->
     <div id="test-taking-workspace" class="hidden space-y-6">
       
-      <!-- Top Test Header -->
-      <div class="bg-white/95 backdrop-blur-md border border-[#DCE6DF] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm sticky top-20 z-30">
+      <!-- Mobile Slim Sticky Exam Bar (<640px) -->
+      <div id="tt-mobile-exam-bar" class="sm:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border border-[#DCE6DF] rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 shadow-xs min-h-[40px]">
+        <!-- Timer -->
+        <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-[#FEF6D6] border border-[#F5DF8B] text-[#111C15] font-mono font-black text-xs shrink-0" role="timer" aria-live="off" aria-label="Mock Test Timer">
+          <i data-lucide="timer" class="w-3.5 h-3.5 text-[#785600]"></i>
+          <span id="tt-mobile-timer">02:00:00</span>
+        </div>
+
+        <!-- Question Index -->
+        <div id="tt-mobile-q-index" class="text-xs font-black text-[#111C15] tracking-tight shrink-0">
+          Q: 1/150
+        </div>
+
+        <!-- Option E Safe Skip Rule Indicator -->
+        <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#EBF3E6] border border-[#C6DEC0] text-[10px] font-bold text-[#10402D] truncate" title="Option E = Safe Skip (0 Marks Deduction)">
+          <span class="w-2 h-2 rounded-full bg-[#10402D] shrink-0"></span>
+          <span class="truncate">Opt E: Safe Skip (0)</span>
+        </div>
+      </div>
+
+      <!-- Desktop Top Test Header (>=640px) -->
+      <div class="hidden sm:flex bg-white/95 backdrop-blur-md border border-[#DCE6DF] rounded-2xl p-4 sm:p-5 flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm sticky top-20 z-30">
         <div>
           <div class="flex items-center gap-2 flex-wrap">
             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">LIVE MOCK TEST</span>
@@ -3764,7 +3794,7 @@ summary:focus-visible,
           </div>
 
           <!-- Countdown Timer -->
-          <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FEF6D6] border border-[#F5DF8B] text-[#111C15] font-mono font-black text-base">
+          <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FEF6D6] border border-[#F5DF8B] text-[#111C15] font-mono font-black text-base" role="timer" aria-live="off" aria-label="Mock Test Timer">
             <i data-lucide="timer" class="w-4 h-4 text-[#785600]"></i>
             <span id="tt-timer">02:00:00</span>
           </div>
@@ -9255,7 +9285,20 @@ summary:focus-visible,
         mockUserAnswers = {};
         mockMarkedForReview = {};
         mockTimeRemaining = test.timeMins * 60;
+        const padInit = (n) => String(n).padStart(2, '0');
+        const initH = Math.floor(mockTimeRemaining / 3600);
+        const initM = Math.floor((mockTimeRemaining % 3600) / 60);
+        const initS = mockTimeRemaining % 60;
+        const initTimeStr = `${padInit(initH)}:${padInit(initM)}:${padInit(initS)}`;
+        const tEl = document.getElementById('tt-timer');
+        if (tEl) tEl.textContent = initTimeStr;
+        const mEl = document.getElementById('tt-mobile-timer');
+        if (mEl) mEl.textContent = initTimeStr;
 
+        const portalView = document.getElementById('page-portal-view');
+        if (portalView) portalView.classList.add('hidden');
+        const qbView = document.getElementById('page-bpsc-pyq-view');
+        if (qbView) qbView.classList.remove('hidden');
         document.getElementById('view-testseries').classList.add('hidden');
         document.getElementById('test-taking-workspace').classList.remove('hidden');
 
@@ -9282,9 +9325,14 @@ summary:focus-visible,
       const secs = mockTimeRemaining % 60;
 
       const pad = (n) => String(n).padStart(2, '0');
+      const timeStr = `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
       const timerEl = document.getElementById('tt-timer');
       if (timerEl) {
-        timerEl.textContent = `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+        timerEl.textContent = timeStr;
+      }
+      const mobileTimerEl = document.getElementById('tt-mobile-timer');
+      if (mobileTimerEl) {
+        mobileTimerEl.textContent = timeStr;
       }
 
       // Auto-save test draft to backend engine every 5 seconds (Crash-Recovery)
@@ -9304,6 +9352,10 @@ summary:focus-visible,
         indexLabel.textContent = isHindi 
           ? `प्रश्न ${currentMockIndex + 1} / ${currentMockQuestions.length}`
           : `Question ${currentMockIndex + 1} of ${currentMockQuestions.length}`;
+      }
+      const mobileIndexLabel = document.getElementById('tt-mobile-q-index');
+      if (mobileIndexLabel) {
+        mobileIndexLabel.textContent = `Q: ${currentMockIndex + 1}/${currentMockQuestions.length}`;
       }
 
       // Update subject badge
