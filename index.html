@@ -1501,11 +1501,50 @@ summary:focus-visible,
   }
 
   
-  /* Practice Mode Dark Header - White Text & Logo Guarantee */
-  html.light #page-bpsc-pyq-view > header .text-\[\#3B493F\],
-  html.light #page-bpsc-pyq-view > header p.text-\[\#3B493F\],
-  #page-bpsc-pyq-view > header p.text-\[\#3B493F\] {
+  /* Scope white color ONLY to the active recall subtitle paragraph */
+  #qb-active-recall-subtitle { color: #FFFFFF !important; }
+
+  /* Workspace Mode Switcher - High Contrast Guarantee */
+  #workspace-mode-btn-testseries.mode-active,
+  #workspace-mode-btn-pyq.mode-active {
+    background-color: #10402D !important;
     color: #FFFFFF !important;
+  }
+  #workspace-mode-btn-testseries.mode-active svg,
+  #workspace-mode-btn-pyq.mode-active svg {
+    color: #FCE27B !important;
+  }
+  #workspace-mode-btn-testseries.mode-inactive,
+  #workspace-mode-btn-pyq.mode-inactive {
+    background-color: transparent !important;
+    color: #223127 !important;
+  }
+  #workspace-mode-btn-testseries.mode-inactive svg {
+    color: #B45309 !important;
+  }
+  #workspace-mode-btn-pyq.mode-inactive svg {
+    color: #10402D !important;
+  }
+  #workspace-mode-btn-testseries.mode-inactive:hover,
+  #workspace-mode-btn-pyq.mode-inactive:hover {
+    color: #10402D !important;
+    background-color: #EBF3E6 !important;
+  }
+
+  /* Subnav Buttons - High Contrast Guarantee */
+  .subnav-btn.subnav-active {
+    background-color: #EBF3E6 !important;
+    color: #10402D !important;
+    border-color: #C6DEC0 !important;
+  }
+  .subnav-btn.subnav-inactive {
+    background-color: #FFFFFF !important;
+    color: #223127 !important;
+    border-color: #DCE6DF !important;
+  }
+  .subnav-btn.subnav-inactive:hover {
+    background-color: #F8FAF7 !important;
+    color: #10402D !important;
   }
 
   </style>
@@ -2493,10 +2532,10 @@ summary:focus-visible,
             <button type="button" id="tab-btn-bpsc" role="tab" aria-selected="true" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer" data-exam="bpsc">
               Target: 72nd/73rd BPSC
             </button>
-            <button type="button" id="tab-btn-bssc" role="tab" aria-selected="false" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-[#3B493F] hover:text-[#111C15] cursor-pointer" data-exam="bssc">
+            <button type="button" id="tab-btn-bssc" role="tab" aria-selected="false" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-[#223127] hover:text-[#10402D] hover:bg-[#F6F7F2] cursor-pointer" data-exam="bssc">
               BSSC CGL 4
             </button>
-            <button type="button" id="tab-btn-aedo" role="tab" aria-selected="false" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-[#3B493F] hover:text-[#111C15] cursor-pointer" data-exam="aedo">
+            <button type="button" id="tab-btn-aedo" role="tab" aria-selected="false" class="practice-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-[#223127] hover:text-[#10402D] hover:bg-[#F6F7F2] cursor-pointer" data-exam="aedo">
               AEDO Bihar
             </button>
           </div>
@@ -3523,7 +3562,7 @@ summary:focus-visible,
               <picture><source srcset="/logo-white.webp" type="image/webp"><img src="/logo-white.png" width="144" height="48" loading="lazy" decoding="async" alt="ShaktiQ Logo" class="h-10 sm:h-12 w-auto object-contain shrink-0 logo-white" style="flex-shrink: 0 !important;"></picture>
               <div class="hidden sm:block pl-3 border-l border-white/25">
                 <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#FCE27B] text-[#111C15]">2,800+ PYQs &amp; 22 Mock Tests</span>
-                <p class="text-[11px] text-white mt-0.5 font-medium">Attempt-First Active Recall: Select an option to test yourself</p>
+                <p id="qb-active-recall-subtitle" class="text-[11px] text-white mt-0.5 font-medium">Attempt-First Active Recall: Select an option to test yourself</p>
               </div>
             </div>
           </div>
@@ -3537,7 +3576,7 @@ summary:focus-visible,
                 <span class="hidden sm:inline">Medium:</span>
               </span>
               <button type="button" onclick="setGlobalAppLanguage('en')" data-lang-btn="en" class="lang-switch-btn px-3 py-1 rounded-lg transition-all cursor-pointer font-bold bg-[#10402D] text-white shadow-xs">English</button>
-              <button type="button" onclick="setGlobalAppLanguage('hi')" data-lang-btn="hi" class="lang-switch-btn px-3 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#3B493F] hover:text-[#10402D]">हिन्दी</button>
+              <button type="button" onclick="setGlobalAppLanguage('hi')" data-lang-btn="hi" class="lang-switch-btn px-3 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#223127] hover:text-[#10402D]">हिन्दी</button>
             </div>
             <div class="bg-[#F6F7F2] border border-[#DCE6DF] rounded-xl px-3 py-1.5 text-xs">
               <span class="text-[#526056]">Total Questions:</span>
@@ -3562,11 +3601,11 @@ summary:focus-visible,
           
           <!-- Mode Tabs -->
           <div class="inline-flex p-1 rounded-2xl bg-[#F6F7F2] border border-[#DCE6DF] shrink-0">
-            <button type="button" id="workspace-mode-btn-testseries" onclick="switchMainMode('testseries')" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer">
+            <button type="button" id="workspace-mode-btn-testseries" onclick="switchMainMode('testseries')" class="mode-active flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer">
               <i data-lucide="award" class="w-4 h-4 text-[#FCE27B]"></i>
               <span>22 Full-Length Mock Tests (Complete)</span>
             </button>
-            <button type="button" id="workspace-mode-btn-pyq" onclick="switchMainMode('pyq')" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#3B493F] hover:text-[#111C15] cursor-pointer">
+            <button type="button" id="workspace-mode-btn-pyq" onclick="switchMainMode('pyq')" class="mode-inactive flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#223127] hover:text-[#10402D] cursor-pointer">
               <i data-lucide="book-open" class="w-4 h-4 text-[#10402D]"></i>
               <span>2,800+ Subject-Wise PYQ Bank</span>
             </button>
@@ -3574,16 +3613,16 @@ summary:focus-visible,
 
           <!-- Secondary Sub-Navigation for PYQ Bank -->
           <div id="pyq-subnav" class="hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            <button type="button" onclick="switchView('bank')" class="px-3 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer">
+            <button type="button" id="subnav-btn-bank" onclick="switchView('bank')" class="subnav-btn subnav-active px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer shadow-2xs">
               Question Feed
             </button>
-            <button type="button" onclick="switchView('exams')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3B493F] hover:text-[#10402D] bg-white border border-[#DCE6DF] cursor-pointer">
+            <button type="button" id="subnav-btn-exams" onclick="switchView('exams')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs">
               Exam Directory
             </button>
-            <button type="button" onclick="switchView('practice')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3B493F] hover:text-[#10402D] bg-white border border-[#DCE6DF] cursor-pointer">
+            <button type="button" id="subnav-btn-practice" onclick="switchView('practice')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs">
               Scorecard &amp; Option E Calculator
             </button>
-            <button type="button" onclick="switchView('manage')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3B493F] hover:text-[#10402D] bg-white border border-[#DCE6DF] cursor-pointer">
+            <button type="button" id="subnav-btn-manage" onclick="switchView('manage')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs">
               + Add Questions
             </button>
           </div>
@@ -3663,7 +3702,7 @@ summary:focus-visible,
               <i data-lucide="languages" class="w-3.5 h-3.5"></i>
             </span>
             <button type="button" onclick="setGlobalAppLanguage('en')" data-lang-btn="en" class="lang-switch-btn px-2.5 py-1 rounded-lg transition-all cursor-pointer font-bold bg-[#10402D] text-white shadow-xs">English</button>
-            <button type="button" onclick="setGlobalAppLanguage('hi')" data-lang-btn="hi" class="lang-switch-btn px-2.5 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#3B493F] hover:text-[#10402D]">हिन्दी</button>
+            <button type="button" onclick="setGlobalAppLanguage('hi')" data-lang-btn="hi" class="lang-switch-btn px-2.5 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#223127] hover:text-[#10402D]">हिन्दी</button>
           </div>
 
           <!-- Countdown Timer -->
@@ -4038,7 +4077,7 @@ summary:focus-visible,
             <span class="text-xs font-bold text-[#111C15]">Medium / भाषा चुनें:</span>
             <div class="inline-flex items-center p-1 rounded-xl bg-[#EBF3E6] border border-[#C6DEC0] text-xs font-bold shrink-0 shadow-2xs">
               <button type="button" onclick="setGlobalAppLanguage('en')" data-lang-btn="en" class="lang-switch-btn px-3 py-1 rounded-lg transition-all cursor-pointer font-bold bg-[#10402D] text-white shadow-xs">English Medium</button>
-              <button type="button" onclick="setGlobalAppLanguage('hi')" data-lang-btn="hi" class="lang-switch-btn px-3 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#3B493F] hover:text-[#10402D]">हिन्दी माध्यम</button>
+              <button type="button" onclick="setGlobalAppLanguage('hi')" data-lang-btn="hi" class="lang-switch-btn px-3 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#223127] hover:text-[#10402D]">हिन्दी माध्यम</button>
             </div>
           </div>
           <span class="text-[11px] text-[#526056]">Switching language updates questions, options &amp; published answer keys</span>
@@ -5410,6 +5449,24 @@ summary:focus-visible,
         }
       });
 
+      // Update pyq-subnav active button styling
+      const subnavMap = {
+        'bank': 'subnav-btn-bank',
+        'exams': 'subnav-btn-exams',
+        'practice': 'subnav-btn-practice',
+        'manage': 'subnav-btn-manage'
+      };
+      Object.keys(subnavMap).forEach(key => {
+        const btn = document.getElementById(subnavMap[key]);
+        if (btn) {
+          if (key === viewName) {
+            btn.className = 'subnav-btn subnav-active px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer shadow-2xs';
+          } else {
+            btn.className = 'subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs';
+          }
+        }
+      });
+
       if (viewName === "testseries") {
         renderTestSeriesCards();
       } else if (viewName === "exams") {
@@ -6588,19 +6645,19 @@ summary:focus-visible,
 
       if (mode === 'testseries') {
         if (btnTS) {
-          btnTS.className = 'flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer';
+          btnTS.className = 'mode-active flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer';
         }
         if (btnPYQ) {
-          btnPYQ.className = 'flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#3B493F] hover:text-[#111C15] cursor-pointer';
+          btnPYQ.className = 'mode-inactive flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#223127] hover:text-[#10402D] hover:bg-[#F6F7F2] cursor-pointer';
         }
         if (pyqSubNav) pyqSubNav.classList.add('hidden');
         switchView('testseries');
       } else {
         if (btnTS) {
-          btnTS.className = 'flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#3B493F] hover:text-[#111C15] cursor-pointer';
+          btnTS.className = 'mode-inactive flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#223127] hover:text-[#10402D] hover:bg-[#F6F7F2] cursor-pointer';
         }
         if (btnPYQ) {
-          btnPYQ.className = 'flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer';
+          btnPYQ.className = 'mode-active flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#10402D] text-white shadow-sm cursor-pointer';
         }
         if (pyqSubNav) pyqSubNav.classList.remove('hidden');
         switchView('bank');
@@ -6709,7 +6766,7 @@ summary:focus-visible,
           if (btnLang === lang) {
             btn.className = 'lang-switch-btn px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer font-bold bg-[#10402D] text-white shadow-xs';
           } else {
-            btn.className = 'lang-switch-btn px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#3B493F] hover:text-[#10402D]';
+            btn.className = 'lang-switch-btn px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#223127] hover:text-[#10402D]';
           }
         });
       }

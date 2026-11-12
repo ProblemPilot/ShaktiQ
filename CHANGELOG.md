@@ -106,3 +106,22 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
   - Added defensive CSS ensuring all subtitle text inside `#page-bpsc-pyq-view > header` renders `#FFFFFF !important`.
 - **Verification**: 38/38 automated regression tests passed. Verified live on `https://shaktiq.com/#pyq-bank`.
 - **Commit**: `a7537c9` (deployed to GitHub Pages).
+---
+
+## UI Fix: Practice & Test Mode High-Contrast Switching
+- **Status**: PASSED
+- **Issue**:
+  - When switching between "22 Full-Length Mock Tests" and "2,800+ Subject-Wise PYQ Bank", the inactive button text turned invisible (white on white/light gray).
+  - Subnav pills ("Exam Directory", "Scorecard & Option E Calculator", "+ Add Questions") appeared as blank white pills on view switch.
+- **Root Cause**:
+  - An over-broad CSS rule `html.light #page-bpsc-pyq-view > header .text-[#3B493F] { color: #FFFFFF !important; }` forced white text on all elements with `.text-[#3B493F]`, including buttons nested inside light/white containers.
+- **Changes**:
+  - Removed over-broad CSS selector and scoped white color strictly to the subtitle paragraph (`#qb-active-recall-subtitle { color: #FFFFFF !important; }`).
+  - Added dedicated CSS classes `.mode-active`, `.mode-inactive`, `.subnav-active`, and `.subnav-inactive` ensuring:
+    - Active mode tab: `#10402D` dark green background, `#FFFFFF` white text, `#FCE27B` gold icon.
+    - Inactive mode tab: high-contrast dark charcoal text (`#223127`) with colored icons (`#B45309` and `#10402D`) and hover states (`#10402D` on `#EBF3E6`).
+    - Active subnav button: `#10402D` text on `#EBF3E6` light mint background with border.
+    - Inactive subnav buttons: `#223127` dark charcoal text on `#FFFFFF` white background with subtle border and hover effect.
+  - Updated `switchMainMode` and `switchView` functions to toggle these classes dynamically on click.
+  - Upgraded all inactive language switcher buttons and exam tabs to dark contrast `text-[#223127]`.
+- **Verification**: 38/38 automated regression tests passed. Data checksums byte-identical.
