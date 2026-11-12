@@ -24,14 +24,6 @@ const cssSnippet = `/* Anti-Scraping & Copy Protection */
   -webkit-touch-callout: none !important;
 }
 
-#security-watermark-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  background-repeat: repeat;
-  background-size: 340px 200px;
-}
 `;
 
 if (!content.includes('Anti-Scraping & Copy Protection')) {
@@ -111,29 +103,6 @@ const jsProtection = `
           showToast('Keyboard shortcuts are disabled to protect examination integrity.', 'warning');
         }
       });
-
-      // 4. Dynamic Anti-Leak Session Watermark
-      function updateSessionWatermark() {
-        const user = (typeof getCurrentAspirant === 'function') ? getCurrentAspirant() : null;
-        let overlay = document.getElementById('security-watermark-overlay');
-        if (!overlay) {
-          overlay = document.createElement('div');
-          overlay.id = 'security-watermark-overlay';
-          document.body.appendChild(overlay);
-        }
-        if (user && user.name) {
-          const phoneTag = user.phone ? ('***' + user.phone.slice(-4)) : user.email;
-          const watermarkText = (user.name + ' • ' + phoneTag + ' • ShaktiQ Session').replace(/"/g, "'");
-          const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="360" height="200"><text x="20" y="100" fill="%230A3826" font-size="12" font-family="monospace" font-weight="bold" opacity="0.08" transform="rotate(-25 180 100)">' + watermarkText + '</text></svg>';
-          overlay.style.backgroundImage = 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
-          overlay.classList.remove('hidden');
-        } else {
-          overlay.classList.add('hidden');
-        }
-      }
-
-      window.addEventListener('load', updateSessionWatermark);
-      document.addEventListener('DOMContentLoaded', updateSessionWatermark);
     })();
 `;
 
