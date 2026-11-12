@@ -214,3 +214,12 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
     `Official Disclaimer: This website is an independent educational platform and is not affiliated with BPSC, BSSC, or the Government of Bihar.`
   - Reduced visual weight and eliminated dense text block from the footer.
 - **Verification**: 38/38 automated regression tests passed. Full JavaScript compilation verified with 0 syntax errors. SHA-256 question bank checksums byte-identical.
+
+---
+
+## UI Fix: Match Daily Goal Target & Solved Number Font Size
+- **Status**: PASSED
+- **Changes Implemented**:
+  - Matched the font size and styling of the Daily Abhyas target count (`#abhyas-daily-target-label`) with the solved count (`#abhyas-solved-today`).
+  - Both numbers now consistently render as `text-2xl sm:text-3xl font-display font-black text-[#10402D]` separated by an aligned `/` divider, giving equal visual balance to `30 / 100`.
+- **Verification**: 38/38 automated regression tests passed. Full JavaScript compilation verified with 0 syntax errors. SHA-256 question bank checksums byte-identical.
