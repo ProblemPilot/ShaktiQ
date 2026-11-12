@@ -92,3 +92,17 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
   - Added all modern WebP image assets (`logo.webp`, `hero-museum.webp`, `bodhi-tree.webp`, `yt-logo.webp`) to `STATIC_ASSETS` in `sw.js`.
 - **Verification**: 38/38 regression tests passed. Data checksums byte-identical.
 - **Decision**: Keep and commit.
+
+---
+
+## UI Fix: Practice Mode Header High-Contrast Visibility
+- **Status**: PASSED
+- **Changes**:
+  - Replaced the dark green header logo in `#page-bpsc-pyq-view` with `logo-white.webp` and class `logo-white` (`filter: brightness(0) invert(1)`), turning the ShaktiQ brand mark pure white on the `#0A3826` dark green header bar.
+  - Changed the invisible subtitle text under the yellow badge (`Attempt-First Active Recall: Select an option to test yourself`) from dark green `text-[#3B493F]` to crisp pure white `text-white`.
+  - Upgraded the `+ Add Question` button from a dark-on-dark container to a crisp white pill button with dark green text (`bg-white hover:bg-[#EBF3E6] text-[#10402D] border border-white/80`).
+  - Updated vertical dividers around the logo and badge to `bg-white/25` and `border-white/25`, and the horizontal row divider to `border-white/15`.
+  - Updated unauthenticated `Sign In` button in practice mode to a clean white pill.
+  - Added defensive CSS ensuring all subtitle text inside `#page-bpsc-pyq-view > header` renders `#FFFFFF !important`.
+- **Verification**: 38/38 automated regression tests passed. Verified live on `https://shaktiq.com/#pyq-bank`.
+- **Commit**: `a7537c9` (deployed to GitHub Pages).
