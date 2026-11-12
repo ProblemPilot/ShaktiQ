@@ -125,3 +125,29 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
   - Updated `switchMainMode` and `switchView` functions to toggle these classes dynamically on click.
   - Upgraded all inactive language switcher buttons and exam tabs to dark contrast `text-[#223127]`.
 - **Verification**: 38/38 automated regression tests passed. Data checksums byte-identical.
+---
+
+## Feature: Ultra-Personalized Student Prep Hub, Testbook-Style Mock Tracking & Dual-Engine Subject Analytics
+- **Status**: PASSED
+- **User Requirements Addressed**:
+  1. *Per-Student Isolation*: Separate storage and profile tracking per signed-in student (`shaktiq_usr_<email>_practice`), supporting multi-user switching on shared devices.
+  2. *Mock Test Tracking (Testbook-Style)*:
+     - Automatically tracks attempt counts per mock test ("Attempted: 1 time", "Attempted: 2 times").
+     - Records and displays best score, latest score, and historical scores with dates, +correct, and -wrong breakdowns.
+     - Dynamic action button switches to "Re-Attempt Mock Test".
+  3. *Practice PYQ Bank (2,800+ Questions) Tracking*:
+     - Lightweight per-student storage tracking attempted status and chosen options.
+     - On question cards: High-contrast badge indicating "`✓ Previously Attempted (Selected B) • Correct / Needs Review`".
+     - Real-time subject progress tracking (e.g. Economics: "64 Attempted • 105 Unattempted • 169 Total Questions" with visual progress bar).
+     - Dedicated filter pills: "All Questions", "Unattempted Only", and "Attempted Only" allowing students to drill down into unattempted questions with 1 click.
+  4. *Personalized Student Dashboard (`#view-analytics`)*:
+     - Accessible via new subnav tab "📊 My Prep & Weak Areas", header button, and mock test dashboard.
+     - **Dual-Engine Subject Analytics**: Synthesizes question-level accuracy across both practice questions and mock tests.
+     - **🌟 Strongest Subjects (Scoring Weapons)**: Highlights top accuracy subjects (>65%) with mastery badges.
+     - **⚠️ High-Yield Focus Areas (Weakest Subjects)**: Highlights lowest accuracy subjects and unattempted gaps, with 1-click action button ("Solve X Unattempted Qs Now").
+     - Complete 11-subject progress table with completion percentages and action links.
+     - Testbook-style mock test history log.
+  5. *Zero Lag & Offline-First*:
+     - Single-pass $O(N)$ calculations ($<3$ ms computation time).
+     - Zero external dependencies; 100% offline-compatible via localStorage.
+- **Verification**: 38/38 automated regression tests passed. Full simulation test on real 2,809 questions bank passed.

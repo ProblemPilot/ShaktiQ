@@ -3616,6 +3616,10 @@ summary:focus-visible,
             <button type="button" id="subnav-btn-bank" onclick="switchView('bank')" class="subnav-btn subnav-active px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer shadow-2xs">
               Question Feed
             </button>
+            <button type="button" id="subnav-btn-analytics" onclick="switchView('analytics')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs flex items-center gap-1.5">
+              <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-[#10402D]"></i>
+              <span>My Prep &amp; Weak Areas</span>
+            </button>
             <button type="button" id="subnav-btn-exams" onclick="switchView('exams')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#223127] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs">
               Exam Directory
             </button>
@@ -3677,6 +3681,23 @@ summary:focus-visible,
       </div>
 
       <!-- Test Series Grid (22 Curated Complete BPSC Tests) -->
+      <!-- Student Personalized Performance Strip in Mock Test series -->
+      <div class="bg-white border border-[#C6DEC0] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#EBF3E6] flex items-center justify-center text-[#10402D] shrink-0 font-bold">
+            <i data-lucide="award" class="w-5 h-5 text-[#10402D]"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-extrabold text-sm sm:text-base text-[#111C15]">Personalized Mock Test &amp; PYQ Performance Tracker</h3>
+            <p class="text-xs text-[#526056] mt-0.5">Testbook-style attempt history, score tracking &amp; subject accuracy combining mock tests and PYQs.</p>
+          </div>
+        </div>
+        <button type="button" onclick="switchView('analytics')" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#10402D] hover:bg-[#17593F] transition cursor-pointer shadow-xs shrink-0">
+          <i data-lucide="bar-chart-2" class="w-4 h-4 text-[#FCE27B]"></i>
+          <span>View My Prep Analytics &amp; Scores</span>
+        </button>
+      </div>
+
       <div id="testseries-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Rendered dynamically by renderTestSeriesCards() -->
       </div>
@@ -4142,6 +4163,32 @@ summary:focus-visible,
       </div>
 
       <!-- Subject Quick-Jump Index Bar -->
+      <!-- Live Subject Practice Progress Strip -->
+      <div id="subjectProgressStrip" class="bg-white rounded-2xl shadow-sm border border-[#DCE6DF] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="progSubjectTitle" class="font-display font-extrabold text-sm text-[#111C15]">All Subjects Practice Progress:</span>
+            <span id="progSubjectAttemptedBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">0 Attempted</span>
+            <span id="progSubjectUnattemptedBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]">2,809 Unattempted</span>
+            <span id="progSubjectTotalBadge" class="text-xs text-[#526056] font-medium">(2,809 Total Questions)</span>
+          </div>
+          <div class="w-full bg-[#E5ECE6] h-2 rounded-full overflow-hidden mt-2 max-w-md">
+            <div id="progSubjectBar" class="bg-[#10402D] h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 flex-wrap">
+          <button type="button" onclick="setPracticeStatusFilter('all')" id="filterStatusBtn-all" class="px-3 py-1.5 rounded-xl font-bold text-xs bg-[#10402D] text-white transition cursor-pointer shadow-2xs">
+            All Questions
+          </button>
+          <button type="button" onclick="setPracticeStatusFilter('unattempted')" id="filterStatusBtn-unattempted" class="px-3 py-1.5 rounded-xl font-bold text-xs bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] transition cursor-pointer shadow-2xs">
+            Unattempted Only
+          </button>
+          <button type="button" onclick="setPracticeStatusFilter('attempted')" id="filterStatusBtn-attempted" class="px-3 py-1.5 rounded-xl font-bold text-xs bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] transition cursor-pointer shadow-2xs">
+            Attempted Only
+          </button>
+        </div>
+      </div>
+
       <div id="subjectJumpBar" class="bg-[#F6F7F2] border border-[#DCE6DF] text-[#111C15] rounded-2xl px-4 py-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar text-xs no-print">
         <span class="font-bold text-[#10402D] shrink-0">Jump to Subject:</span>
         <div id="subjectJumpLinks" class="flex items-center gap-1.5">
@@ -4164,6 +4211,14 @@ summary:focus-visible,
         </button>
       </div>
     </section>
+    <!-- ========================================== -->
+    <!-- VIEW: PERSONALIZED STUDENT PREP & ANALYTICS -->
+    <!-- ========================================== -->
+    <section id="view-analytics" class="space-y-6 hidden">
+      <!-- Dynamically rendered by renderStudentAnalyticsView() -->
+      <div id="student-analytics-container" class="space-y-6"></div>
+    </section>
+
 
     <!-- ========================================== -->
     <!-- VIEW 3: 2025-2026 EXAMS & WEIGHTAGE        -->
@@ -5244,6 +5299,40 @@ summary:focus-visible,
     let customExams = [];
     let bookmarkedIds = {};
     let userAttempts = {}; // { qid: selectedLetter }
+    let practiceFilterStatus = 'all'; // 'all', 'unattempted', 'attempted'
+
+    function getStudentStoragePrefix() {
+      const user = getCurrentAspirant();
+      if (user && user.email) {
+        return 'shaktiq_usr_' + user.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+      }
+      return 'shaktiq_usr_default';
+    }
+
+    function loadStudentPracticeAttempts() {
+      const prefix = getStudentStoragePrefix();
+      try {
+        const saved = localStorage.getItem(prefix + '_practice');
+        if (saved) return JSON.parse(saved) || {};
+        // Backward-compatible fallback / migration
+        const legacy = localStorage.getItem('bpsc_practice_attempts_v1');
+        if (legacy) {
+          const parsed = JSON.parse(legacy) || {};
+          localStorage.setItem(prefix + '_practice', JSON.stringify(parsed));
+          return parsed;
+        }
+      } catch (e) {}
+      return {};
+    }
+
+    function saveStudentPracticeAttempt(qid, opt) {
+      userAttempts[qid] = opt;
+      const prefix = getStudentStoragePrefix();
+      try {
+        localStorage.setItem(prefix + '_practice', JSON.stringify(userAttempts));
+        localStorage.setItem('bpsc_practice_attempts_v1', JSON.stringify(userAttempts));
+      } catch (e) {}
+    }
 
     // Filter state
     let activeView = "bank";
@@ -5424,7 +5513,7 @@ summary:focus-visible,
         return;
       }
       activeView = viewName;
-      const views = ["testseries", "bank", "exams", "manage", "practice"];
+      const views = ["testseries", "bank", "analytics", "exams", "manage", "practice"];
       views.forEach(v => {
         const el = document.getElementById("view-" + v);
         if (el) {
@@ -5452,6 +5541,7 @@ summary:focus-visible,
       // Update pyq-subnav active button styling
       const subnavMap = {
         'bank': 'subnav-btn-bank',
+        'analytics': 'subnav-btn-analytics',
         'exams': 'subnav-btn-exams',
         'practice': 'subnav-btn-practice',
         'manage': 'subnav-btn-manage'
@@ -5469,6 +5559,8 @@ summary:focus-visible,
 
       if (viewName === "testseries") {
         renderTestSeriesCards();
+      } else if (viewName === "analytics") {
+        renderStudentAnalyticsView();
       } else if (viewName === "exams") {
         renderExamDirectoryAndStats();
       } else if (viewName === "practice") {
@@ -5509,6 +5601,10 @@ summary:focus-visible,
         if (selectedType === "Mains" && item.type !== "Mains") return false;
         if (selectedType === "BOOKMARKED" && !bookmarkedIds[item.id]) return false;
         if (selectedType === "CUSTOM" && !item.custom) return false;
+        if (selectedType === "UNATTEMPTED" && userAttempts[item.id]) return false;
+        if (selectedType === "ATTEMPTED" && !userAttempts[item.id]) return false;
+        if (practiceFilterStatus === 'unattempted' && userAttempts[item.id]) return false;
+        if (practiceFilterStatus === 'attempted' && !userAttempts[item.id]) return false;
 
         if (qLower) {
           const hay = (
@@ -5586,25 +5682,37 @@ summary:focus-visible,
     function renderSubjectPills() {
       const all = getAllQuestions();
       const counts = { ALL: all.length };
-      SUBJECT_ORDER.forEach(s => { counts[s] = 0; });
+      const attemptedCounts = { ALL: 0 };
+      SUBJECT_ORDER.forEach(s => { counts[s] = 0; attemptedCounts[s] = 0; });
       all.forEach(item => {
         counts[item.subject] = (counts[item.subject] || 0) + 1;
+        if (userAttempts[item.id]) {
+          attemptedCounts.ALL = (attemptedCounts.ALL || 0) + 1;
+          attemptedCounts[item.subject] = (attemptedCounts[item.subject] || 0) + 1;
+        }
       });
 
       const container = document.getElementById("subjectPillsContainer");
       if (!container) return;
 
-      let html = `<button type="button" data-subject="ALL" class="subject-pill ${selectedSubject === 'ALL' ? 'subject-pill-active' : 'bg-[#F8FAF7] text-[#223127] hover:bg-[#EBF3E6] border-[#DCE6DF]'} border rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold transition flex items-center gap-1.5">
+      const allAtt = attemptedCounts.ALL || 0;
+      const allTot = counts.ALL || 0;
+      const allLeft = Math.max(0, allTot - allAtt);
+
+      let html = `<button type="button" data-subject="ALL" class="subject-pill ${selectedSubject === 'ALL' ? 'subject-pill-active' : 'bg-[#F8FAF7] text-[#223127] hover:bg-[#EBF3E6] border-[#DCE6DF]'} border rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold transition flex items-center gap-1.5" title="${allAtt} attempted, ${allLeft} unattempted">
         <span>All Subjects</span>
-        <span class="px-1.5 py-0.5 text-xs rounded-full bg-black/10">${counts.ALL}</span>
+        <span class="px-2 py-0.5 text-xs rounded-full ${selectedSubject === 'ALL' ? 'bg-white/20 text-white' : 'bg-black/10 text-[#111C15]'}">${allAtt > 0 ? `${allAtt}/${allTot}` : allTot}</span>
       </button>`;
 
       SUBJECT_ORDER.forEach(subj => {
         const isActive = selectedSubject === subj;
         const count = counts[subj] || 0;
-        html += `<button type="button" data-subject="${escapeHtml(subj)}" class="subject-pill ${isActive ? 'subject-pill-active' : 'bg-white text-[#223127] hover:bg-[#EBF3E6] border-[#DCE6DF]'} border rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5">
+        const att = attemptedCounts[subj] || 0;
+        const unatt = Math.max(0, count - att);
+        const countLabel = att > 0 ? `${att}/${count}` : count;
+        html += `<button type="button" data-subject="${escapeHtml(subj)}" class="subject-pill ${isActive ? 'subject-pill-active' : 'bg-white text-[#223127] hover:bg-[#EBF3E6] border-[#DCE6DF]'} border rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5" title="${att} attempted, ${unatt} unattempted remaining">
           <span>${escapeHtml(subj)}</span>
-          <span class="px-1.5 py-0.5 text-xs rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-[#EBF3E6] text-[#10402D] font-bold'}">${count}</span>
+          <span class="px-1.5 py-0.5 text-xs rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-[#EBF3E6] text-[#10402D] font-bold'}">${countLabel}</span>
         </button>`;
       });
 
@@ -5615,10 +5723,75 @@ summary:focus-visible,
           selectedSubject = btn.getAttribute("data-subject");
           displayLimit = 60;
           renderSubjectPills();
+          updateSubjectProgressUI();
           renderQuestions();
         });
       });
+
+      updateSubjectProgressUI();
     }
+
+    function setPracticeStatusFilter(mode) {
+      practiceFilterStatus = mode; // 'all', 'unattempted', 'attempted'
+      displayLimit = 60;
+      updateSubjectProgressUI();
+      renderQuestions();
+    }
+
+    function updateSubjectProgressUI() {
+      const all = getAllQuestions();
+      const currentSubj = selectedSubject || 'ALL';
+
+      let total = 0;
+      let attempted = 0;
+
+      all.forEach(q => {
+        if (currentSubj === 'ALL' || q.subject === currentSubj) {
+          total += 1;
+          if (userAttempts[q.id]) attempted += 1;
+        }
+      });
+
+      const unattempted = Math.max(0, total - attempted);
+      const pct = total > 0 ? Math.round((attempted / total) * 100) : 0;
+
+      const titleEl = document.getElementById('progSubjectTitle');
+      const attEl = document.getElementById('progSubjectAttemptedBadge');
+      const unattEl = document.getElementById('progSubjectUnattemptedBadge');
+      const totEl = document.getElementById('progSubjectTotalBadge');
+      const barEl = document.getElementById('progSubjectBar');
+
+      const subjName = currentSubj === 'ALL' ? 'All Subjects' : currentSubj;
+      if (titleEl) titleEl.textContent = `${subjName} Practice Progress:`;
+      if (attEl) attEl.textContent = `${attempted} Attempted`;
+      if (unattEl) unattEl.textContent = `${unattempted} Unattempted`;
+      if (totEl) totEl.textContent = `(${total} Total Questions • ${pct}% Completed)`;
+      if (barEl) barEl.style.width = `${pct}%`;
+
+      const btnAll = document.getElementById('filterStatusBtn-all');
+      const btnUnatt = document.getElementById('filterStatusBtn-unattempted');
+      const btnAtt = document.getElementById('filterStatusBtn-attempted');
+
+      if (btnAll) {
+        btnAll.textContent = `All (${total})`;
+        btnAll.className = practiceFilterStatus === 'all'
+          ? 'px-3 py-1.5 rounded-xl font-bold text-xs bg-[#10402D] text-white transition cursor-pointer shadow-2xs'
+          : 'px-3 py-1.5 rounded-xl font-bold text-xs bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] transition cursor-pointer shadow-2xs';
+      }
+      if (btnUnatt) {
+        btnUnatt.textContent = `Unattempted Only (${unattempted})`;
+        btnUnatt.className = practiceFilterStatus === 'unattempted'
+          ? 'px-3 py-1.5 rounded-xl font-bold text-xs bg-[#10402D] text-white transition cursor-pointer shadow-2xs'
+          : 'px-3 py-1.5 rounded-xl font-bold text-xs bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] transition cursor-pointer shadow-2xs';
+      }
+      if (btnAtt) {
+        btnAtt.textContent = `Attempted (${attempted})`;
+        btnAtt.className = practiceFilterStatus === 'attempted'
+          ? 'px-3 py-1.5 rounded-xl font-bold text-xs bg-[#10402D] text-white transition cursor-pointer shadow-2xs'
+          : 'px-3 py-1.5 rounded-xl font-bold text-xs bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] transition cursor-pointer shadow-2xs';
+      }
+    }
+
 
     function toDdMmYyyy(dateStr) {
       const s = String(dateStr || '').trim();
@@ -5824,6 +5997,12 @@ summary:focus-visible,
             <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">📅 ${escapeHtml(item.date)} (${escapeHtml(item.year)})</span>
             <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">${isMains ? 'Descriptive Mains' : escapeHtml(item.type)}</span>
             ${item.custom ? '<span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#0A2E20] text-emerald-200 border border-[#17593F]">Custom Added</span>' : ''}
+            ${isAttempted ? `
+              <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${userChoice === item.ans ? 'bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]' : 'bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]'} flex items-center gap-1 shadow-2xs">
+                <i data-lucide="${userChoice === item.ans ? 'check-circle' : 'alert-circle'}" class="w-3.5 h-3.5"></i>
+                <span>Previously Attempted (Selected ${userChoice}) • ${userChoice === item.ans ? 'Correct' : 'Needs Review'}</span>
+              </span>
+            ` : ''}
           </div>
 
           <div class="flex items-center gap-1.5 no-print flex-wrap">
@@ -6073,7 +6252,8 @@ summary:focus-visible,
             const qid = btn.getAttribute("data-qid");
             const opt = btn.getAttribute("data-opt");
             userAttempts[qid] = opt;
-            try { localStorage.setItem('bpsc_practice_attempts_v1', JSON.stringify(userAttempts)); } catch (e) {}
+            saveStudentPracticeAttempt(qid, opt);
+            updateSubjectProgressUI();
             logPyqInteraction(aspirant, qid, opt);
             renderQuestions();
             updatePracticeScorecard();
@@ -7161,8 +7341,14 @@ summary:focus-visible,
           if (!questionsLoaded || INITIAL_QUESTIONS.length === 0) {
             loadQuestionsData(true);
           }
-          updateAspirantNavUI();
-          closeAspirantRegModal();
+          userAttempts = loadStudentPracticeAttempts();
+        updateAspirantNavUI();
+        renderSubjectPills();
+        updateSubjectProgressUI();
+        renderQuestions();
+        if (typeof renderTestSeriesCards === 'function') renderTestSeriesCards();
+        if (activeView === 'analytics') renderStudentAnalyticsView();
+        closeAspirantRegModal();
           showToast(`Welcome back, ${existing.name}! Resumed your session.`, 'success');
           if (pendingAspirantCallback) {
             const cb = pendingAspirantCallback;
@@ -8315,6 +8501,18 @@ summary:focus-visible,
     let mockTimeRemaining = 7200; // seconds
     let activeMockTest = null;
 
+    function getTestAttemptsForTest(testIdOrTitle, studentEmail) {
+      const allAttempts = getAllTestAttempts();
+      const current = getCurrentAspirant();
+      const email = (studentEmail || (current ? current.email : '') || '').toLowerCase().trim();
+      return allAttempts.filter(a => {
+        const matchesEmail = !email || (a.studentEmail || '').toLowerCase().trim() === email;
+        const matchesTest = (a.testId && a.testId === testIdOrTitle) || 
+                            (a.examTitle && testIdOrTitle && a.examTitle.toLowerCase().trim() === String(testIdOrTitle).toLowerCase().trim());
+        return matchesEmail && matchesTest;
+      });
+    }
+
     function renderTestSeriesCards(category = 'ALL') {
       const grid = document.getElementById('testseries-grid');
       if (!grid) return;
@@ -8323,14 +8521,30 @@ summary:focus-visible,
 
       let cardsHtml = '';
       filtered.forEach(test => {
+        const attempts = getTestAttemptsForTest(test.id);
+        const attemptCount = attempts.length;
+        let bestScore = null;
+        let latestAttempt = attemptCount > 0 ? attempts[0] : null;
+        attempts.forEach(a => {
+          const s = parseFloat(a.score);
+          if (!isNaN(s) && (bestScore === null || s > bestScore)) bestScore = s;
+        });
+
         cardsHtml += `
           <div class="bg-white border border-[#DCE6DF] hover:border-[#10402D] rounded-3xl p-6 shadow-sm hover:shadow-md flex flex-col justify-between transition-all group">
             <div class="space-y-4">
-              <div class="flex items-center justify-between gap-2">
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">
-                  ${escapeHtml(test.statusLabel || "100% Complete")}
-                </span>
-                <span class="text-xs font-bold text-[#3B493F] flex items-center gap-1">
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                ${attemptCount > 0 ? `
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0] flex items-center gap-1">
+                    <i data-lucide="check-circle-2" class="w-3 h-3 text-[#10402D]"></i>
+                    Attempted: ${attemptCount} ${attemptCount === 1 ? 'time' : 'times'}
+                  </span>
+                ` : `
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F6F7F2] text-[#223127] border border-[#DCE6DF]">
+                    ${escapeHtml(test.statusLabel || "100% Complete Full Paper")}
+                  </span>
+                `}
+                <span class="text-xs font-bold text-[#526056] flex items-center gap-1">
                   <i data-lucide="clock" class="w-3.5 h-3.5 text-[#10402D]"></i>
                   ${test.timeMins} Mins
                 </span>
@@ -8340,7 +8554,7 @@ summary:focus-visible,
                 <h3 class="font-display font-extrabold text-lg text-[#111C15] group-hover:text-[#10402D] transition">
                   ${escapeHtml(test.title)}
                 </h3>
-                <p class="text-xs text-[#3B493F] mt-1.5 leading-relaxed">
+                <p class="text-xs text-[#526056] mt-1.5 leading-relaxed">
                   ${escapeHtml(test.desc)}
                 </p>
               </div>
@@ -8359,12 +8573,31 @@ summary:focus-visible,
                   <strong class="text-rose-600 font-bold">-1/3</strong>
                 </div>
               </div>
+
+              ${attemptCount > 0 ? `
+                <!-- Past Attempt History Box -->
+                <div class="p-3.5 rounded-2xl bg-[#EBF3E6]/60 border border-[#C6DEC0] text-xs space-y-1.5">
+                  <div class="flex items-center justify-between font-bold text-[#10402D]">
+                    <span>Best Score: <strong>${bestScore !== null ? bestScore.toFixed(2) : '0.00'} / ${test.marks}</strong></span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#10402D] text-white">Latest: ${latestAttempt ? latestAttempt.score : '0.00'}</span>
+                  </div>
+                  <div class="pt-1.5 border-t border-[#C6DEC0]/50 space-y-1">
+                    ${attempts.slice(0, 2).map((att, idx) => `
+                      <div class="flex items-center justify-between text-[11px] text-[#223127]">
+                        <span>Attempt #${attempts.length - idx}: <strong class="text-[#10402D]">${att.score} Marks</strong> (+${att.correct || 0}/-${att.wrong || 0})</span>
+                        <span class="text-[#526056] text-[10px]">${att.timestamp ? att.timestamp.split(',')[0] : ''}</span>
+                      </div>
+                    `).join('')}
+                    ${attempts.length > 2 ? `<div class="text-[10px] text-[#526056] text-right font-medium">+${attempts.length - 2} earlier attempts logged</div>` : ''}
+                  </div>
+                </div>
+              ` : ''}
             </div>
 
             <div class="pt-5">
               <button type="button" onclick="startMockTest('${escapeHtml(test.id)}')" class="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl font-display font-bold text-xs sm:text-sm text-white bg-[#10402D] hover:bg-[#17593F] shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer">
-                <i data-lucide="play" class="w-4 h-4 fill-current"></i>
-                <span>Start Mock Test</span>
+                <i data-lucide="${attemptCount > 0 ? 'rotate-ccw' : 'play'}" class="w-4 h-4 fill-current"></i>
+                <span>${attemptCount > 0 ? 'Re-Attempt Mock Test' : 'Start Mock Test'}</span>
               </button>
             </div>
           </div>
@@ -8384,6 +8617,482 @@ summary:focus-visible,
         }
       });
       renderTestSeriesCards(cat);
+    }
+
+    
+    // ========================================================================
+    // PERSONALIZED STUDENT PREP & ACCURACY ANALYTICS ENGINE
+    // Combines Practice PYQ Bank + Full-Length Mock Test Attempts
+    // ========================================================================
+
+    function getStudentAnalyticsData() {
+      const user = getCurrentAspirant() || {
+        name: "Aspirant",
+        email: "aspirant@shaktiq.com",
+        district: "Patna",
+        targetExam: "72nd/73rd BPSC CCE"
+      };
+
+      const allQs = getAllQuestions().filter(q => !isMainsDescriptiveQuestion(q));
+      const allMap = {};
+      allQs.forEach(q => { allMap[q.id] = q; });
+
+      const practiceAttempts = userAttempts || {};
+      const studentEmail = (user.email || '').toLowerCase().trim();
+      const allMockAttempts = getAllTestAttempts();
+      const studentMocks = allMockAttempts.filter(a => !studentEmail || (a.studentEmail || '').toLowerCase().trim() === studentEmail);
+
+      const subjectStats = {};
+      SUBJECT_ORDER.forEach(s => {
+        subjectStats[s] = {
+          subject: s,
+          totalBank: 0,
+          practiceAttempted: 0,
+          practiceCorrect: 0,
+          practiceWrong: 0,
+          mockAttempted: 0,
+          mockCorrect: 0,
+          mockWrong: 0,
+          uniqueAttemptedQids: new Set(),
+          uniqueCorrectQids: new Set()
+        };
+      });
+
+      allQs.forEach(q => {
+        if (subjectStats[q.subject]) {
+          subjectStats[q.subject].totalBank += 1;
+        }
+      });
+
+      // Aggregate practice attempts
+      Object.keys(practiceAttempts).forEach(qid => {
+        const q = allMap[qid];
+        if (!q || !subjectStats[q.subject]) return;
+        const choice = practiceAttempts[qid];
+        if (choice === 'E' && q.options && q.options[4] && q.options[4].toLowerCase().includes('not attempted')) {
+          return;
+        }
+        subjectStats[q.subject].practiceAttempted += 1;
+        subjectStats[q.subject].uniqueAttemptedQids.add(qid);
+        if (choice === q.ans) {
+          subjectStats[q.subject].practiceCorrect += 1;
+          subjectStats[q.subject].uniqueCorrectQids.add(qid);
+        } else {
+          subjectStats[q.subject].practiceWrong += 1;
+        }
+      });
+
+      // Aggregate mock test attempts
+      studentMocks.forEach(m => {
+        if (Array.isArray(m.questionResults) && m.questionResults.length > 0) {
+          m.questionResults.forEach(qr => {
+            if (!qr.subject || !subjectStats[qr.subject]) return;
+            if (!qr.userOpt || qr.userOpt === 'E') return;
+            subjectStats[qr.subject].mockAttempted += 1;
+            subjectStats[qr.subject].uniqueAttemptedQids.add(qr.id);
+            if (qr.isCorrect) {
+              subjectStats[qr.subject].mockCorrect += 1;
+              subjectStats[qr.subject].uniqueCorrectQids.add(qr.id);
+            } else {
+              subjectStats[qr.subject].mockWrong += 1;
+            }
+          });
+        }
+      });
+
+      // Compute accuracy and progress per subject
+      const subjectList = SUBJECT_ORDER.map(s => {
+        const stat = subjectStats[s];
+        const totalBank = stat.totalBank;
+        const attemptedUnique = stat.uniqueAttemptedQids.size;
+        const unattempted = Math.max(0, totalBank - attemptedUnique);
+        const correctUnique = stat.uniqueCorrectQids.size;
+        const accuracy = attemptedUnique > 0 ? Math.round((correctUnique / attemptedUnique) * 100) : 0;
+        const completionPct = totalBank > 0 ? Math.round((attemptedUnique / totalBank) * 100) : 0;
+
+        return {
+          subject: s,
+          totalBank: totalBank,
+          attempted: attemptedUnique,
+          unattempted: unattempted,
+          correct: correctUnique,
+          accuracy: accuracy,
+          completionPct: completionPct
+        };
+      });
+
+      const attemptedSubjects = subjectList.filter(s => s.attempted > 0);
+
+      const strongestSubjects = [...attemptedSubjects]
+        .sort((a, b) => b.accuracy - a.accuracy || b.attempted - a.attempted)
+        .slice(0, 4);
+
+      const weakestSubjects = [...subjectList]
+        .sort((a, b) => {
+          if (a.attempted > 0 && b.attempted > 0) return a.accuracy - b.accuracy;
+          if (a.attempted > 0) return -1;
+          if (b.attempted > 0) return 1;
+          return b.unattempted - a.unattempted;
+        })
+        .slice(0, 4);
+
+      const totalAttemptedPYQs = Object.keys(practiceAttempts).length;
+      const totalBankQuestions = allQs.length;
+      const totalUnattemptedPYQs = Math.max(0, totalBankQuestions - totalAttemptedPYQs);
+      const totalMockTestsTaken = studentMocks.length;
+
+      let bestMockScore = null;
+      studentMocks.forEach(m => {
+        const sc = parseFloat(m.score);
+        if (!isNaN(sc) && (bestMockScore === null || sc > bestMockScore)) {
+          bestMockScore = sc;
+        }
+      });
+
+      let allTestedCount = 0;
+      let allCorrectCount = 0;
+      subjectList.forEach(s => {
+        allTestedCount += s.attempted;
+        allCorrectCount += s.correct;
+      });
+      const overallAccuracy = allTestedCount > 0 ? Math.round((allCorrectCount / allTestedCount) * 100) : 0;
+
+      return {
+        student: user,
+        totalBankQuestions,
+        totalAttemptedPYQs,
+        totalUnattemptedPYQs,
+        totalMockTestsTaken,
+        bestMockScore: bestMockScore !== null ? bestMockScore.toFixed(2) : '0.00',
+        allTestedCount,
+        overallAccuracy,
+        subjectList,
+        strongestSubjects,
+        weakestSubjects,
+        studentMocks
+      };
+    }
+
+    function renderStudentAnalyticsView() {
+      const container = document.getElementById('student-analytics-container');
+      if (!container) return;
+
+      const data = getStudentAnalyticsData();
+      const student = data.student;
+
+      let html = `
+        <!-- Personalized Aspirant Header -->
+        <div class="bg-white rounded-3xl border border-[#DCE6DF] p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0] flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#10402D] animate-pulse"></span>
+                Personalized Study Profile
+              </span>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#F6F7F2] text-[#223127] border border-[#DCE6DF]">
+                📍 ${escapeHtml(student.district || 'Bihar')}
+              </span>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#F6F7F2] text-[#223127] border border-[#DCE6DF]">
+                🎯 ${escapeHtml(student.targetExam || '72nd/73rd BPSC CCE')}
+              </span>
+            </div>
+            <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-[#111C15]">
+              ${escapeHtml(student.name || 'Aspirant')}'s Prep Hub
+            </h2>
+            <p class="text-xs sm:text-sm text-[#526056] leading-relaxed max-w-2xl">
+              Real-time performance analytics combining your <strong>${data.totalAttemptedPYQs.toLocaleString()} practice PYQ attempts</strong> and <strong>${data.totalMockTestsTaken} full-length mock tests</strong>. Stored offline-first and synced to your personal profile.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3 shrink-0 flex-wrap">
+            <button type="button" onclick="openStudentProfileModal()" class="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-[#10402D] bg-[#EBF3E6] hover:bg-[#DCE9D5] border border-[#C6DEC0] transition cursor-pointer">
+              <i data-lucide="user" class="w-4 h-4 inline mr-1 text-[#10402D]"></i>
+              Edit Profile
+            </button>
+            <button type="button" onclick="switchStudentAccount()" class="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-[#223127] hover:text-[#10402D] bg-white hover:bg-[#F8FAF7] border border-[#DCE6DF] transition cursor-pointer">
+              <i data-lucide="users" class="w-4 h-4 inline mr-1 text-[#526056]"></i>
+              Switch Student
+            </button>
+          </div>
+        </div>
+
+        <!-- Overall Prep KPIs (4 Cards) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white rounded-2xl border border-[#DCE6DF] p-5 shadow-2xs">
+            <span class="text-xs text-[#526056] font-semibold block">PYQs COMPLETED</span>
+            <div class="font-display font-extrabold text-2xl sm:text-3xl text-[#10402D] mt-1">
+              ${data.totalAttemptedPYQs.toLocaleString()}
+              <span class="text-xs font-normal text-[#526056]">/ ${data.totalBankQuestions.toLocaleString()}</span>
+            </div>
+            <div class="text-[11px] font-bold text-[#785600] mt-1.5 flex items-center gap-1">
+              <span>${data.totalUnattemptedPYQs.toLocaleString()} unattempted remaining</span>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-[#DCE6DF] p-5 shadow-2xs">
+            <span class="text-xs text-[#526056] font-semibold block">MOCK TESTS TAKEN</span>
+            <div class="font-display font-extrabold text-2xl sm:text-3xl text-[#10402D] mt-1">
+              ${data.totalMockTestsTaken}
+              <span class="text-xs font-normal text-[#526056]">/ 22 Tests</span>
+            </div>
+            <div class="text-[11px] font-bold text-[#10402D] mt-1.5">
+              Best Score: ${data.bestMockScore} / 150
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-[#DCE6DF] p-5 shadow-2xs">
+            <span class="text-xs text-[#526056] font-semibold block">COMBINED QUESTIONS TESTED</span>
+            <div class="font-display font-extrabold text-2xl sm:text-3xl text-[#111C15] mt-1">
+              ${data.allTestedCount.toLocaleString()}
+            </div>
+            <div class="text-[11px] text-[#526056] mt-1.5">
+              Mock Tests + PYQ Bank Combined
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-[#DCE6DF] p-5 shadow-2xs">
+            <span class="text-xs text-[#526056] font-semibold block">OVERALL ACCURACY RATE</span>
+            <div class="font-display font-extrabold text-2xl sm:text-3xl ${data.overallAccuracy >= 70 ? 'text-[#10402D]' : (data.overallAccuracy >= 50 ? 'text-[#785600]' : 'text-rose-600')} mt-1">
+              ${data.overallAccuracy}%
+            </div>
+            <div class="text-[11px] text-[#526056] mt-1.5">
+              ${data.overallAccuracy >= 70 ? 'Strong accuracy grip' : (data.overallAccuracy > 0 ? 'Target: 75%+ for Prelims cutoff' : 'Start practicing to calculate')}
+            </div>
+          </div>
+        </div>
+
+        <!-- STRONGEST VS WEAKEST SUBJECTS (THE DUAL ENGINE) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- STRONGEST SUBJECTS CARD -->
+          <div class="bg-white rounded-3xl border border-[#C6DEC0] p-6 shadow-sm">
+            <div class="flex items-center justify-between pb-3.5 border-b border-[#E5ECE6]">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-[#EBF3E6] flex items-center justify-center text-[#10402D] font-bold">
+                  🌟
+                </div>
+                <div>
+                  <h3 class="font-display font-extrabold text-base sm:text-lg text-[#111C15]">Your Strongest Subjects</h3>
+                  <p class="text-xs text-[#526056]">Highest accuracy &amp; proven retention across tests</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#EBF3E6] text-[#10402D]">Scoring Pillars</span>
+            </div>
+
+            <div class="mt-4 space-y-3.5">
+              ${data.strongestSubjects.length === 0 ? `
+                <div class="p-6 text-center text-xs text-[#526056] bg-[#F8FAF7] rounded-2xl border border-[#DCE6DF]">
+                  <p>No practice attempts recorded yet.</p>
+                  <button type="button" onclick="openSubjectPractice('History')" class="mt-3 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#10402D] hover:bg-[#17593F] transition cursor-pointer">
+                    Start Practicing PYQs
+                  </button>
+                </div>
+              ` : data.strongestSubjects.map(s => `
+                <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DCE6DF] hover:border-[#10402D] transition space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="font-display font-extrabold text-sm text-[#111C15]">${escapeHtml(s.subject)}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">
+                      ${s.accuracy}% Accuracy
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between text-xs text-[#526056]">
+                    <span>${s.attempted} of ${s.totalBank} Attempted (${s.unattempted} to go)</span>
+                    <span class="font-semibold text-[#10402D]">${s.completionPct}% Covered</span>
+                  </div>
+                  <div class="w-full bg-[#E5ECE6] h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-[#10402D] h-full rounded-full" style="width: ${s.completionPct}%;"></div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- WEAKEST SUBJECTS CARD (FOCUS AREAS) -->
+          <div class="bg-white rounded-3xl border border-[#F5DF8B] p-6 shadow-sm">
+            <div class="flex items-center justify-between pb-3.5 border-b border-[#E5ECE6]">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-[#FEF6D6] flex items-center justify-center text-[#785600] font-bold">
+                  ⚠️
+                </div>
+                <div>
+                  <h3 class="font-display font-extrabold text-base sm:text-lg text-[#111C15]">High-Yield Focus Areas (Weakest)</h3>
+                  <p class="text-xs text-[#526056]">Subjects with lowest accuracy or highest unattempted gaps</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#FEF6D6] text-[#785600]">Needs Revision</span>
+            </div>
+
+            <div class="mt-4 space-y-3.5">
+              ${data.weakestSubjects.length === 0 ? `
+                <div class="p-6 text-center text-xs text-[#526056] bg-[#F8FAF7] rounded-2xl border border-[#DCE6DF]">
+                  All subjects covered with high accuracy! Keep practicing.
+                </div>
+              ` : data.weakestSubjects.map(s => `
+                <div class="p-4 rounded-2xl bg-[#FFFDF5] border border-[#F5DF8B] hover:border-[#785600] transition space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="font-display font-extrabold text-sm text-[#111C15]">${escapeHtml(s.subject)}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold ${s.attempted > 0 ? (s.accuracy < 50 ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]') : 'bg-gray-100 text-gray-700'}">
+                      ${s.attempted > 0 ? `${s.accuracy}% Accuracy` : 'Not Started'}
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between text-xs text-[#526056]">
+                    <span><strong>${s.attempted}</strong> Attempted • <strong class="text-[#785600]">${s.unattempted} Unattempted</strong></span>
+                    <span class="font-semibold text-[#111C15]">${s.totalBank} Total</span>
+                  </div>
+                  <div class="w-full bg-[#E5ECE6] h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-[#B45309] h-full rounded-full" style="width: ${s.completionPct}%;"></div>
+                  </div>
+                  <div class="pt-1 text-right">
+                    <button type="button" onclick="openSubjectPractice('${escapeHtml(s.subject)}', 'unattempted')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs text-white bg-[#10402D] hover:bg-[#17593F] transition cursor-pointer shadow-2xs">
+                      <span>Solve ${s.unattempted} Unattempted Qs</span>
+                      <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- FULL 11-SUBJECT MASTERY BREAKDOWN MATRIX -->
+        <div class="bg-white rounded-3xl border border-[#DCE6DF] p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E5ECE6]">
+            <div>
+              <h3 class="font-display font-extrabold text-lg text-[#111C15]">Complete 11-Subject Syllabus Breakdown</h3>
+              <p class="text-xs text-[#526056]">Real-time attempted vs unattempted question distribution</p>
+            </div>
+            <button type="button" onclick="openSubjectPractice('ALL', 'unattempted')" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs text-[#10402D] bg-[#EBF3E6] hover:bg-[#DCE9D5] border border-[#C6DEC0] transition cursor-pointer shrink-0">
+              <span>Practice All Remaining (${data.totalUnattemptedPYQs.toLocaleString()})</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${data.subjectList.map(s => `
+              <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DCE6DF] hover:border-[#10402D] transition space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-display font-extrabold text-sm text-[#111C15]">${escapeHtml(s.subject)}</span>
+                  <span class="text-xs font-bold text-[#10402D]">${s.accuracy > 0 ? s.accuracy + '% Acc' : '—'}</span>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-[#526056]">
+                  <span><strong class="text-[#10402D]">${s.attempted}</strong> Attempted</span>
+                  <span><strong class="text-[#785600]">${s.unattempted}</strong> Unattempted</span>
+                  <span>${s.totalBank} Total</span>
+                </div>
+
+                <div class="w-full bg-[#E5ECE6] h-2 rounded-full overflow-hidden">
+                  <div class="bg-[#10402D] h-full rounded-full transition-all duration-300" style="width: ${s.completionPct}%;"></div>
+                </div>
+
+                <div class="flex items-center justify-between pt-1">
+                  <span class="text-[11px] font-semibold text-[#526056]">${s.completionPct}% Completed</span>
+                  <button type="button" onclick="openSubjectPractice('${escapeHtml(s.subject)}', 'unattempted')" class="text-xs font-bold text-[#10402D] hover:underline cursor-pointer">
+                    Practice Unattempted →
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- MOCK TEST ATTEMPT HISTORY (TESTBOOK-STYLE) -->
+        <div class="bg-white rounded-3xl border border-[#DCE6DF] p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E5ECE6]">
+            <div>
+              <h3 class="font-display font-extrabold text-lg text-[#111C15]">Mock Test History Log (Testbook-Style)</h3>
+              <p class="text-xs text-[#526056]">Complete audit record of marks, accuracy &amp; Option E safe skips for every attempt</p>
+            </div>
+            <button type="button" onclick="openTestSeriesMode()" class="px-4 py-2 rounded-xl font-bold text-xs text-white bg-[#10402D] hover:bg-[#17593F] transition cursor-pointer shrink-0">
+              Take a New Mock Test
+            </button>
+          </div>
+
+          <div class="mt-4 space-y-3">
+            ${data.studentMocks.length === 0 ? `
+              <div class="p-8 text-center text-xs text-[#526056] bg-[#F8FAF7] rounded-2xl border border-[#DCE6DF]">
+                <p class="text-sm font-bold text-[#111C15]">No Mock Tests Taken Yet</p>
+                <p class="mt-1">Experience real BPSC exam pressure with negative marking (-1/3) and Option E safe skip.</p>
+                <button type="button" onclick="openTestSeriesMode()" class="mt-4 px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-[#10402D] hover:bg-[#17593F] transition cursor-pointer">
+                  Browse 22 Full-Length Mock Tests
+                </button>
+              </div>
+            ` : data.studentMocks.map((att, idx) => `
+              <div class="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DCE6DF] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2 py-0.5 rounded-md font-bold text-[10px] bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">
+                      Attempt #${data.studentMocks.length - idx}
+                    </span>
+                    <span class="font-display font-bold text-sm text-[#111C15]">${escapeHtml(att.examTitle || 'BPSC Mock Test')}</span>
+                  </div>
+                  <div class="text-[#526056] text-[11px]">
+                    📅 ${escapeHtml(att.timestamp || 'Recent')} • <strong>${att.attempted || 0}</strong> Attempted / ${att.totalQ || 150} Questions
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-4 shrink-0 justify-between sm:justify-end">
+                  <div class="text-right">
+                    <div class="font-display font-black text-lg text-[#10402D]">${escapeHtml(att.score)} <span class="text-xs font-normal text-[#526056]">/ ${att.totalQ || 150}</span></div>
+                    <div class="text-[10px] text-[#526056]">
+                      <span class="text-emerald-700 font-bold">+${att.correct || 0} Right</span> • 
+                      <span class="text-rose-600 font-bold">-${att.wrong || 0} Wrong</span> • 
+                      <span class="text-[#785600] font-bold">${att.safeSkip || 0} Opt E</span>
+                    </div>
+                  </div>
+                  <button type="button" onclick="openTestSeriesMode()" class="px-3.5 py-2 rounded-xl font-bold text-xs text-[#10402D] bg-white hover:bg-[#EBF3E6] border border-[#DCE6DF] transition cursor-pointer">
+                    Re-Attempt
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+      initIcons();
+    }
+
+    function openSubjectPractice(subject, filterMode = 'all') {
+      openPyqBankMode();
+      selectedSubject = subject || 'ALL';
+      practiceFilterStatus = filterMode; // 'all', 'unattempted', 'attempted'
+      displayLimit = 60;
+      switchView('bank');
+      renderSubjectPills();
+      updateSubjectProgressUI();
+      renderQuestions();
+      window.scrollTo({ top: 320, behavior: 'smooth' });
+    }
+
+    function switchStudentAccount() {
+      const all = getAllAspirants();
+      if (all.length > 1) {
+        const names = all.map((a, i) => `${i + 1}. ${a.name} (${a.email})`).join('\n');
+        const choice = prompt(`Select student profile (enter 1 to ${all.length}) or enter 'new' to add a new student:\n\n${names}`);
+        if (!choice) return;
+        if (choice.trim().toLowerCase() === 'new') {
+          openAspirantRegModal('Sign in with a new aspirant profile');
+          return;
+        }
+        const idx = parseInt(choice, 10) - 1;
+        if (all[idx]) {
+          PrepBackendEngine.auth.saveUserSession(all[idx]).then(() => {
+            userAttempts = loadStudentPracticeAttempts();
+            updateAspirantNavUI();
+            renderSubjectPills();
+            updateSubjectProgressUI();
+            renderQuestions();
+            if (typeof renderTestSeriesCards === 'function') renderTestSeriesCards();
+            if (activeView === 'analytics') renderStudentAnalyticsView();
+            showToast(`Switched to ${all[idx].name}!`, 'success');
+          });
+          return;
+        }
+      }
+      openAspirantRegModal('Sign in with another student profile');
     }
 
     function startMockTest(testId) {
@@ -8731,6 +9440,7 @@ summary:focus-visible,
       const currentStudent = getCurrentAspirant() || { name: "Aspirant", email: "aspirant@shaktiq.com", phone: "", district: "Bihar", targetExam: "71st BPSC CCE Prelims" };
       const attemptLog = {
         attemptId: 'att_' + Date.now(),
+        testId: activeMockTest ? activeMockTest.id : '',
         studentName: currentStudent.name,
         studentEmail: currentStudent.email,
         studentPhone: currentStudent.phone || "",
@@ -8744,7 +9454,14 @@ summary:focus-visible,
         blank: blank,
         attempted: attempted,
         totalQ: validQuestions.length,
-        timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+        timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        questionResults: validQuestions.map((q, idx) => ({
+          id: q.id,
+          subject: q.subject,
+          ans: q.ans,
+          userOpt: mockUserAnswers[idx] || null,
+          isCorrect: (mockUserAnswers[idx] === q.ans)
+        }))
       };
       
       // Fire Google Sheets sync immediately
@@ -9176,10 +9893,10 @@ summary:focus-visible,
       setupPracticeWorkspace();
       initShaktiQExtras();
 
-      // Restore saved PYQ attempts
+      // Restore saved PYQ attempts per student
       try {
-        const savedAtt = localStorage.getItem('bpsc_practice_attempts_v1');
-        if (savedAtt) userAttempts = JSON.parse(savedAtt) || {};
+        userAttempts = loadStudentPracticeAttempts();
+      } catch (e) {}
       } catch (e) {}
 
       // Initialize High-Capacity Backend Engine & Restore Aspirant Identity
