@@ -89,6 +89,58 @@
   <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js" defer></script>
 
   <style>
+
+/* ========================================================= */
+/* BULLETPROOF BRAND LOGO & ZOOM-STABLE RESPONSIVE NAVBAR     */
+/* Prevents logo shrinking or disappearing at ANY zoom level */
+/* ========================================================= */
+.brand-logo-link {
+  display: flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+  min-width: 140px !important;
+  height: 100% !important;
+  z-index: 20;
+}
+.brand-logo-img {
+  height: 48px !important;
+  width: auto !important;
+  max-height: 54px !important;
+  object-fit: contain !important;
+  flex-shrink: 0 !important;
+  display: block !important;
+  transition: transform 0.2s ease;
+}
+@media (min-width: 640px) {
+  .brand-logo-link {
+    min-width: 165px !important;
+  }
+  .brand-logo-img {
+    height: 56px !important;
+    max-height: 60px !important;
+  }
+}
+@media (min-width: 1024px) {
+  .brand-logo-link {
+    min-width: 185px !important;
+  }
+  .brand-logo-img {
+    height: 62px !important;
+    max-height: 66px !important;
+  }
+}
+
+/* Secondary navigation links hide gracefully on intermediate screens (768px - 1279px) */
+/* so that the header never overflows and never squashes the brand logo */
+@media (max-width: 1279px) {
+  .nav-extra-link {
+    display: none !important;
+  }
+  #nav-mock-cta-pill {
+    display: none !important;
+  }
+}
+
 /* Anti-Scraping & Copy Protection */
 .no-copy,
 #page-bpsc-pyq-view,
@@ -1458,7 +1510,7 @@ summary:focus-visible,
       <!-- Modal Header with User Logo Only -->
       <div class="text-center space-y-2">
         <div class="flex justify-center mb-1">
-          <img src="/logo.png" alt="ShaktiQ Logo" class="h-9 w-auto object-contain">
+          <img src="/logo.png" alt="ShaktiQ Logo" class="h-12 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
         </div>
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#EBF3E6] border border-[#C6DEC0] text-[#10402D]">
           <i data-lucide="lock" class="w-3.5 h-3.5"></i>
@@ -1676,7 +1728,7 @@ summary:focus-visible,
 
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5ECE6] pb-4 pr-10">
         <div class="flex items-center gap-3">
-          <img src="/logo.png" alt="ShaktiQ Logo" class="h-8 w-auto object-contain">
+          <img src="/logo.png" alt="ShaktiQ Logo" class="h-10 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
           <h3 id="legal-modal-title" class="text-xl font-display font-extrabold text-[#111C15]">Privacy Policy, Terms &amp; Contact</h3>
         </div>
         <div class="flex flex-wrap items-center gap-2">
@@ -1785,8 +1837,8 @@ summary:focus-visible,
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
       
       <!-- Brand Logo Lockup: Attached ShaktiQ Logo Only -->
-      <a href="#top" class="flex items-center group  py-1">
-        <img src="/logo.png" alt="ShaktiQ Logo" class="h-10 sm:h-12 w-auto object-contain group-hover:scale-[1.02] transition-transform duration-200 shrink-0">
+      <a href="#top" class="brand-logo-link group py-1 shrink-0" style="flex-shrink: 0 !important;" aria-label="ShaktiQ Home">
+        <img src="/logo.png" alt="ShaktiQ Logo" class="brand-logo-img object-contain group-hover:scale-[1.02] transition-transform duration-200 shrink-0" style="flex-shrink: 0 !important;">
       </a>
 
       <!-- Center Navigation Links (Clean, No YouTube Promotion) -->
@@ -1870,21 +1922,21 @@ summary:focus-visible,
           Mock Tests
         </button>
 
-        <a href="#revision-sheets" class="px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">Revision Sheets</a>
-        <a href="#mnemonics" class="px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">Mnemonics</a>
-        <a href="#daily-abhyas" class="px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">Daily Abhyas</a>
-        <a href="#about" class="px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">About</a>
+        <a href="#revision-sheets" class="nav-extra-link px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">Revision Sheets</a>
+        <a href="#mnemonics" class="nav-extra-link px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">Mnemonics</a>
+        <a href="#daily-abhyas" class="nav-extra-link px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">Daily Abhyas</a>
+        <a href="#about" class="nav-extra-link px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">About</a>
       </div>
 
       <!-- Right Action CTAs (Search + Mock Tests CTA + Sign In Profile) -->
-      <div class="hidden sm:flex items-center gap-2.5 shrink-0">
+      <div class="hidden md:flex items-center gap-2.5 shrink-0" style="flex-shrink: 0 !important;">
         <!-- Search Button (Opens PYQ Search) -->
         <button type="button" onclick="openPyqBankMode(); setTimeout(() => { const s = document.getElementById('searchInput'); if(s) s.focus(); }, 250);" class="w-9 h-9 rounded-full hover:bg-[#EBF3E6] flex items-center justify-center text-[#111C15] transition cursor-pointer" title="Search 2,800+ Questions">
           <i data-lucide="search" class="w-5 h-5"></i>
         </button>
 
         <!-- Direct Start Mock Test Pill -->
-        <button type="button" onclick="openTestSeriesMode()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] hover:bg-[#DCE9D5] border border-[#C6DEC0] transition-all shrink-0 cursor-pointer">
+        <button id="nav-mock-cta-pill" type="button" onclick="openTestSeriesMode()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] hover:bg-[#DCE9D5] border border-[#C6DEC0] transition-all shrink-0 cursor-pointer">
           <i data-lucide="award" class="w-3.5 h-3.5 text-[#10402D]"></i>
           <span>22 Full-Length Mock Tests</span>
         </button>
@@ -1925,7 +1977,7 @@ summary:focus-visible,
     <!-- Mobile Drawer Menu -->
     <div id="mobile-menu-drawer" class="hidden md:hidden bg-white border-b border-[#DCE6DF] shadow-xl p-4 transition-all duration-200">
       <div class="flex items-center pb-3 mb-2 border-b border-[#E5ECE6]">
-        <img src="/logo.png" alt="ShaktiQ Logo" class="h-9 w-auto object-contain shrink-0">
+        <img src="/logo.png" alt="ShaktiQ Logo" class="h-11 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
       </div>
       <div class="flex flex-col gap-1.5">
         <a href="#top" class="mobile-nav-link px-3 py-2 text-sm font-semibold text-[#111C15] bg-[#EBF3E6] rounded-lg">Home</a>
@@ -2112,7 +2164,7 @@ summary:focus-visible,
                 <h3 class="font-display font-extrabold text-2xl sm:text-3xl text-[#111C15]">
                   BPSC Prelims
                 </h3>
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#FCE27B] text-[#111C15]">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">
                   72nd / 73rd Target
                 </span>
               </div>
@@ -3293,7 +3345,7 @@ summary:focus-visible,
         <!-- Col 1: Brand Logo Only + Description -->
         <div class="md:col-span-2">
           <a href="#top" class="inline-flex items-center mb-4 group">
-            <img src="/logo.png" alt="ShaktiQ Logo" class="h-10 sm:h-11 w-auto object-contain group-hover:scale-[1.02] transition-transform duration-200 shrink-0">
+            <img src="/logo.png" alt="ShaktiQ Logo" class="h-12 sm:h-14 w-auto object-contain group-hover:scale-[1.02] transition-transform duration-200 shrink-0" style="flex-shrink: 0 !important;">
           </a>
           <p class="text-sm text-[#3B493F] max-w-md mb-5 leading-relaxed">
             Master BPSC (72nd/73rd CCE, ASO, Teacher), BSSC CGL 4, and AEDO with 2,800+ PYQs based on published answer keys, 22 full-length BPSC-pattern mock tests, rapid revision sheets, and exam mnemonics.
@@ -3358,7 +3410,7 @@ summary:focus-visible,
       <!-- Bottom Copyright & Minimal "Created by" + Logo Only -->
       <div class="pt-6 border-t border-[#DCE6DF] flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-3 flex-wrap">
-          <img src="/logo.png" alt="ShaktiQ Logo" class="h-6 w-auto object-contain">
+          <img src="/logo.png" alt="ShaktiQ Logo" class="h-8 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
           <p class="text-xs sm:text-sm text-[#36443A]">© 2026 • Independent Competitive Exam Preparation Platform.</p>
         </div>
 
@@ -3397,10 +3449,10 @@ summary:focus-visible,
             <div class="h-6 w-px bg-[#DCE6DF] hidden sm:block"></div>
 
             <div class="flex items-center gap-3">
-              <img src="/logo-white.png" alt="ShaktiQ Logo" class="h-9 sm:h-10 w-auto object-contain shrink-0" style="filter: brightness(0) invert(1) !important; -webkit-filter: brightness(0) invert(1) !important;">
-              <div class="hidden sm:block pl-3 border-l border-white/25">
+              <img src="/logo.png" alt="ShaktiQ Logo" class="h-10 sm:h-12 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
+              <div class="hidden sm:block pl-3 border-l border-[#DCE6DF]">
                 <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#FCE27B] text-[#111C15]">2,800+ PYQs &amp; 22 Mock Tests</span>
-                <p class="text-[11px] text-white/90 mt-0.5" style="color: #EBF3E6 !important;">Attempt-First Active Recall: Select an option to test yourself</p>
+                <p class="text-[11px] text-[#3B493F] mt-0.5 font-medium">Attempt-First Active Recall: Select an option to test yourself</p>
               </div>
             </div>
           </div>
@@ -4313,7 +4365,7 @@ summary:focus-visible,
       <div class="max-w-7xl mx-auto space-y-4">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex flex-wrap items-center gap-3">
-            <img src="/logo.png" alt="ShaktiQ Logo" class="h-6 w-auto object-contain">
+            <img src="/logo.png" alt="ShaktiQ Logo" class="h-8 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;">
             <span class="text-[#36443A]">• 2,800+ Subject-Wise PYQ Bank &amp; 22 Full-Length Mock Tests</span>
           </div>
           <div class="flex flex-wrap items-center gap-3">
