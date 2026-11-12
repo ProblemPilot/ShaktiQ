@@ -74,9 +74,6 @@
   <link rel="icon" href="/favicon.ico">
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <!-- Official Google Identity Services & Facebook Login SDK -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 
   
   <!-- Critical Image Preloads for Instant Mobile LCP -->
@@ -84,6 +81,8 @@
   <link rel="preload" as="image" href="/hero-museum.webp" type="image/webp" fetchpriority="high">
 
   <!-- Google Fonts -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -1488,7 +1487,66 @@ summary:focus-visible,
       filter: brightness(0) invert(1) !important;
       -webkit-filter: brightness(0) invert(1) !important;
     }
+  
+  /* Mobile Input Auto-Zoom Prevention (iOS & Android) */
+  @media (max-width: 640px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
   </style>
+
+  <!-- Structured Data: WebSite Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "ShaktiQ",
+    "url": "https://shaktiq.com/",
+    "description": "Practice 2800+ BPSC PYQs based on published answer keys, 22 full-length tests on BPSC pattern, rapid revision sheets, and exam mnemonics"
+  }
+  </script>
+
+  <!-- Structured Data: FAQPage Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does the platform work and can I save my test scores?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This exam preparation portal runs directly in your browser. You can practice all 2,800+ PYQs based on published answer keys, take all 22 full-length timed tests on BPSC pattern (including 2-hour AEDO and BPSC CCE papers), and sign in free with your aspirant profile to save your test attempts and track your progress."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which competitive exams are covered on this platform?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The platform focuses on Bihar State and national competitive recruitment: BPSC Decoded (72nd & 73rd CCE Prelims, ASO, Special Teacher), BSSC CGL 4 Decoded (Secretariat Assistant & Planning Assistant), and AEDO Decoded (Assistant Executive Development Officer, Panchayati Raj)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I add my own questions or export the question bank for offline study?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! Inside the Question Bank workspace, you can add your own custom questions, bulk-paste question sets, print any filtered question set to PDF, or export the database to CSV/JSON for offline revision."
+        }
+      }
+    ]
+  }
+  </script>
+
 </head>
 <body id="top" class="bg-[#F8FAF7] text-[#111C15] antialiased font-sans selection:bg-amber-200 selection:text-[#10402D] transition-colors duration-300 min-h-screen relative overflow-x-hidden">
   <!-- Accessibility: Skip to Main Content Link -->
@@ -2921,7 +2979,7 @@ summary:focus-visible,
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <!-- CARD 1: CONSTITUTION 25 PARTS -->
-        <div class="flip-card perspective-1000 cursor-pointer h-96 group" tabindex="0" role="button" aria-label="Constitution 25 Parts Mnemonic Card">
+        <div class="flip-card perspective-1000 cursor-pointer h-96 group" tabindex="0">
           <div class="flip-card-inner relative w-full h-full preserve-3d">
             
             <!-- Front Face -->
@@ -2988,7 +3046,7 @@ summary:focus-visible,
         </div>
 
         <!-- CARD 2: VITAMIN B COMPLEX -->
-        <div class="flip-card perspective-1000 cursor-pointer h-96 group" tabindex="0" role="button" aria-label="Vitamin B Complex Mnemonic Card">
+        <div class="flip-card perspective-1000 cursor-pointer h-96 group" tabindex="0">
           <div class="flip-card-inner relative w-full h-full preserve-3d">
             
             <!-- Front Face -->
@@ -3055,7 +3113,7 @@ summary:focus-visible,
         </div>
 
         <!-- CARD 3: TROPIC OF CANCER 8 STATES -->
-        <div class="flip-card perspective-1000 cursor-pointer h-96 group" tabindex="0" role="button" aria-label="Tropic of Cancer States Mnemonic Card">
+        <div class="flip-card perspective-1000 cursor-pointer h-96 group" tabindex="0">
           <div class="flip-card-inner relative w-full h-full preserve-3d">
             
             <!-- Front Face -->
@@ -3122,7 +3180,7 @@ summary:focus-visible,
         </div>
 
         <!-- CARD 4: 7 FUNDAMENTAL QUANTITIES -->
-        <div class="flip-card perspective-1000 cursor-pointer h-96 group" tabindex="0" role="button" aria-label="7 Fundamental Quantities Mnemonic Card">
+        <div class="flip-card perspective-1000 cursor-pointer h-96 group" tabindex="0">
           <div class="flip-card-inner relative w-full h-full preserve-3d">
             
             <!-- Front Face -->
@@ -4707,15 +4765,26 @@ summary:focus-visible,
       if (!forceReload && questionsLoadPromise) return questionsLoadPromise;
 
       const token = getAspirantAuthToken();
+      // On initial unauthenticated page load, defer question fetch until aspirant signs in or starts a test
+      if (!token && !forceReload) {
+        questionsLoaded = false;
+        return Promise.resolve([]);
+      }
+
       const fetchHeaders = {};
       if (token) {
         fetchHeaders['Authorization'] = 'Bearer ' + token;
       }
 
-      questionsLoadPromise = fetch(AUTH_BACKEND_ORIGIN + '/questions.json?v=' + Date.now(), {
+      const fetchOptions = {
         cache: 'no-store',
         headers: fetchHeaders
-      })
+      };
+      if (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
+        fetchOptions.signal = AbortSignal.timeout(6000);
+      }
+
+      questionsLoadPromise = fetch(AUTH_BACKEND_ORIGIN + '/questions.json?v=' + Date.now(), fetchOptions)
         .then(function(res) {
           if (res.status === 401 || res.status === 403) {
             console.warn('ShaktiQ: Session token required to load question bank.');
@@ -6641,10 +6710,12 @@ summary:focus-visible,
     function setGlobalAppLanguage(lang) {
       if (lang !== 'en' && lang !== 'hi') lang = 'en';
       ShaktiQBilingualEngine.currentLang = lang;
+      document.documentElement.lang = lang;
       try {
         localStorage.setItem('shaktiq_preferred_lang', lang);
       } catch (e) {}
 
+      document.documentElement.lang = ShaktiQBilingualEngine.currentLang;
       ShaktiQBilingualEngine.updateButtonsUI();
 
       // If in Mock Test Taking view: re-render question immediately

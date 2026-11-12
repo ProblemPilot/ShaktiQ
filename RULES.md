@@ -9,3 +9,7 @@ One-line rules learned from measured improvements and regression checks.
 - [R5] In GitHub Pages environments, custom response headers cannot be set; use HTML meta tags, service worker cache headers, or client-side declarations.
 - [R6] Hero image must be served as WebP, under 200 KB, with explicit width/height and fetchpriority="high" preload in head.
 - [R7] All interactive buttons inside role="tablist" must have role="tab" and aria-selected attributes; headings must strictly follow sequential order without skipping levels.
+- [R8] Unauthenticated network requests to protected backends must never execute on initial boot; defer until user login or test start.
+- [R9] Form input fields on mobile must have font-size >= 16px to prevent intrusive iOS/Android viewport zoom.
+- [R10] Sitemaps must contain clean canonical URLs only; fragment identifiers (#) must never be placed in XML sitemaps.
+- [R11] Language switcher must update document.documentElement.lang dynamically to maintain accessibility for screen readers and search engines.

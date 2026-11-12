@@ -1,8 +1,15 @@
-const CACHE_NAME = 'shaktiq-cache-v12';
+const CACHE_NAME = 'shaktiq-cache-v13';
 const STATIC_ASSETS = [
   './',
   './index.html',
+  './logo.webp',
   './logo.png',
+  './hero-museum.webp',
+  './hero-museum.png',
+  './bodhi-tree.webp',
+  './bodhi-tree.png',
+  './yt-logo.webp',
+  './yt-logo.png',
   './favicon.ico',
   './favicon.png',
   './favicon-48x48.png',

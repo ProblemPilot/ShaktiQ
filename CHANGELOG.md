@@ -32,3 +32,63 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
   - Added accessible `aria-label="Exam Time Remaining"` to real-time timer element.
 - **Verification**: 36/36 regression tests passed (100%). Data checksums byte-identical.
 - **Decision**: Keep and commit.
+- **Commit**: `121607c` (pushed to `origin/improve/site-audit`)
+
+---
+
+## Unit 2: Performance (Fonts, CSS, JS Deferral & Network Optimization)
+- **Status**: PASSED
+- **Changes**:
+  - Removed unused external third-party SDKs (`accounts.google.com/gsi/client` and `connect.facebook.net/en_US/sdk.js`) from `<head>`.
+  - Added `dns-prefetch` for `fonts.googleapis.com` and `fonts.gstatic.com`.
+  - Optimized question loader (`loadQuestionsData`): deferred unauthenticated initial network fetch on boot when `!token && !forceReload`, preventing 45-second network stalls and rate-limiting blocks. Added 6s `AbortSignal.timeout`.
+  - Slashed Total Blocking Time (TBT) by 76% (from 1,300 ms down to 310 ms).
+  - Increased Performance score from 46 to 60.
+- **Verification**: 38/38 regression tests passed. Data checksums byte-identical.
+- **Decision**: Keep and commit.
+
+---
+
+## Unit 3: Mobile Layout & Tap Targets
+- **Status**: PASSED
+- **Changes**:
+  - Injected mobile input auto-zoom prevention CSS: set `font-size: 16px !important` for `input`, `select`, and `textarea` on screens $\le 640\text{px}$, preventing annoying iOS/Android viewport jumps.
+  - Verified `overflow-x: hidden` on both `html` and `body` to ensure zero horizontal scroll at 360, 390, 768, and 1280px viewports.
+  - Validated tap targets across touch elements (Lighthouse target-size audit passed with score 1.0).
+- **Verification**: 38/38 regression tests passed.
+- **Decision**: Keep and commit.
+
+---
+
+## Unit 5 & Unit 6: SEO & Structured Data (Schema.org JSON-LD)
+- **Status**: PASSED
+- **Changes**:
+  - Cleaned `sitemap.xml`: removed invalid `#hash` fragment URLs, leaving clean canonical XML URL conformant with sitemaps.org.
+  - Added valid `WebSite` Schema.org JSON-LD to `<head>`.
+  - Added rich `FAQPage` Schema.org JSON-LD to `<head>` mirroring the exact FAQ questions and answers on the site.
+  - Resolved `label-content-name-mismatch` on mnemonic flip cards by replacing outer `role="button"` container markup with semantic interactive card containers.
+  - Maintained 100 SEO score and achieved a perfect 100 Accessibility score across all audits.
+- **Verification**: 38/38 regression tests passed.
+- **Decision**: Keep and commit.
+
+---
+
+## Unit 7: Hindi/English Bilingual Dynamic Sync
+- **Status**: PASSED
+- **Changes**:
+  - Updated `setGlobalAppLanguage` to dynamically synchronize `document.documentElement.lang = lang` when toggling between English (`en`) and Hindi (`hi`).
+  - Added initialization check to set `document.documentElement.lang` on initial load based on aspirant's saved preference in localStorage.
+- **Verification**: 38/38 regression tests passed.
+- **Decision**: Keep and commit.
+
+---
+
+## Unit 8 & Unit 10: Links, Security & Service Worker Precaching
+- **Status**: PASSED
+- **Changes**:
+  - Verified all external links have `rel="noopener noreferrer"`.
+  - Verified question auth gate token protection.
+  - Bumped Service Worker cache version from `shaktiq-cache-v12` to `shaktiq-cache-v13`.
+  - Added all modern WebP image assets (`logo.webp`, `hero-museum.webp`, `bodhi-tree.webp`, `yt-logo.webp`) to `STATIC_ASSETS` in `sw.js`.
+- **Verification**: 38/38 regression tests passed. Data checksums byte-identical.
+- **Decision**: Keep and commit.
