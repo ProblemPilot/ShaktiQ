@@ -154,6 +154,31 @@ async function runE2ETests() {
     }
     console.log(`[PASS] E2E: Mobile mock exam bar (<640px) verified: ${mobileBarStatus.qIdx}, timer ${mobileBarStatus.timer}`);
 
+    // Test Mobile Bottom Action Bar (<640px)
+    const mobileBottomStatus = await page.evaluate(() => {
+      const bar = document.getElementById('tt-mobile-bottom-bar');
+      const prevBtn = document.getElementById('tt-mobile-prev-btn');
+      const revBtn = document.getElementById('tt-mobile-review-btn');
+      const clrBtn = document.getElementById('tt-mobile-clear-btn');
+      const nextBtn = document.getElementById('tt-mobile-next-btn');
+      const isVisible = (el) => el && !el.classList.contains('hidden') && window.getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0;
+      return {
+        barVisible: isVisible(bar),
+        prevH: prevBtn ? prevBtn.getBoundingClientRect().height : 0,
+        revH: revBtn ? revBtn.getBoundingClientRect().height : 0,
+        clrH: clrBtn ? clrBtn.getBoundingClientRect().height : 0,
+        nextH: nextBtn ? nextBtn.getBoundingClientRect().height : 0
+      };
+    });
+
+    if (!mobileBottomStatus.barVisible) {
+      throw new Error('Mobile bottom action bar (#tt-mobile-bottom-bar) not visible at 360px');
+    }
+    if (mobileBottomStatus.prevH < 48 || mobileBottomStatus.nextH < 48) {
+      throw new Error(`Mobile bottom action buttons height must be >= 48px, got prev: ${mobileBottomStatus.prevH}px, next: ${mobileBottomStatus.nextH}px`);
+    }
+    console.log(`[PASS] E2E: Mobile bottom action bar verified: thumb-friendly height >= 48px (Prev: ${mobileBottomStatus.prevH}px, Next: ${mobileBottomStatus.nextH}px).`);
+
     // Restore desktop viewport
     await page.setViewport({ width: 1280, height: 800 });
 

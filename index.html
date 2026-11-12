@@ -168,6 +168,17 @@
   }
 }
 
+.mobile-bottom-bar {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+.mobile-bottom-btn {
+  min-height: 48px !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 /* Anti-Scraping & Copy Protection */
 .no-copy,
 #page-bpsc-pyq-view,
@@ -3751,7 +3762,7 @@ summary:focus-visible,
     </section>
 
     <!-- TIMED MOCK TEST TAKING WORKSPACE -->
-    <div id="test-taking-workspace" class="hidden space-y-6">
+    <div id="test-taking-workspace" class="hidden space-y-6 pb-24 sm:pb-6">
       
       <!-- Mobile Slim Sticky Exam Bar (<640px) -->
       <div id="tt-mobile-exam-bar" class="sm:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border border-[#DCE6DF] rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 shadow-xs min-h-[40px]">
@@ -3842,8 +3853,8 @@ summary:focus-visible,
             <!-- Radio options A, B, C, D, E -->
           </div>
 
-          <!-- Bottom Test Controls -->
-          <div class="pt-6 border-t border-[#E5ECE6] flex flex-wrap items-center justify-between gap-3">
+          <!-- Desktop Bottom Test Controls (>=640px) -->
+          <div class="hidden sm:flex pt-6 border-t border-[#E5ECE6] items-center justify-between gap-3">
             <div class="flex items-center gap-2">
               <button type="button" onclick="ttClearResponse()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-[#223127] hover:bg-[#F6F7F2] bg-white border border-[#DCE6DF] transition cursor-pointer">
                 Clear Response
@@ -3895,6 +3906,29 @@ summary:focus-visible,
           </div>
         </div>
 
+      </div>
+
+      <!-- Mobile Bottom Action Bar (<640px) -->
+      <div id="tt-mobile-bottom-bar" class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#DCE6DF] px-3 py-2 shadow-lg flex items-center justify-between gap-2 mobile-bottom-bar">
+        <!-- Prev Button -->
+        <button type="button" id="tt-mobile-prev-btn" onclick="ttPrevQuestion()" class="mobile-bottom-btn flex-1 px-2 py-2 rounded-xl text-xs font-bold text-[#223127] bg-[#F8FAF7] border border-[#DCE6DF] active:bg-[#EBF3E6] transition cursor-pointer" aria-label="Previous Question">
+          <span>← Prev</span>
+        </button>
+
+        <!-- Review Button -->
+        <button type="button" id="tt-mobile-review-btn" onclick="ttMarkForReview()" class="mobile-bottom-btn flex-1 px-2 py-2 rounded-xl text-xs font-bold text-[#785600] bg-[#FEF6D6] border border-[#F5DF8B] active:bg-[#FCE27B] transition cursor-pointer" aria-label="Mark for Review">
+          <span>Review</span>
+        </button>
+
+        <!-- Clear Button -->
+        <button type="button" id="tt-mobile-clear-btn" onclick="ttClearResponse()" class="mobile-bottom-btn flex-1 px-2 py-2 rounded-xl text-xs font-bold text-[#526056] bg-white border border-[#DCE6DF] active:bg-[#F6F7F2] transition cursor-pointer" aria-label="Clear Response">
+          <span>Clear</span>
+        </button>
+
+        <!-- Next Button -->
+        <button type="button" id="tt-mobile-next-btn" onclick="ttSaveAndNext()" class="mobile-bottom-btn flex-1 px-3 py-2 rounded-xl text-xs font-extrabold text-white bg-[#10402D] active:bg-[#17593F] shadow-sm transition cursor-pointer" aria-label="Next Question">
+          <span>Next →</span>
+        </button>
       </div>
 
     </div>
