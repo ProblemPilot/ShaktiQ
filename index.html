@@ -3623,11 +3623,11 @@ summary:focus-visible,
               <span class="text-[#526056]">Total Questions:</span>
               <span id="headerTotalCount" class="font-bold text-[#10402D] ml-1">2809</span>
             </div>
-            <div class="bg-[#F6F7F2] border border-[#DCE6DF] rounded-xl px-3 py-1.5 text-xs hidden sm:block">
+            <div id="headerCustomCountWrapper" class="bg-[#F6F7F2] border border-[#DCE6DF] rounded-xl px-3 py-1.5 text-xs hidden">
               <span class="text-[#526056]">Custom Added:</span>
               <span id="headerCustomCount" class="font-bold text-[#10402D] ml-1">0</span>
             </div>
-            <button type="button" id="quickAddQuestionBtn" class="bg-white hover:bg-[#EBF3E6] text-[#10402D] font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-sm border border-white/80 transition flex items-center gap-1.5 cursor-pointer">
+            <button type="button" id="quickAddQuestionBtn" class="bg-white hover:bg-[#EBF3E6] text-[#10402D] font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-sm border border-white/80 transition flex items-center gap-1.5 cursor-pointer hidden">
               <span>+ Add Question</span>
             </button>
             <button type="button" id="printPageBtn" class="bg-white hover:bg-[#EBF3E6] text-[#111C15] text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-[#DCE6DF] transition cursor-pointer">
@@ -3662,7 +3662,7 @@ summary:focus-visible,
               <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-[#10402D]"></i>
               <span>My Prep &amp; Weak Areas</span>
             </button>
-            <button type="button" id="subnav-btn-manage" onclick="switchView('manage')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#111C15] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs inline-flex items-center gap-1.5">
+            <button type="button" id="subnav-btn-manage" onclick="switchView('manage')" class="subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#111C15] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs inline-flex items-center gap-1.5 hidden">
               <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-[#10402D]"></i>
               <span>+ Add Questions</span>
             </button>
@@ -4813,8 +4813,20 @@ summary:focus-visible,
         openTestSeriesMode();
       } else if (window.location.hash === '#pyq-bank' || window.location.hash === '#practice-bpsc-pyq') {
         openPyqBankMode();
+      } else if ((window.location.hash || '').toLowerCase().includes('#admin')) {
+        openPyqBankMode();
+        switchView('manage');
       } else {
         openPortalView();
+      }
+      if (typeof updateAdminUI === 'function') updateAdminUI();
+    });
+
+    window.addEventListener('hashchange', () => {
+      if (typeof updateAdminUI === 'function') updateAdminUI();
+      if ((window.location.hash || '').toLowerCase().includes('#admin')) {
+        openPyqBankMode();
+        switchView('manage');
       }
     });
 
@@ -5552,7 +5564,34 @@ summary:focus-visible,
       }).join("");
     }
 
+    function isAdminMode() {
+      return (window.location.hash || '').toLowerCase().includes('#admin');
+    }
+
+    function updateAdminUI() {
+      const isAdmin = isAdminMode();
+      const manageBtn = document.getElementById("subnav-btn-manage");
+      if (manageBtn) {
+        if (isAdmin) manageBtn.classList.remove("hidden");
+        else manageBtn.classList.add("hidden");
+      }
+      const quickAddBtn = document.getElementById("quickAddQuestionBtn");
+      if (quickAddBtn) {
+        if (isAdmin) quickAddBtn.classList.remove("hidden");
+        else quickAddBtn.classList.add("hidden");
+      }
+      const customWrapper = document.getElementById("headerCustomCountWrapper");
+      if (customWrapper) {
+        if (isAdmin) customWrapper.classList.remove("hidden");
+        else customWrapper.classList.add("hidden");
+      }
+    }
+
     function switchView(viewName) {
+      if (viewName === 'manage' && !isAdminMode()) {
+        showToast('Admin mode required (access via #admin in URL)', 'info');
+        return;
+      }
       if (viewName === 'bank' && !getCurrentAspirant()) {
         openAspirantRegModal('Please sign in with your profile before accessing the Question Bank.');
         return;
@@ -6895,7 +6934,11 @@ summary:focus-visible,
         switchMainMode('pyq');
         safeScrollToTop();
         initIcons();
-        try { history.pushState(null, null, '#pyq-bank'); } catch(e){}
+        try {
+          if (!window.location.hash.toLowerCase().includes('#admin')) {
+            history.pushState(null, null, '#pyq-bank');
+          }
+        } catch(e){}
       }
     }
 
@@ -10014,7 +10057,11 @@ summary:focus-visible,
         openPyqBankMode();
       } else if (window.location.hash === '#test-series') {
         openTestSeriesMode();
+      } else if ((window.location.hash || '').toLowerCase().includes('#admin')) {
+        openPyqBankMode();
+        switchView('manage');
       }
+      if (typeof updateAdminUI === 'function') updateAdminUI();
 
       // Register Versioned Offline Service Worker (PWA) for weak/offline connections
       if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {

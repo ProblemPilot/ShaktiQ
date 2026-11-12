@@ -198,7 +198,7 @@ async function runE2ETests() {
     // When visiting without #admin
     const adminVisibleWithoutHash = await page.evaluate(() => {
       const manageBtn = document.getElementById('subnav-btn-manage');
-      const customBadge = document.getElementById('headerCustomCount')?.closest('div');
+      const customBadge = document.getElementById('headerCustomCountWrapper');
       const isVisible = (el) => el && !el.classList.contains('hidden') && el.offsetParent !== null;
       return {
         manageVisible: isVisible(manageBtn),
@@ -206,15 +206,42 @@ async function runE2ETests() {
       };
     });
 
+    if (adminVisibleWithoutHash.manageVisible || adminVisibleWithoutHash.badgeVisible) {
+      throw new Error(`Admin tools visible without #admin! ${JSON.stringify(adminVisibleWithoutHash)}`);
+    }
+
     // Check with #admin
-    await page.goto(`http://localhost:${TEST_PORT}/#admin`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`http://localhost:${TEST_PORT}/#admin`, { waitUntil: 'networkidle0' });
     const adminVisibleWithHash = await page.evaluate(() => {
       const manageBtn = document.getElementById('subnav-btn-manage');
       const isVisible = (el) => el && !el.classList.contains('hidden');
       return isVisible(manageBtn);
     });
 
-    console.log(`[INFO] Admin tools gating status: Without #admin (${JSON.stringify(adminVisibleWithoutHash)}), With #admin (${adminVisibleWithHash})`);
+    if (!adminVisibleWithHash) {
+      throw new Error('Admin tools not visible with #admin in URL');
+    }
+
+    // Test creating a question in #admin
+    const addSuccess = await page.evaluate(() => {
+      const form = document.getElementById('addQuestionForm');
+      if (!form) return false;
+      document.getElementById('formQuestionText').value = 'Test Admin Question 1';
+      document.getElementById('formOptA').value = 'Opt 1';
+      document.getElementById('formOptB').value = 'Opt 2';
+      document.getElementById('formOptC').value = 'Opt 3';
+      document.getElementById('formOptD').value = 'Opt 4';
+      document.getElementById('formOptE').value = 'Opt 5';
+      document.getElementById('formCorrectOption').value = 'A';
+      document.getElementById('formExplanation').value = 'Admin test explanation';
+      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      return customQuestions.some(q => q.q === 'Test Admin Question 1');
+    });
+
+    if (!addSuccess) {
+      throw new Error('Failed to create and save question in admin mode');
+    }
+    console.log('[PASS] E2E: Admin tools strictly gated behind #admin and question creation verified.');
 
     // ----------------------------------------------------
     // TEST 7: Console Errors Check
