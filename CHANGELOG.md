@@ -204,3 +204,13 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
        - Automatically resets daily at midnight local time, operating as an authentic daily study companion.
        - Added a *"Resets Daily at Midnight (24h)"* indicator badge and dynamic status messages.
 - **Verification**: 38/38 automated regression tests passed. JavaScript compilation checked with 0 syntax errors. SHA-256 question bank checksums byte-identical.
+
+---
+
+## Content Update: Shorten Footer Non-Affiliation Disclaimer
+- **Status**: PASSED
+- **Changes Implemented**:
+  - Replaced the verbose multi-sentence legal disclaimer banner in the footer with a concise, single-sentence non-affiliation statement:
+    `Official Disclaimer: This website is an independent educational platform and is not affiliated with BPSC, BSSC, or the Government of Bihar.`
+  - Reduced visual weight and eliminated dense text block from the footer.
+- **Verification**: 38/38 automated regression tests passed. Full JavaScript compilation verified with 0 syntax errors. SHA-256 question bank checksums byte-identical.
