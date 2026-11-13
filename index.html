@@ -3885,6 +3885,10 @@ summary:focus-visible,
         <button type="button" onclick="filterTestSeries('OTHER_2026')" class="ts-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] cursor-pointer whitespace-nowrap" data-ts-filter="OTHER_2026">
           Auditor, APO, Steno &amp; Dept Exams (10)
         </button>
+        <button type="button" id="ts-filter-bssc" onclick="filterTestSeries('BSSC')" class="ts-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5" data-ts-filter="BSSC">
+          <i data-lucide="layers" class="w-3.5 h-3.5 text-[#526056]"></i>
+          <span id="ts-filter-bssc-label">BSSC Packs (Placeholder)</span>
+        </button>
       </div>
 
       <!-- Test Series Grid (22 Curated Complete BPSC Tests) -->
@@ -6689,6 +6693,17 @@ summary:focus-visible,
 
         const tsOtherBtn = document.querySelector('button[data-ts-filter="OTHER_2026"]');
         if (tsOtherBtn) tsOtherBtn.textContent = 'Auditor, APO, Steno & Dept Exams (' + otherCount + ')';
+
+        const bsscCount = CURATED_TESTS.filter(t => t.category === 'BSSC').length;
+        const tsBsscLabel = document.getElementById('ts-filter-bssc-label');
+        if (tsBsscLabel) {
+          const isHi = (typeof ShaktiQBilingualEngine !== 'undefined' && ShaktiQBilingualEngine.currentLang === 'hi');
+          if (bsscCount > 0) {
+            tsBsscLabel.textContent = isHi ? `बीएसएससी पैक्स (${bsscCount})` : `BSSC Packs (${bsscCount})`;
+          } else {
+            tsBsscLabel.textContent = isHi ? 'बीएसएससी पैक्स (प्रारूप)' : 'BSSC Packs (Placeholder)';
+          }
+        }
       }
     }
 
@@ -8174,6 +8189,23 @@ summary:focus-visible,
       document.querySelectorAll('.tt-view-card-text').forEach(el => el.textContent = isHi ? 'कार्ड व्यू' : 'Card View');
       document.querySelectorAll('.tt-view-omr-text').forEach(el => el.textContent = isHi ? 'ओएमआर शीट' : 'OMR Sheet');
 
+      // Exam Packs Bilingual Filter Labels
+      const bsscCount = (typeof CURATED_TESTS !== 'undefined' && Array.isArray(CURATED_TESTS))
+        ? CURATED_TESTS.filter(t => t.category === 'BSSC').length
+        : 0;
+      if (bsscCount > 0) {
+        setTxt('ts-filter-bssc-label', `BSSC Packs (${bsscCount})`, `बीएसएससी पैक्स (${bsscCount})`);
+      } else {
+        setTxt('ts-filter-bssc-label', 'BSSC Packs (Placeholder)', 'बीएसएससी पैक्स (प्रारूप)');
+      }
+
+      // Re-render Test Series cards if currently on test series view to sync bilingual labels
+      const tsView = document.getElementById('view-testseries');
+      if (tsView && !tsView.classList.contains('hidden') && typeof renderTestSeriesCards === 'function') {
+        const activeCat = (typeof currentTestSeriesFilter !== 'undefined' && currentTestSeriesFilter) ? currentTestSeriesFilter : 'ALL';
+        renderTestSeriesCards(activeCat);
+      }
+
       // If result modal is open, re-render cutoff meter bilingual text
       const resModal = document.getElementById('tt-result-modal');
       if (resModal && !resModal.classList.contains('hidden') && typeof renderCutoffMeter === 'function') {
@@ -9509,6 +9541,184 @@ summary:focus-visible,
     function signOutAccount() { switchAspirantAccount(); }
 
     // ==========================================
+    // EXAM PACKS REGISTRY & MODULAR ARCHITECTURE (Feature 3.3)
+    // Clean data structure to add new exam packs (BSSC, TRE 4.0, etc.) by dropping in data.
+    // Strict data integrity: Zero invented questions.
+    // ==========================================
+    const SHAKTIQ_EXAM_PACKS = {
+      bpsc_cce: {
+        id: "bpsc_cce",
+        name: "BPSC Combined Competitive Examination (CCE)",
+        shortName: "BPSC CCE",
+        nameHi: "बीपीएससी संयुक्त प्रतियोगिता परीक्षा (CCE)",
+        conductedBy: "Bihar Public Service Commission (BPSC)",
+        categoryKey: "BPSC_CCE",
+        icon: "award",
+        badge: "71st • 70th • 69th",
+        markingScheme: { correct: 1.0, wrong: -1/3, safeSkip: 0, blank: -1/3 },
+        optionsCount: 5,
+        hasData: true,
+        totalQuestions: 594,
+        activeMocksCount: 4,
+        isPlaceholder: false,
+        description: "Official full-length timed mock tests from 71st, 70th Re-exam, 70th Main and 69th Prelims on official BPSC pattern.",
+        descriptionHi: "71वीं, 70वीं पुनर्परीक्षा, 70वीं मुख्य सत्र और 69वीं प्रारंभिक परीक्षा के आधिकारिक मॉक टेस्ट।"
+      },
+      bpsc_tre: {
+        id: "bpsc_tre",
+        name: "BPSC TRE 4.0 & Teacher Recruitment Exams",
+        shortName: "TRE 4.0 & Teacher Exams",
+        nameHi: "बीपीएससी टीआरई 4.0 एवं शिक्षक भर्ती परीक्षा",
+        conductedBy: "Bihar Public Service Commission (BPSC)",
+        categoryKey: "BPSC_TRE",
+        icon: "graduation-cap",
+        badge: "TRE 4.0 • 2026 Pattern",
+        markingScheme: { correct: 1.0, wrong: -1/3, safeSkip: 0, blank: -1/3 },
+        optionsCount: 5,
+        hasData: true,
+        totalQuestions: 229,
+        activeMocksCount: 2,
+        isPlaceholder: false,
+        description: "Curated tests matching the BPSC TRE 4.0 teacher recruitment pattern (General Studies, Environmental Science, Pedagogy) built strictly from verified papers in repo.",
+        descriptionHi: "बीपीएससी टीआरई 4.0 शिक्षक भर्ती पैटर्न (सामान्य अध्ययन, पर्यावरण विज्ञान, शिक्षण अभिरुचि) पर आधारित मॉक टेस्ट।"
+      },
+      aedo: {
+        id: "aedo",
+        name: "BPSC AEDO (Assistant Executive Officer)",
+        shortName: "AEDO Phase 1-3",
+        nameHi: "बीपीएससी एईडीओ परीक्षा",
+        conductedBy: "Bihar Public Service Commission (BPSC)",
+        categoryKey: "AEDO",
+        icon: "briefcase",
+        badge: "Phases 1, 2 & 3",
+        markingScheme: { correct: 1.0, wrong: -1/3, safeSkip: 0, blank: -1/3 },
+        optionsCount: 5,
+        hasData: true,
+        totalQuestions: 600,
+        activeMocksCount: 6,
+        isPlaceholder: false,
+        description: "Complete 6-paper series (100 Qs each) covering General Studies and General Aptitude across all 3 phases.",
+        descriptionHi: "सभी 3 चरणों में सामान्य अध्ययन और सामान्य योग्यता को कवर करने वाली 6 प्रश्नपत्रों की श्रृंखला।"
+      },
+      bpsc_dept: {
+        id: "bpsc_dept",
+        name: "BPSC Auditor, Prosecution Officer & Specialized Exams",
+        shortName: "Auditor, APO, Steno & Dept",
+        nameHi: "बीपीएससी अंकेक्षक, अभियोजन पदाधिकारी एवं अन्य परीक्षाएं",
+        conductedBy: "Bihar Public Service Commission (BPSC)",
+        categoryKey: "OTHER_2026",
+        icon: "file-text",
+        badge: "10 Specialized Papers",
+        markingScheme: { correct: 1.0, wrong: -1/3, safeSkip: 0, blank: -1/3 },
+        optionsCount: 5,
+        hasData: true,
+        totalQuestions: 1386,
+        activeMocksCount: 10,
+        isPlaceholder: false,
+        description: "Published official papers for BPSC Auditor, APO, LDC, Stenographer, Research Officer, MDO, and Engineering services.",
+        descriptionHi: "बीपीएससी अंकेक्षक, एपीओ, एलडीसी, आशुलिपिक, अनुसंधान अधिकारी एवं अन्य तकनीकी सेवाओं के प्रश्नपत्र।"
+      },
+      bssc: {
+        id: "bssc",
+        name: "BSSC CGL & Inter Level Examination Pack",
+        shortName: "BSSC CGL / Inter Level",
+        nameHi: "बीएसएससी सीजीएल / इंटर स्तरीय परीक्षा पैक",
+        conductedBy: "Bihar Staff Selection Commission (BSSC)",
+        categoryKey: "BSSC",
+        icon: "layers",
+        badge: "Schema Ready (Upcoming)",
+        markingScheme: { correct: 4.0, wrong: -1.0, safeSkip: 0, blank: 0 },
+        optionsCount: 4,
+        hasData: false, // Strict integrity: 0 questions currently in repo
+        totalQuestions: 0,
+        activeMocksCount: 0,
+        isPlaceholder: true,
+        placeholderNotice: "Data schema ready. Questions will appear when official BSSC question data files are dropped into the repository. Zero artificial or invented questions.",
+        description: "Modular exam pack structure ready. Drop in official BSSC question data files to activate full mock testing with BSSC marking scheme (+4 / -1).",
+        descriptionHi: "मॉड्यूलर परीक्षा पैक संरचना तैयार है। आधिकारिक बीएसएससी प्रश्न डेटा फाइल लोड करते ही टेस्ट अनलॉक हो जाएंगे (+4 / -1 अंक प्रणाली)।"
+      },
+      speed_drills: {
+        id: "speed_drills",
+        name: "10-Minute Subject Speed Drills",
+        shortName: "10-Min Speed Drills",
+        nameHi: "10-मिनट विषयवार स्पीड ड्रिल",
+        conductedBy: "ShaktiQ Timed Practice Engine",
+        categoryKey: "SPEED_DRILLS",
+        icon: "zap",
+        badge: "8 Subject Drills",
+        markingScheme: { correct: 1.0, wrong: -1/3, safeSkip: 0, blank: -1/3 },
+        optionsCount: 5,
+        hasData: true,
+        totalQuestions: 120,
+        activeMocksCount: 8,
+        isPlaceholder: false,
+        description: "Rapid 15-question subject drills strictly from the verified bank for focused time-pressured revision.",
+        descriptionHi: "सटीक और त्वरित अभ्यास के लिए प्रमाणित बैंक से 15 प्रश्नों के विषयवार त्वरित टेस्ट।"
+      },
+
+      getAllPacks: function() {
+        return Object.values(this).filter(p => typeof p === 'object' && p.id);
+      },
+      getActivePacks: function() {
+        return this.getAllPacks().filter(p => p.hasData);
+      },
+      getPack: function(id) {
+        return this[id] || null;
+      },
+      dropInPackData: function(packId, payload) {
+        if (!packId || !payload) {
+          throw new Error('Exam pack ID and payload are required');
+        }
+        const pack = this.getPack(packId);
+        if (!pack) {
+          throw new Error(`Exam pack "${packId}" not found in registry`);
+        }
+        if (!payload.test || !payload.test.id || !payload.test.title) {
+          throw new Error('Valid test configuration object is required');
+        }
+        if (!Array.isArray(payload.questions) || payload.questions.length === 0) {
+          throw new Error('Array of verified questions is required');
+        }
+        payload.questions.forEach((q, idx) => {
+          if (!q.q || !q.ans) {
+            throw new Error(`Question at index ${idx} is missing required 'q' or 'ans' fields`);
+          }
+        });
+        const existingIdx = CURATED_TESTS.findIndex(t => t.id === payload.test.id);
+        const testObj = {
+          id: payload.test.id,
+          examMatch: payload.test.examMatch || payload.test.title,
+          title: payload.test.title,
+          category: pack.categoryKey,
+          questionsCount: payload.questions.length,
+          marks: payload.test.marks || payload.questions.length,
+          timeMins: payload.test.timeMins || 120,
+          year: payload.test.year || "2026",
+          statusLabel: payload.test.statusLabel || "100% Complete Full Paper",
+          desc: payload.test.desc || `Official full-length paper for ${payload.test.title}.`,
+          customQuestions: payload.questions,
+          markingScheme: pack.markingScheme
+        };
+        if (existingIdx >= 0) {
+          CURATED_TESTS[existingIdx] = testObj;
+        } else {
+          CURATED_TESTS.push(testObj);
+        }
+        pack.hasData = true;
+        pack.isPlaceholder = false;
+        pack.totalQuestions = (pack.totalQuestions || 0) + payload.questions.length;
+        pack.activeMocksCount = (pack.activeMocksCount || 0) + 1;
+        return {
+          status: 'success',
+          packId: pack.id,
+          testId: testObj.id,
+          questionsLoaded: payload.questions.length
+        };
+      }
+    };
+    window.SHAKTIQ_EXAM_PACKS = SHAKTIQ_EXAM_PACKS;
+
+    // ==========================================
     // TESTBOOK PATTERN TEST SERIES ENGINE
     // ==========================================
     const CURATED_TESTS = [
@@ -9936,6 +10146,74 @@ summary:focus-visible,
             </p>
           </div>
         `;
+      } else if (category === 'BSSC') {
+        const isHi = (typeof ShaktiQBilingualEngine !== 'undefined' && ShaktiQBilingualEngine.currentLang === 'hi');
+        cardsHtml += `
+          <div id="bssc-pack-header" class="col-span-full bg-linear-to-r from-[#10402D] to-[#1E5638] text-white p-5 sm:p-6 rounded-3xl shadow-sm space-y-2 mb-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FEF6D6] text-[#785600] flex items-center gap-1">
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i> ${isHi ? 'बीएसएससी आर्किटेक्चर तैयार' : 'BSSC Architecture Ready'}
+              </span>
+              <span class="text-xs text-white/80 font-medium">${isHi ? 'बीएसएससी सीजीएल एवं इंटर स्तर • +4.0 / -1.0 अंकन • 4 विकल्प (A-D)' : 'BSSC CGL & Inter Level • +4.0 / -1.0 Pattern • 4 Options (A-D)'}</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-display font-extrabold text-white">${isHi ? 'बिहार कर्मचारी चयन आयोग (BSSC) परीक्षा पैक' : 'Bihar Staff Selection Commission (BSSC) Exam Pack'}</h2>
+            <p class="text-xs sm:text-sm text-white/90 max-w-2xl leading-relaxed">
+              ${isHi 
+                ? 'मॉड्यूलर परीक्षा पैक संरचना तैयार है। शक्ति-क्यू सख्त शैक्षणिक शुचिता का पालन करता है: कोई भी काल्पनिक प्रश्न नहीं बनाया गया है। आधिकारिक प्रश्न पत्र जोड़ते ही मॉक टेस्ट स्वतः सक्रिय हो जाएंगे।' 
+                : 'Clean modular exam pack structure configured and waiting for official question papers. ShaktiQ follows strict academic integrity: zero questions are invented or hallucinated. Drop official question data files into the repository to instantly unlock full timed mock tests.'}
+            </p>
+          </div>
+        `;
+
+        if (filtered.length === 0) {
+          cardsHtml += `
+            <div id="bssc-placeholder-card" class="col-span-full bg-white border-2 border-dashed border-[#C6DEC0] rounded-3xl p-6 sm:p-8 text-center space-y-4">
+              <div class="w-14 h-14 rounded-2xl bg-[#EBF3E6] text-[#10402D] mx-auto flex items-center justify-center font-bold shadow-2xs">
+                <i data-lucide="package-plus" class="w-7 h-7"></i>
+              </div>
+              <div class="max-w-md mx-auto space-y-1.5">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]">
+                  <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                  <span>${isHi ? 'आधिकारिक प्रश्न डेटा की प्रतीक्षा (रिपो में 0 प्रश्न)' : 'Awaiting Official Question Data (0 Questions in Repo)'}</span>
+                </div>
+                <h3 class="text-lg sm:text-xl font-display font-extrabold text-[#111C15]">
+                  ${isHi ? 'बीएसएससी सीजीएल एवं इंटर स्तरीय मॉक टेस्ट पैक' : 'BSSC CGL & Inter Level Mock Pack'}
+                </h3>
+                <p class="text-xs sm:text-sm text-[#526056] leading-relaxed">
+                  ${isHi 
+                    ? 'डेटा संरचना और अंकन प्रणाली (+4 सही, -1 गलत, 4 विकल्प) पूरी तरह से तैयार है। आधिकारिक प्रश्न रिपो में जोड़ते ही या <code class="px-1.5 py-0.5 rounded bg-[#F0F4F1] font-mono text-[11px] text-[#10402D]">SHAKTIQ_EXAM_PACKS.dropInPackData()</code> कॉल करते ही टेस्ट सक्रिय हो जाएंगे।'
+                    : 'Data structure and scoring engine (+4 correct, -1 wrong, 4 options) are fully implemented. New packs can be activated seamlessly by calling <code class="px-1.5 py-0.5 rounded bg-[#F0F4F1] font-mono text-[11px] text-[#10402D]">SHAKTIQ_EXAM_PACKS.dropInPackData()</code> or placing official question JSON into the repository.'}
+                </p>
+              </div>
+              
+              <div class="inline-grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-lg mx-auto py-3 px-4 rounded-2xl bg-[#F8FAF7] border border-[#E5ECE6] text-center text-xs">
+                <div>
+                  <span class="text-[#526056] block text-[10px] font-semibold">${isHi ? 'प्रारूप प्रश्न' : 'TARGET QS'}</span>
+                  <strong class="text-[#111C15] font-bold">${isHi ? '150 प्रश्न' : '150 Questions'}</strong>
+                </div>
+                <div>
+                  <span class="text-[#526056] block text-[10px] font-semibold">${isHi ? 'सही उत्तर' : 'CORRECT'}</span>
+                  <strong class="text-[#10402D] font-bold">+4.0 Marks</strong>
+                </div>
+                <div>
+                  <span class="text-[#526056] block text-[10px] font-semibold">${isHi ? 'नेगेटिव' : 'NEGATIVE'}</span>
+                  <strong class="text-rose-600 font-bold">-1.0 Mark</strong>
+                </div>
+                <div>
+                  <span class="text-[#526056] block text-[10px] font-semibold">${isHi ? 'विकल्प' : 'OPTIONS'}</span>
+                  <strong class="text-[#111C15] font-bold">${isHi ? '4 विकल्प (A-D)' : '4 Options (A-D)'}</strong>
+                </div>
+              </div>
+
+              <div class="pt-2">
+                <button type="button" disabled class="px-5 py-2.5 rounded-xl bg-[#F0F4F1] text-[#526056] text-xs font-bold border border-[#DCE6DF] cursor-not-allowed inline-flex items-center gap-2">
+                  <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                  <span>${isHi ? 'आधिकारिक प्रश्न पत्र जुड़ने तक सुरक्षित लॉक' : 'Pack Locked Until Official Papers Added'}</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }
       }
 
       filtered.forEach(test => {
@@ -10027,7 +10305,9 @@ summary:focus-visible,
       initIcons();
     }
 
+    let currentTestSeriesFilter = 'ALL';
     function filterTestSeries(cat) {
+      currentTestSeriesFilter = cat || 'ALL';
       document.querySelectorAll('.ts-filter-btn').forEach(btn => {
         if (btn.getAttribute('data-ts-filter') === cat) {
           btn.className = 'ts-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#10402D] text-white shadow-sm border border-[#10402D] cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5';
@@ -10528,7 +10808,10 @@ summary:focus-visible,
         const allMcq = getAllQuestions().filter(q => !isMainsDescriptiveQuestion(q));
         let questions = [];
 
-        if (test.isSpeedDrill) {
+        if (test.customQuestions && Array.isArray(test.customQuestions) && test.customQuestions.length > 0) {
+          // Drop-in exam pack questions loaded at runtime
+          questions = test.customQuestions;
+        } else if (test.isSpeedDrill) {
           // Select questions strictly from existing bank matching this drill's subject(s)
           const subjectPool = allMcq.filter(q => {
             if (Array.isArray(test.subjectFilter)) {
@@ -11409,12 +11692,13 @@ summary:focus-visible,
         }
       });
 
-      // BPSC-Pattern Score Formula (-1/3 deduction):
-      // Correct: +1.0
-      // Wrong (A-D): -1/3 (-0.33)
-      // Option E: 0 (Safe Skip)
-      // Blank (Unattempted row): -1/3 (-0.33 penalty)
-      const netScore = ((correct * 3 - wrong - blank) / 3).toFixed(2);
+      // Scoring formula: supports modular marking schemes (BPSC: +1, -1/3, 0 Safe Skip, -1/3 blank; BSSC: +4, -1, 0 Safe Skip, 0 blank)
+      const scheme = (activeMockTest && activeMockTest.markingScheme)
+        ? activeMockTest.markingScheme
+        : { correct: 1.0, wrong: -1/3, safeSkip: 0, blank: -1/3 };
+
+      const netScoreCalc = (correct * scheme.correct) + (wrong * scheme.wrong) + (blank * scheme.blank) + (safeSkip * scheme.safeSkip);
+      const netScore = netScoreCalc.toFixed(2);
 
       const isHindiMode = (ShaktiQBilingualEngine && ShaktiQBilingualEngine.currentLang === 'hi');
       const isSpeed = activeMockTest && activeMockTest.isSpeedDrill;

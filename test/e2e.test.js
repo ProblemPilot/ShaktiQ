@@ -1284,7 +1284,177 @@ async function runE2ETests() {
     console.log('[PASS] E2E: Virtual OMR Sheet Mode verified: 150 5-bubble rows (A to E), Safe Skip E indicator, seamless bidirectional answer state sync, OMR quick filters, desktop split view (>=1024px), and mobile full switch (<1024px).');
 
     // ----------------------------------------------------
-    // TEST 15: Console Errors Check
+    // TEST 15: Preparation for More Exam Packs (BSSC, TRE 4.0) Modular Registry & Placeholder Verification
+    // ----------------------------------------------------
+    await page.evaluate(() => {
+      // Exit mock taking workspace and return to testseries view
+      const ws = document.getElementById('test-taking-workspace');
+      if (ws) ws.classList.add('hidden');
+      const tsView = document.getElementById('view-testseries');
+      if (tsView) tsView.classList.remove('hidden');
+      if (typeof renderTestSeriesCards === 'function') {
+        renderTestSeriesCards('ALL');
+      }
+    });
+
+    const packsRegistryAudit = await page.evaluate(() => {
+      if (!window.SHAKTIQ_EXAM_PACKS) return { ok: false, error: 'window.SHAKTIQ_EXAM_PACKS missing' };
+      const packs = window.SHAKTIQ_EXAM_PACKS;
+      const cce = packs.getPack('bpsc_cce');
+      const tre = packs.getPack('bpsc_tre');
+      const aedo = packs.getPack('aedo');
+      const dept = packs.getPack('bpsc_dept');
+      const drills = packs.getPack('speed_drills');
+      const bssc = packs.getPack('bssc');
+
+      return {
+        ok: true,
+        cceHasData: cce && cce.hasData && cce.totalQuestions === 594,
+        treHasData: tre && tre.hasData && tre.totalQuestions === 229,
+        aedoHasData: aedo && aedo.hasData && aedo.totalQuestions === 600,
+        deptHasData: dept && dept.hasData && dept.totalQuestions === 1386,
+        drillsHasData: drills && drills.hasData && drills.totalQuestions === 120,
+        bsscIsPlaceholder: bssc && !bssc.hasData && bssc.isPlaceholder && bssc.totalQuestions === 0,
+        bsscMarking: bssc ? bssc.markingScheme : null
+      };
+    });
+
+    if (!packsRegistryAudit.ok) {
+      throw new Error(`Exam packs registry audit failed: ${packsRegistryAudit.error}`);
+    }
+    if (!packsRegistryAudit.cceHasData || !packsRegistryAudit.treHasData || !packsRegistryAudit.aedoHasData ||
+        !packsRegistryAudit.deptHasData || !packsRegistryAudit.drillsHasData) {
+      throw new Error(`Verified exam packs data check failed in registry: ${JSON.stringify(packsRegistryAudit)}`);
+    }
+    if (!packsRegistryAudit.bsscIsPlaceholder || packsRegistryAudit.bsscMarking.correct !== 4.0 || packsRegistryAudit.bsscMarking.wrong !== -1.0) {
+      throw new Error(`BSSC placeholder specification failed: ${JSON.stringify(packsRegistryAudit)}`);
+    }
+
+    // Verify UI rendering of BSSC tab and clean placeholder card
+    await page.evaluate(() => {
+      filterTestSeries('BSSC');
+    });
+
+    const bsscUiAudit = await page.evaluate(() => {
+      const header = document.getElementById('bssc-pack-header');
+      const placeholder = document.getElementById('bssc-placeholder-card');
+      const lockedBtn = placeholder ? placeholder.querySelector('button[disabled]') : null;
+      return {
+        hasHeader: !!header,
+        headerText: header ? header.textContent : '',
+        hasPlaceholder: !!placeholder,
+        placeholderText: placeholder ? placeholder.textContent : '',
+        hasDisabledButton: !!lockedBtn
+      };
+    });
+
+    if (!bsscUiAudit.hasHeader || !bsscUiAudit.headerText.includes('BSSC Architecture Ready')) {
+      throw new Error(`BSSC pack header missing or incorrect: ${JSON.stringify(bsscUiAudit)}`);
+    }
+    if (!bsscUiAudit.hasPlaceholder || !bsscUiAudit.placeholderText.includes('0 Questions in Repo')) {
+      throw new Error(`BSSC clean placeholder card missing or fails to state 0 Questions in Repo: ${JSON.stringify(bsscUiAudit)}`);
+    }
+    if (!bsscUiAudit.hasDisabledButton) {
+      throw new Error('BSSC placeholder must have a disabled lock button while awaiting official papers');
+    }
+
+    // Test Bilingual switch for BSSC tab & placeholder
+    await page.evaluate(() => {
+      setGlobalAppLanguage('hi');
+    });
+    const bsscHiAudit = await page.evaluate(() => {
+      const label = document.getElementById('ts-filter-bssc-label');
+      const header = document.getElementById('bssc-pack-header');
+      return {
+        filterLabel: label ? label.textContent : '',
+        headerText: header ? header.textContent : ''
+      };
+    });
+    if (!bsscHiAudit.filterLabel.includes('प्रारूप') && !bsscHiAudit.filterLabel.includes('बीएसएससी')) {
+      throw new Error(`BSSC filter Hindi translation failed: got "${bsscHiAudit.filterLabel}"`);
+    }
+    if (!bsscHiAudit.headerText.includes('बिहार कर्मचारी चयन आयोग')) {
+      throw new Error(`BSSC header Hindi translation failed: got "${bsscHiAudit.headerText}"`);
+    }
+
+    // Switch back to English
+    await page.evaluate(() => {
+      setGlobalAppLanguage('en');
+    });
+
+    // Test dropInPackData validation and runtime drop-in
+    const dropInValidationAudit = await page.evaluate(() => {
+      let errMissingPayload = false;
+      let errMissingQuestions = false;
+      try {
+        window.SHAKTIQ_EXAM_PACKS.dropInPackData('bssc', null);
+      } catch (e) {
+        errMissingPayload = true;
+      }
+      try {
+        window.SHAKTIQ_EXAM_PACKS.dropInPackData('bssc', { test: { id: 'bad' }, questions: [] });
+      } catch (e) {
+        errMissingQuestions = true;
+      }
+
+      // Valid test drop-in
+      const dropResult = window.SHAKTIQ_EXAM_PACKS.dropInPackData('bssc', {
+        test: {
+          id: 'test_dropin_bssc_cgl_01',
+          title: 'BSSC CGL Drop-In Practice Test 01',
+          marks: 400,
+          timeMins: 135,
+          statusLabel: 'Drop-In Active',
+          desc: 'Modular test loaded dynamically via drop-in architecture.'
+        },
+        questions: [
+          { id: 'q_bssc_sample_1', q: 'Capital of Bihar?', a: 'Gaya', b: 'Patna', c: 'Muzaffarpur', d: 'Bhagalpur', ans: 'B', subject: 'General Studies' },
+          { id: 'q_bssc_sample_2', q: 'River flowing through Patna?', a: 'Yamuna', b: 'Narmada', c: 'Ganga', d: 'Godavari', ans: 'C', subject: 'General Studies' }
+        ]
+      });
+
+      renderTestSeriesCards('BSSC');
+
+      const packAfter = window.SHAKTIQ_EXAM_PACKS.getPack('bssc');
+      const renderedCards = Array.from(document.querySelectorAll('#testseries-grid .group')).map(c => c.textContent);
+      const placeholderAfter = document.getElementById('bssc-placeholder-card');
+
+      return {
+        errMissingPayload,
+        errMissingQuestions,
+        dropResult,
+        packHasData: packAfter ? packAfter.hasData : false,
+        placeholderAfter: !!placeholderAfter,
+        renderedCardCount: renderedCards.length,
+        hasDroppedInTitle: renderedCards.some(t => t.includes('BSSC CGL Drop-In Practice Test 01'))
+      };
+    });
+
+    if (!dropInValidationAudit.errMissingPayload || !dropInValidationAudit.errMissingQuestions) {
+      throw new Error('dropInPackData schema validation failed to reject invalid payloads');
+    }
+    if (!dropInValidationAudit.packHasData || dropInValidationAudit.placeholderAfter || !dropInValidationAudit.hasDroppedInTitle) {
+      throw new Error(`dropInPackData failed to activate BSSC pack: ${JSON.stringify(dropInValidationAudit)}`);
+    }
+
+    // Clean up test drop-in from memory & restore baseline BSSC state
+    await page.evaluate(() => {
+      const idx = CURATED_TESTS.findIndex(t => t.id === 'test_dropin_bssc_cgl_01');
+      if (idx >= 0) CURATED_TESTS.splice(idx, 1);
+      const bssc = window.SHAKTIQ_EXAM_PACKS.getPack('bssc');
+      if (bssc) {
+        bssc.hasData = false;
+        bssc.isPlaceholder = true;
+        bssc.totalQuestions = 0;
+        bssc.activeMocksCount = 0;
+      }
+      renderTestSeriesCards('BSSC');
+    });
+
+    console.log('[PASS] E2E: Preparation for More Exam Packs (BSSC, TRE 4.0) verified: clean modular registry, dropInPackData schema validation, BSSC clean placeholder card with strict 0-invented-question guarantee, and bilingual synchronization.');
+
+    // ----------------------------------------------------
+    // TEST 16: Console Errors Check
     // ----------------------------------------------------
     if (consoleErrors.length > 0) {
       console.warn(`[WARN] Console errors logged during test run:\n${consoleErrors.join('\n')}`);
