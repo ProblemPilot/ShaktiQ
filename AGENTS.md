@@ -80,3 +80,27 @@ npm run verify
 # Runs automated unit tests, data checksums, static audits, and accessibility checks
 # Exits with code 0 on complete pass
 ```
+
+---
+
+## 4. Current Progress & Resume Checkpoint (Paused)
+
+### Landed Commits on branch `improve/three-phases`:
+1. `72f34bd` - `chore: establish safety net test suite and architecture guide (Step 0 & 1)`
+2. `92c3896` - `feat(admin): gate question management and custom count behind #admin (1.1)`
+3. `6bfa3aa` - `feat(mock): add mobile slim sticky exam bar with timer, question index, and Option E indicator (1.2)`
+4. `555eee1` - `feat(mock): add mobile bottom action bar with thumb-friendly buttons (1.3)`
+
+### In Progress: Feature 1.4 (Question Palette Off-Canvas Sheet on Mobile)
+- **Status:** Markup, drawer open/close logic, palette buttons (150 count), and e2e tests implemented.
+- **Verification:** `npm run verify` passing 5/5.
+- **Visual Inspection Finding & Immediate Next Step upon Resuming:**
+  1. Add explicit CSS rules in `<style>` for drawer styling:
+     ```css
+     .inset-x-0 { left: 0 !important; right: 0 !important; width: 100% !important; }
+     .max-h-\[85vh\] { max-height: 85vh !important; }
+     ```
+  2. In `startMockTest()`, hide `#qb-sticky-header` on mobile (`hidden sm:block`) so `#tt-mobile-exam-bar` is the sole slim top bar; restore in `exitMockTest()` / `closeTestResultModal()`.
+  3. Re-run `node scripts/inspect_1_4.js` and verify two consecutive clean visual inspection passes across all 5 viewports (EN & HI).
+  4. Commit 1.4: `feat(mock): add mobile off-canvas question palette slide-up sheet (1.4)` and push.
+  5. Continue with Feature 1.5 (Print/Save PDF overflow menu under 640px).

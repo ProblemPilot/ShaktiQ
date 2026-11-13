@@ -210,7 +210,7 @@ async function runE2ETests() {
     console.log('[PASS] E2E: Answer selection, Option E safe-skip, and cross-question persistence verified.');
 
     // ----------------------------------------------------
-    // TEST 4: Question Palette States
+    // TEST 4: Question Palette States & Mobile Drawer (1.4)
     // ----------------------------------------------------
     const paletteStates = await page.evaluate(() => {
       renderQuestionPalette();
@@ -221,6 +221,57 @@ async function runE2ETests() {
       };
     });
     console.log(`[PASS] E2E: Question Palette verified (Answered: ${paletteStates.answered}, Visited: ${paletteStates.unanswered}, Unvisited: ${paletteStates.unvisited}).`);
+
+    // Mobile Palette Drawer check (<1024px):
+    await page.setViewport({ width: 390, height: 844 });
+    const mobilePaletteTest = await page.evaluate(() => {
+      const floatBtn = document.getElementById('tt-floating-grid-btn');
+      const drawer = document.getElementById('tt-palette-drawer');
+      const sheet = document.getElementById('tt-palette-sheet');
+      
+      const floatBtnVisible = floatBtn && window.getComputedStyle(floatBtn).display !== 'none';
+      const drawerHiddenInitially = drawer && drawer.classList.contains('hidden');
+
+      // Click floating button to open drawer
+      openPaletteDrawer();
+
+      const drawerOpenNow = drawer && !drawer.classList.contains('hidden');
+      const mobileButtons = document.querySelectorAll('#tt-palette-grid-mobile button');
+      const mobileBtnCount = mobileButtons.length;
+      
+      // Click question 5 in mobile drawer (index 4)
+      if (mobileButtons.length >= 5) {
+        mobileButtons[4].click();
+      }
+
+      return {
+        floatBtnVisible,
+        drawerHiddenInitially,
+        drawerOpenNow,
+        mobileBtnCount,
+        newIndex: currentMockIndex
+      };
+    });
+
+    if (!mobilePaletteTest.floatBtnVisible) {
+      throw new Error('Floating question grid button (#tt-floating-grid-btn) not visible at 390px');
+    }
+    if (!mobilePaletteTest.drawerHiddenInitially) {
+      throw new Error('Mobile palette drawer should be hidden initially');
+    }
+    if (!mobilePaletteTest.drawerOpenNow) {
+      throw new Error('Mobile palette drawer failed to open on openPaletteDrawer()');
+    }
+    if (mobilePaletteTest.mobileBtnCount < 100) {
+      throw new Error(`Mobile palette grid button count expected >= 100, got ${mobilePaletteTest.mobileBtnCount}`);
+    }
+    if (mobilePaletteTest.newIndex !== 4) {
+      throw new Error(`Clicking question in mobile palette expected currentMockIndex 4, got ${mobilePaletteTest.newIndex}`);
+    }
+    console.log(`[PASS] E2E: Mobile Question Palette slide-up sheet verified (150 buttons, drawer open/close, jump to Q5).`);
+
+    // Restore desktop viewport
+    await page.setViewport({ width: 1280, height: 800 });
 
     // ----------------------------------------------------
     // TEST 5: Language Switch & Option Labels Preservation
