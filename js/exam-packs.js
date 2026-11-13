@@ -79,21 +79,21 @@
       bssc: {
         id: "bssc",
         name: "BSSC CGL & Inter Level Examination Pack",
-        shortName: "BSSC CGL / Inter Level",
-        nameHi: "बीएसएससी सीजीएल / इंटर स्तरीय परीक्षा पैक",
+        shortName: "BSSC CGL 4 (Coming Soon)",
+        nameHi: "बीएसएससी सीजीएल 4 (जल्द आ रहा है)",
         conductedBy: "Bihar Staff Selection Commission (BSSC)",
         categoryKey: "BSSC",
         icon: "layers",
-        badge: "Schema Ready (Upcoming)",
+        badge: "Coming Soon (सामग्री संकलन जारी)",
         markingScheme: { correct: 4.0, wrong: -1.0, safeSkip: 0, blank: 0 },
         optionsCount: 4,
         hasData: false, // Strict integrity: 0 questions currently in repo
         totalQuestions: 0,
         activeMocksCount: 0,
         isPlaceholder: true,
-        placeholderNotice: "Data schema ready. Questions will appear when official BSSC question data files are dropped into the repository. Zero artificial or invented questions.",
-        description: "Modular exam pack structure ready. Drop in official BSSC question data files to activate full mock testing with BSSC marking scheme (+4 / -1).",
-        descriptionHi: "मॉड्यूलर परीक्षा पैक संरचना तैयार है। आधिकारिक बीएसएससी प्रश्न डेटा फाइल लोड करते ही टेस्ट अनलॉक हो जाएंगे (+4 / -1 अंक प्रणाली)।"
+        placeholderNotice: "BSSC CGL 4 study material and official papers are currently being accumulated. High quality tests will be released soon. Zero artificial or invented questions.",
+        description: "BSSC CGL 4 official material is currently being accumulated. Timed mock tests (+4 / -1 marking pattern) will unlock as verified question sets are added.",
+        descriptionHi: "बीएसएससी सीजीएल 4 आधिकारिक सामग्री और प्रश्नपत्रों का संकलन जारी है। गुणवत्तापूर्ण मॉक टेस्ट जल्द उपलब्ध होंगे (+4 / -1 अंक प्रणाली)।"
       },
       speed_drills: {
         id: "speed_drills",
@@ -177,7 +177,7 @@
     window.SHAKTIQ_EXAM_PACKS = SHAKTIQ_EXAM_PACKS;
 
     // ==========================================
-    // TESTBOOK PATTERN TEST SERIES ENGINE
+    // FULL LENGTH TEST SERIES ENGINE
     // ==========================================
     const CURATED_TESTS = [
   {

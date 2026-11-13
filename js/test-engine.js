@@ -47,11 +47,11 @@ let currentMockQuestions = [];
           <div id="bssc-pack-header" class="col-span-full bg-linear-to-r from-[#10402D] to-[#1E5638] text-white p-5 sm:p-6 rounded-3xl shadow-sm space-y-2 mb-2">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FEF6D6] text-[#785600] flex items-center gap-1">
-                <i data-lucide="layers" class="w-3.5 h-3.5"></i> ${isHi ? 'बीएसएससी आर्किटेक्चर तैयार' : 'BSSC Architecture Ready'}
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i> ${isHi ? 'बीएसएससी सीजीएल 4 • जल्द आ रहा है' : 'BSSC CGL 4 • Coming Soon'}
               </span>
               <span class="text-xs text-white/80 font-medium">${isHi ? 'बीएसएससी सीजीएल एवं इंटर स्तर • +4.0 / -1.0 अंकन • 4 विकल्प (A-D)' : 'BSSC CGL & Inter Level • +4.0 / -1.0 Pattern • 4 Options (A-D)'}</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-display font-extrabold text-white">${isHi ? 'बिहार कर्मचारी चयन आयोग (BSSC) परीक्षा पैक' : 'Bihar Staff Selection Commission (BSSC) Exam Pack'}</h2>
+            <h2 class="text-xl sm:text-2xl font-display font-extrabold text-white">${isHi ? 'बिहार कर्मचारी चयन आयोग (BSSC CGL 4) • जल्द आ रहा है' : 'Bihar Staff Selection Commission (BSSC CGL 4) • Coming Soon'}</h2>
             <p class="text-xs sm:text-sm text-white/90 max-w-2xl leading-relaxed">
               ${isHi 
                 ? 'मॉड्यूलर परीक्षा पैक संरचना तैयार है। शक्ति-क्यू सख्त शैक्षणिक शुचिता का पालन करता है: कोई भी काल्पनिक प्रश्न नहीं बनाया गया है। आधिकारिक प्रश्न पत्र जोड़ते ही मॉक टेस्ट स्वतः सक्रिय हो जाएंगे।' 
@@ -69,10 +69,10 @@ let currentMockQuestions = [];
               <div class="max-w-md mx-auto space-y-1.5">
                 <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]">
                   <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                  <span>${isHi ? 'आधिकारिक प्रश्न डेटा की प्रतीक्षा (रिपो में 0 प्रश्न)' : 'Awaiting Official Question Data (0 Questions in Repo)'}</span>
+                  <span>${isHi ? 'सामग्री संकलन जारी • जल्द आ रहा है' : 'Material In Preparation • Coming Soon'}</span>
                 </div>
                 <h3 class="text-lg sm:text-xl font-display font-extrabold text-[#111C15]">
-                  ${isHi ? 'बीएसएससी सीजीएल एवं इंटर स्तरीय मॉक टेस्ट पैक' : 'BSSC CGL & Inter Level Mock Pack'}
+                  ${isHi ? 'बीएसएससी सीजीएल 4 मॉक टेस्ट पैक (जल्द उपलब्ध)' : 'BSSC CGL 4 Mock Test Pack (Coming Soon)'}
                 </h3>
                 <p class="text-xs sm:text-sm text-[#526056] leading-relaxed">
                   ${isHi 
@@ -591,11 +591,11 @@ let currentMockQuestions = [];
           </div>
         </div>
 
-        <!-- MOCK TEST ATTEMPT HISTORY (TESTBOOK-STYLE) -->
+        <!-- MOCK TEST ATTEMPT HISTORY -->
         <div class="bg-white rounded-3xl border border-[#DCE6DF] p-6 shadow-sm">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E5ECE6]">
             <div>
-              <h3 class="font-display font-extrabold text-lg text-[#111C15]">Mock Test History Log (Testbook-Style)</h3>
+              <h3 class="font-display font-extrabold text-lg text-[#111C15]">Mock Test History Log</h3>
               <p class="text-xs text-[#526056]">Complete audit record of marks, accuracy &amp; Option E safe skips for every attempt</p>
             </div>
             <button type="button" onclick="openTestSeriesMode()" class="px-4 py-2 rounded-xl font-bold text-xs text-white bg-[#10402D] hover:bg-[#17593F] transition cursor-pointer shrink-0">
@@ -2103,7 +2103,7 @@ Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
     }
 
     // ==========================================
-    // DEDICATED TESTBOOK-STYLE SOLUTION REVIEW ENGINE
+    // DEDICATED SOLUTION REVIEW ENGINE
     // (Completely independent from PYQ Question Bank)
     // ==========================================
     let reviewMockQuestions = [];
@@ -2122,7 +2122,7 @@ Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
       const viewBank = document.getElementById('view-bank');
       if (viewBank) viewBank.classList.add('hidden');
 
-      // Show dedicated Testbook Solutions Workspace
+      // Show dedicated Solutions Workspace
       const solWs = document.getElementById('test-solution-workspace');
       if (solWs) solWs.classList.remove('hidden');
 
@@ -2145,7 +2145,7 @@ Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
       renderSolutionPalette();
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      showToast("Displaying dedicated Testbook solutions for this test only.", "success");
+      showToast("Displaying detailed solutions for this test only.", "success");
     }
 
     function updateSolutionStatsAndCounts() {

@@ -401,31 +401,8 @@ const PrepBackendEngine = {
         }
       },
 
-      exportStudentDataJSON: async function(email) {
-        const student = PrepBackendEngine.auth.getCurrentUser();
-        const attempts = await PrepBackendEngine.tests.getAttemptsForStudent(email);
-
-        const dataObj = {
-          portal: "ShaktiQ - BPSC & AEDO Test Series",
-          targetExam: "72nd/73rd BPSC CCE & AEDO",
-          exportDate: new Date().toISOString(),
-          student: student,
-          totalCompletedTests: attempts.length,
-          attempts: attempts
-        };
-
-        const jsonStr = JSON.stringify(dataObj, null, 2);
-        const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        const fname = student && student.firstName ? student.firstName : "Student";
-        a.download = `${fname}_Test_Portfolio.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast("Exported your complete test records backup!", "success");
+      exportStudentDataJSON: async function() {
+        return null;
       }
     };
 

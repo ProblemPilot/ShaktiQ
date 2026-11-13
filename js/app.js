@@ -678,7 +678,8 @@
       const email = (document.getElementById('reg-student-email').value || '').trim();
       const phone = (document.getElementById('reg-student-phone').value || '').trim().replace(/\D/g, '');
       const targetExam = document.getElementById('reg-target-exam').value || '72nd BPSC CCE';
-      const district = (document.getElementById('reg-student-district').value || '').trim();
+      const distEl = document.getElementById('reg-student-district');
+      const district = distEl ? (distEl.value || '').trim() : '';
 
       if (!name || name.length < 2) {
         resetBtn();
@@ -698,11 +699,7 @@
         return;
       }
 
-      if (!district) {
-        resetBtn();
-        showToast('Please select your home district in Bihar.', 'error');
-        return;
-      }
+      // District field removed per specification
 
       // 3. SPAM PROTECTION: Rate limit check
       const rateCheck = checkRegistrationRateLimit();
@@ -887,14 +884,14 @@
         }
       } else {
         const signInBtnHtml = `
-          <button type="button" onclick="openAspirantRegModal('Sign in with your name, email, mobile number, and district to unlock the PYQ Bank and Mock Tests.')" class="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#0A3826] hover:bg-[#145239] shadow-sm transition-all cursor-pointer" id="nav-signin-btn">
+          <button type="button" onclick="openAspirantRegModal('Sign in with your name, email, and mobile number to unlock the PYQ Bank and Mock Tests.')" class="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#0A3826] hover:bg-[#145239] shadow-sm transition-all cursor-pointer" id="nav-signin-btn">
             <i data-lucide="user" class="w-4 h-4 text-[#FCE27B]"></i>
             <span>Sign In</span>
           </button>
         `;
 
         const mobileSignInBtnHtml = `
-          <button type="button" onclick="openAspirantRegModal('Sign in with your name, email, mobile number, and district to unlock the PYQ Bank and Mock Tests.')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#0A3826] cursor-pointer">
+          <button type="button" onclick="openAspirantRegModal('Sign in with your name, email, and mobile number to unlock the PYQ Bank and Mock Tests.')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#0A3826] cursor-pointer">
             <i data-lucide="user" class="w-3.5 h-3.5 text-[#FCE27B]"></i>
             <span>Sign In</span>
           </button>
@@ -923,7 +920,7 @@
       document.getElementById('sp-email').textContent = user.email;
       document.getElementById('sp-phone').textContent = user.phone || 'Not specified';
       document.getElementById('sp-target-exam').textContent = user.targetExam || '72nd/73rd BPSC CCE';
-      document.getElementById('sp-district').textContent = user.district || 'Bihar';
+      const spDist = document.getElementById('sp-district'); if (spDist) spDist.textContent = user.district || '';
       document.getElementById('sp-registered-date').textContent = user.registeredAt || 'Active Aspirant';
 
       const attempts = await PrepBackendEngine.tests.getAttemptsForStudent(user.email);
@@ -999,7 +996,7 @@
         return true;
       }
       pendingAspirantCallback = actionCallback || null;
-      openAspirantRegModal(intentMessage || 'Please sign in with your name, email, phone, and district to access the PYQ Bank and Mock Tests.');
+      openAspirantRegModal(intentMessage || 'Please sign in with your name, email, and phone number to access the PYQ Bank and Mock Tests.');
       return false;
     }
 

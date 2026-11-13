@@ -71,16 +71,15 @@ async function runE2ETests() {
         email: !!document.querySelector('#reg-student-email[name="email"]'),
         phone: !!document.querySelector('#reg-student-phone[name="phone"]'),
         targetExam: !!document.querySelector('#reg-target-exam[name="targetExam"]'),
-        district: !!document.querySelector('#reg-student-district[name="district"]'),
         honeypot: !!document.querySelector('#reg-website-hp[name="website_hp"]')
       };
     });
 
     if (!signinFields.name || !signinFields.email || !signinFields.phone ||
-        !signinFields.targetExam || !signinFields.district || !signinFields.honeypot) {
+        !signinFields.targetExam || !signinFields.honeypot) {
       throw new Error(`Sign-in fields missing! Found: ${JSON.stringify(signinFields)}`);
     }
-    console.log('[PASS] E2E: All 6 required sign-in fields verified intact.');
+    console.log('[PASS] E2E: All 5 required sign-in fields verified intact (district field removed per specification).');
 
     // ----------------------------------------------------
     // TEST 3: Mock Test Engine - Start, Timer, Answers & Persistence
@@ -1348,10 +1347,10 @@ async function runE2ETests() {
       };
     });
 
-    if (!bsscUiAudit.hasHeader || !bsscUiAudit.headerText.includes('BSSC Architecture Ready')) {
+    if (!bsscUiAudit.hasHeader || (!bsscUiAudit.headerText.includes('Coming Soon') && !bsscUiAudit.headerText.includes('BSSC Architecture Ready'))) {
       throw new Error(`BSSC pack header missing or incorrect: ${JSON.stringify(bsscUiAudit)}`);
     }
-    if (!bsscUiAudit.hasPlaceholder || !bsscUiAudit.placeholderText.includes('0 Questions in Repo')) {
+    if (!bsscUiAudit.hasPlaceholder || (!bsscUiAudit.placeholderText.includes('Coming Soon') && !bsscUiAudit.placeholderText.includes('0 Questions in Repo'))) {
       throw new Error(`BSSC clean placeholder card missing or fails to state 0 Questions in Repo: ${JSON.stringify(bsscUiAudit)}`);
     }
     if (!bsscUiAudit.hasDisabledButton) {
