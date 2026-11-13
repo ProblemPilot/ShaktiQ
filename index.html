@@ -25,7 +25,10 @@
   <meta property="og:title" content="ShaktiQ – Bihar Exam Prep">
   <meta property="og:description" content="Practice 2800+ BPSC PYQs based on published answer keys, 22 full-length tests on BPSC pattern, rapid revision sheets, and exam mnemonics">
   <meta property="og:url" content="https://shaktiq.com/">
-  <meta property="og:image" content="https://shaktiq.com/favicon-512x512.png">
+  <meta property="og:image" content="https://shaktiq.com/share-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:alt" content="ShaktiQ - Bihar Competitive Exam Preparation Portal">
   <meta property="og:locale" content="en_IN">
 
@@ -34,7 +37,7 @@
   <meta name="twitter:title" content="ShaktiQ – Bihar Exam Prep">
   <meta name="twitter:description" content="Practice 2800+ BPSC PYQs based on published answer keys, 22 full-length tests on BPSC pattern, rapid revision sheets, and exam mnemonics">
   <meta name="twitter:url" content="https://shaktiq.com/">
-  <meta name="twitter:image" content="https://shaktiq.com/favicon-512x512.png">
+  <meta name="twitter:image" content="https://shaktiq.com/share-card.png">
 
   <!-- Structured Data: JSON-LD (EducationalOrganization) -->
   <script type="application/ld+json">
@@ -4988,6 +4991,39 @@ summary:focus-visible,
       }
     }
 
+    function updatePageMeta(meta) {
+      if (!meta) return;
+      if (meta.title) {
+        document.title = meta.title;
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.setAttribute('content', meta.title);
+        const twTitle = document.querySelector('meta[name="twitter:title"]');
+        if (twTitle) twTitle.setAttribute('content', meta.title);
+      }
+      if (meta.description) {
+        const desc = document.querySelector('meta[name="description"]');
+        if (desc) desc.setAttribute('content', meta.description);
+        const ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) ogDesc.setAttribute('content', meta.description);
+        const twDesc = document.querySelector('meta[name="twitter:description"]');
+        if (twDesc) twDesc.setAttribute('content', meta.description);
+      }
+      if (meta.url) {
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.setAttribute('href', meta.url);
+        const ogUrl = document.querySelector('meta[property="og:url"]');
+        if (ogUrl) ogUrl.setAttribute('content', meta.url);
+        const twUrl = document.querySelector('meta[name="twitter:url"]');
+        if (twUrl) twUrl.setAttribute('content', meta.url);
+      }
+      if (meta.image) {
+        const ogImg = document.querySelector('meta[property="og:image"]');
+        if (ogImg) ogImg.setAttribute('content', meta.image);
+        const twImg = document.querySelector('meta[name="twitter:image"]');
+        if (twImg) twImg.setAttribute('content', meta.image);
+      }
+    }
+
     function openPortalView() {
       const portal = document.getElementById('page-portal-view');
       const qb = document.getElementById('page-bpsc-pyq-view');
@@ -5000,6 +5036,12 @@ summary:focus-visible,
         initIcons();
         try { history.pushState(null, null, '#'); } catch(e){}
       }
+      updatePageMeta({
+        title: "ShaktiQ – Bihar Exam Prep | Decode Bihar's Toughest Exams",
+        description: "Practice 2800+ BPSC PYQs based on published answer keys, 22 full-length tests on BPSC pattern, rapid revision sheets, and exam mnemonics",
+        url: "https://shaktiq.com/",
+        image: "https://shaktiq.com/share-card.png"
+      });
     }
 
     function toggleMobileMoreMenu(e) {
@@ -5832,6 +5874,36 @@ summary:focus-visible,
       if (solWork) solWork.classList.add("hidden");
       const resModal = document.getElementById("tt-result-modal");
       if (resModal) resModal.classList.add("hidden");
+
+      if (viewName === 'analytics') {
+        updatePageMeta({
+          title: "My Prep & Weak Areas Analytics | ShaktiQ",
+          description: "Track your subject-wise accuracy, question attempts, and weak areas across BPSC syllabus on ShaktiQ.",
+          url: "https://shaktiq.com/#analytics",
+          image: "https://shaktiq.com/share-card.png"
+        });
+      } else if (viewName === 'manage') {
+        updatePageMeta({
+          title: "Question Management Portal (Admin) | ShaktiQ",
+          description: "Internal administration interface for ShaktiQ question bank management.",
+          url: "https://shaktiq.com/#admin",
+          image: "https://shaktiq.com/share-card.png"
+        });
+      } else if (viewName === 'bank') {
+        updatePageMeta({
+          title: "2,800+ Subject-Wise BPSC PYQ Bank | ShaktiQ",
+          description: "Explore 2,800+ verified BPSC previous year questions organized by subject and exam with active recall self-testing.",
+          url: "https://shaktiq.com/#pyq-bank",
+          image: "https://shaktiq.com/share-card.png"
+        });
+      } else if (viewName === 'testseries') {
+        updatePageMeta({
+          title: "22 Full-Length BPSC Mock Tests | ShaktiQ",
+          description: "Attempt 22 full-length 150-question mock tests calibrated to exact BPSC pattern with 1/3 negative marking and Option E safe-skip rule.",
+          url: "https://shaktiq.com/#test-series",
+          image: "https://shaktiq.com/share-card.png"
+        });
+      }
 
       document.querySelectorAll(".nav-tab").forEach(btn => {
         if (btn.getAttribute("data-view") === viewName) {
@@ -7146,6 +7218,12 @@ summary:focus-visible,
         initIcons();
         try { history.pushState(null, null, '#test-series'); } catch(e){}
       }
+      updatePageMeta({
+        title: "22 Full-Length BPSC Mock Tests | ShaktiQ",
+        description: "Attempt 22 full-length 150-question mock tests calibrated to exact BPSC pattern with 1/3 negative marking and Option E safe-skip rule.",
+        url: "https://shaktiq.com/#test-series",
+        image: "https://shaktiq.com/share-card.png"
+      });
     }
 
     function openPyqBankMode() {
@@ -7164,6 +7242,21 @@ summary:focus-visible,
             history.pushState(null, null, '#pyq-bank');
           }
         } catch(e){}
+      }
+      if (window.location.hash.toLowerCase().includes('#admin')) {
+        updatePageMeta({
+          title: "Question Management Portal (Admin) | ShaktiQ",
+          description: "Internal administration interface for ShaktiQ question bank management.",
+          url: "https://shaktiq.com/#admin",
+          image: "https://shaktiq.com/share-card.png"
+        });
+      } else {
+        updatePageMeta({
+          title: "2,800+ Subject-Wise BPSC PYQ Bank | ShaktiQ",
+          description: "Explore 2,800+ verified BPSC previous year questions organized by subject and exam with active recall self-testing.",
+          url: "https://shaktiq.com/#pyq-bank",
+          image: "https://shaktiq.com/share-card.png"
+        });
       }
     }
 
@@ -9526,6 +9619,13 @@ summary:focus-visible,
         document.getElementById('test-taking-workspace').classList.remove('hidden');
 
         document.getElementById('tt-exam-name').textContent = test.title;
+
+        updatePageMeta({
+          title: `${test.title} (Live Mock) | ShaktiQ`,
+          description: `Attempt ${test.title} under official 2-hour timed exam conditions with real BPSC scoring rules on ShaktiQ.`,
+          url: `https://shaktiq.com/#mock-${test.id}`,
+          image: "https://shaktiq.com/share-card.png"
+        });
 
         if (mockTimerInterval) clearInterval(mockTimerInterval);
         mockTimerInterval = setInterval(updateMockTimer, 1000);

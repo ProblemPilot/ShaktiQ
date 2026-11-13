@@ -4,6 +4,7 @@
  */
 const puppeteer = require('puppeteer-core');
 const { createServer } = require('../scripts/server');
+const fs = require('fs');
 const path = require('path');
 
 const TEST_PORT = 8089;
@@ -426,7 +427,70 @@ async function runE2ETests() {
     console.log('[PASS] E2E: Secondary "More" menu with "Print / Save PDF" verified on mobile <640px.');
 
     // ----------------------------------------------------
-    // TEST 8: Console Errors Check
+    // TEST 8: Dynamic Meta Tags, Per-Page Titles & 1200x630 Share Card (1.6)
+    // ----------------------------------------------------
+    // 1. Verify 1200x630 share card file exists on disk
+    const shareCardPath = path.resolve(__dirname, '..', 'share-card.png');
+    if (!fs.existsSync(shareCardPath)) {
+      throw new Error('share-card.png is missing from repository root');
+    }
+    const shareCardStat = fs.statSync(shareCardPath);
+    if (shareCardStat.size < 5000) {
+      throw new Error(`share-card.png size is suspiciously small: ${shareCardStat.size} bytes`);
+    }
+
+    // 2. Verify initial OpenGraph & Twitter tags reference share-card.png
+    const metaCheck = await page.evaluate(() => {
+      const ogImg = document.querySelector('meta[property="og:image"]')?.getAttribute('content');
+      const twImg = document.querySelector('meta[name="twitter:image"]')?.getAttribute('content');
+      const ogWidth = document.querySelector('meta[property="og:image:width"]')?.getAttribute('content');
+      const ogHeight = document.querySelector('meta[property="og:image:height"]')?.getAttribute('content');
+      return { ogImg, twImg, ogWidth, ogHeight };
+    });
+    if (!metaCheck.ogImg?.includes('share-card.png')) {
+      throw new Error(`og:image expected to reference share-card.png, got: ${metaCheck.ogImg}`);
+    }
+    if (!metaCheck.twImg?.includes('share-card.png')) {
+      throw new Error(`twitter:image expected to reference share-card.png, got: ${metaCheck.twImg}`);
+    }
+    if (metaCheck.ogWidth !== '1200' || metaCheck.ogHeight !== '630') {
+      throw new Error(`og:image dimensions expected 1200x630, got ${metaCheck.ogWidth}x${metaCheck.ogHeight}`);
+    }
+
+    // 3. Test dynamic update on navigation to #test-series
+    await page.evaluate(() => {
+      openTestSeriesMode();
+    });
+    let curTitle = await page.title();
+    let ogTitle = await page.$eval('meta[property="og:title"]', el => el.getAttribute('content'));
+    if (!curTitle.includes('Mock Tests') || !ogTitle.includes('Mock Tests')) {
+      throw new Error(`Expected title & og:title to update for test series, got title: "${curTitle}", og:title: "${ogTitle}"`);
+    }
+
+    // 4. Test dynamic update when launching a mock test
+    await page.evaluate(() => {
+      startMockTest('ts_71st_cce');
+    });
+    curTitle = await page.title();
+    ogTitle = await page.$eval('meta[property="og:title"]', el => el.getAttribute('content'));
+    if (!curTitle.includes('71st BPSC CCE Prelims (Full Mock 1)') || !ogTitle.includes('71st BPSC CCE Prelims (Full Mock 1)')) {
+      throw new Error(`Expected title & og:title to update to mock test name, got title: "${curTitle}", og:title: "${ogTitle}"`);
+    }
+
+    // 5. Test dynamic update on navigation to #pyq-bank
+    await page.evaluate(() => {
+      openPyqBankMode();
+    });
+    curTitle = await page.title();
+    ogTitle = await page.$eval('meta[property="og:title"]', el => el.getAttribute('content'));
+    if (!curTitle.includes('PYQ Bank') || !ogTitle.includes('PYQ Bank')) {
+      throw new Error(`Expected title & og:title to update for PYQ Bank, got title: "${curTitle}", og:title: "${ogTitle}"`);
+    }
+
+    console.log('[PASS] E2E: Dynamic meta tags, per-page titles, and 1200x630 share card verified.');
+
+    // ----------------------------------------------------
+    // TEST 9: Console Errors Check
     // ----------------------------------------------------
     if (consoleErrors.length > 0) {
       console.warn(`[WARN] Console errors logged during test run:\n${consoleErrors.join('\n')}`);
