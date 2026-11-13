@@ -989,7 +989,87 @@ async function runE2ETests() {
     console.log('[PASS] E2E: Reliable Offline Mode verified: versioned cache purges stale data, and mock in progress survives going offline without loss.');
 
     // ----------------------------------------------------
-    // TEST 13: Console Errors Check
+    // TEST 13: Indicative Cut-Off Meter on Scorecard (Feature 2.4)
+    // ----------------------------------------------------
+    console.log('[RUNNING] E2E: Testing Indicative Cut-Off Meter & Thresholds Config...');
+
+    const cutoffAudit = await page.evaluate(() => {
+      // 1. Verify config object exists with default thresholds
+      const cfg = window.SHAKTIQ_CUTOFF_CONFIG;
+      if (!cfg || cfg.safe !== 98 || cfg.borderline !== 85 || cfg.needsImprovement !== 0) {
+        return { error: 'Config object missing or default thresholds mismatch' };
+      }
+
+      // 2. Verify 3 bands categorization logic
+      const bandSafe = window.getCutoffBand(104, 150);
+      const bandBorder = window.getCutoffBand(90, 150);
+      const bandNeeds = window.getCutoffBand(72, 150);
+
+      if (bandSafe.id !== 'safe' || bandBorder.id !== 'borderline' || bandNeeds.id !== 'needs_improvement') {
+        return { error: `Band calculation failed: safe=${bandSafe.id}, border=${bandBorder.id}, needs=${bandNeeds.id}` };
+      }
+
+      // 3. Test scaling for speed drills (15 Qs)
+      const scaled = cfg.getThresholdsForTest(15);
+      if (scaled.safe !== 9.8 || scaled.borderline !== 8.5) {
+        return { error: `Scaled thresholds mismatch: ${JSON.stringify(scaled)}` };
+      }
+      const drillSafe = window.getCutoffBand(12, 15);
+      const drillBorder = window.getCutoffBand(9, 15);
+      const drillNeeds = window.getCutoffBand(6, 15);
+
+      if (drillSafe.id !== 'safe' || drillBorder.id !== 'borderline' || drillNeeds.id !== 'needs_improvement') {
+        return { error: 'Scaled drill band calculation failed' };
+      }
+
+      // 4. Test DOM rendering in scorecard
+      window.renderCutoffMeter(92.33, 150);
+      const meterCard = document.getElementById('tt-result-cutoff-card');
+      const scoreDisp = document.getElementById('cutoff-meter-score-display');
+      const pointer = document.getElementById('cutoff-meter-pointer');
+      const cardBorderline = document.getElementById('band-card-borderline');
+      const cardSafe = document.getElementById('band-card-safe');
+      const disclaimer = meterCard ? meterCard.querySelector('p.leading-relaxed') : null;
+
+      const disclaimerText = disclaimer ? disclaimer.textContent : '';
+      const hasDisclaimerNotice = disclaimerText.includes('not an official BPSC cut-off') &&
+                                  disclaimerText.includes('internal rough study guidelines');
+
+      // 5. Test configurability: edit threshold and re-render
+      window.SHAKTIQ_CUTOFF_CONFIG.safe = 102;
+      window.renderCutoffMeter(99, 150);
+      const thSafeUpdated = document.getElementById('band-threshold-safe') ? document.getElementById('band-threshold-safe').textContent : '';
+      // Reset config back to default
+      window.SHAKTIQ_CUTOFF_CONFIG.safe = 98;
+
+      return {
+        cardVisible: !!meterCard,
+        scoreText: scoreDisp ? scoreDisp.textContent : '',
+        pointerLeft: pointer ? pointer.style.left : '',
+        borderlineHighlighted: cardBorderline ? cardBorderline.className.includes('border-2') : false,
+        safeDimmed: cardSafe ? cardSafe.className.includes('opacity-75') : false,
+        hasDisclaimerNotice,
+        thSafeUpdated
+      };
+    });
+
+    if (cutoffAudit.error) {
+      throw new Error(`Cut-off Audit Error: ${cutoffAudit.error}`);
+    }
+    if (!cutoffAudit.cardVisible) {
+      throw new Error('Indicative Cut-Off Card not found in result modal');
+    }
+    if (!cutoffAudit.hasDisclaimerNotice) {
+      throw new Error('MANDATORY NOTICE MISSING: Cut-off meter must explicitly state it is not an official BPSC cut-off');
+    }
+    if (!cutoffAudit.thSafeUpdated.includes('102')) {
+      throw new Error('Configurability check failed: Edited threshold was not reflected upon re-render');
+    }
+
+    console.log('[PASS] E2E: Indicative Cut-Off Meter verified: configurable 3-band thresholds (Safe >= 98, Borderline 85-97, Needs Improvement < 85), clear non-official disclaimer, and proportional drill scaling.');
+
+    // ----------------------------------------------------
+    // TEST 14: Console Errors Check
     // ----------------------------------------------------
     if (consoleErrors.length > 0) {
       console.warn(`[WARN] Console errors logged during test run:\n${consoleErrors.join('\n')}`);

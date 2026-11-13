@@ -4159,6 +4159,86 @@ summary:focus-visible,
           </div>
         </div>
 
+        <!-- Indicative Cut-Off Meter (Feature 2.4) -->
+        <div id="tt-result-cutoff-card" class="rounded-2xl border border-[#DCE6DF] bg-white p-3.5 sm:p-4 space-y-3 shadow-2xs">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-2 border-b border-[#E5ECE6]">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-[#111C15] flex items-center gap-1.5">
+                <i data-lucide="gauge" class="w-4 h-4 text-[#10402D]"></i>
+                <span id="cutoff-meter-heading">Indicative Cut-Off Meter</span>
+              </span>
+              <p class="text-[11px] text-[#526056] mt-0.5" id="cutoff-meter-subheading">Rough internal study benchmark for self-evaluation only</p>
+            </div>
+            <div id="cutoff-active-badge-wrap">
+              <!-- Dynamically populated band badge -->
+            </div>
+          </div>
+
+          <!-- 3-Band Horizontal Meter Bar -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-[11px] font-semibold text-[#526056]">
+              <span id="cutoff-gauge-label">Study Benchmark Gauge</span>
+              <span id="cutoff-meter-score-display" class="font-bold text-[#111C15]">Your Score: 0.00</span>
+            </div>
+            
+            <!-- Multi-color Segmented Progress Track with Bulletproof Colors -->
+            <div class="relative h-3 w-full rounded-full bg-[#E5ECE6] overflow-hidden flex shadow-inner">
+              <!-- Band 1: Needs Improvement (<85 / <56.7%) -->
+              <div class="h-full transition-all duration-500" style="width: 56.67%; background-color: #E11D48;" title="Needs Improvement (<85)"></div>
+              <!-- Band 2: Borderline (85-97 / 8.67%) -->
+              <div class="h-full transition-all duration-500" style="width: 8.67%; background-color: #D97706;" title="Borderline (85-97)"></div>
+              <!-- Band 3: Safe Zone (>=98 / 34.66%) -->
+              <div class="h-full transition-all duration-500" style="width: 34.66%; background-color: #10402D;" title="Safe Zone (>=98)"></div>
+            </div>
+
+            <!-- Meter Marker Pointer -->
+            <div class="relative w-full h-6 pt-1">
+              <div id="cutoff-meter-pointer" class="absolute top-0 -translate-x-1/2 flex flex-col items-center transition-all duration-500" style="left: 0%;">
+                <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #111C15;"></div>
+                <span id="cutoff-meter-pointer-label" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#111C15] text-white whitespace-nowrap shadow-xs mt-0.5">Your Score</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Three Descriptive Band Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-xs">
+            <!-- Band 1: Needs Improvement -->
+            <div id="band-card-needs" class="p-2.5 rounded-xl border border-rose-200 bg-rose-50/50 text-[#111C15] transition-all">
+              <div class="flex items-center justify-between font-bold text-[11px] text-rose-800 mb-1">
+                <span id="band-title-needs">Needs Improvement</span>
+                <span id="band-threshold-needs" class="text-[10px]">&lt; 85</span>
+              </div>
+              <p class="text-[10.5px] text-[#526056] leading-tight" id="band-desc-needs">Focus on core subjects &amp; use Option E to avoid penalties.</p>
+            </div>
+
+            <!-- Band 2: Borderline -->
+            <div id="band-card-borderline" class="p-2.5 rounded-xl border border-amber-200 bg-amber-50/50 text-[#111C15] transition-all">
+              <div class="flex items-center justify-between font-bold text-[11px] text-[#785600] mb-1">
+                <span id="band-title-borderline">Borderline</span>
+                <span id="band-threshold-borderline" class="text-[10px]">85 – 97</span>
+              </div>
+              <p class="text-[10.5px] text-[#526056] leading-tight" id="band-desc-borderline">Competitive score. Tighten accuracy on high-frequency topics.</p>
+            </div>
+
+            <!-- Band 3: Safe Zone -->
+            <div id="band-card-safe" class="p-2.5 rounded-xl border border-[#C6DEC0] bg-[#EBF3E6]/60 text-[#111C15] transition-all">
+              <div class="flex items-center justify-between font-bold text-[11px] text-[#10402D] mb-1">
+                <span id="band-title-safe">Safe Zone</span>
+                <span id="band-threshold-safe" class="text-[10px]">&ge; 98</span>
+              </div>
+              <p class="text-[10.5px] text-[#526056] leading-tight" id="band-desc-safe">Strong performance on past trends. Maintain steady revision.</p>
+            </div>
+          </div>
+
+          <!-- Non-Official Rough Guide Disclaimer -->
+          <div class="p-2.5 rounded-xl bg-[#F6F7F2] border border-[#DCE6DF] text-[11px] text-[#526056] flex items-start gap-2">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-[#8A6400] shrink-0 mt-0.5"></i>
+            <p class="leading-relaxed">
+              <strong>Indicative Study Benchmark:</strong> These bands are strictly ShaktiQ's internal rough study guidelines for self-evaluation and <strong>not</strong> an official BPSC cut-off, notification, or exam prediction. Official cut-offs are established solely by the Commission based on actual examination dynamics.
+            </p>
+          </div>
+        </div>
+
         <!-- BPSC Rule Notice -->
         <div class="p-3.5 rounded-2xl bg-[#F8FAF7] border border-[#DCE6DF] text-xs text-[#3B493F] space-y-1">
           <div class="font-bold text-[#111C15] flex items-center gap-1.5">
@@ -7909,6 +7989,20 @@ summary:focus-visible,
       setTxt('copy-btn-label', 'Copy Text', 'टेक्स्ट कॉपी करें');
       setTxt('share-img-label', 'Score Card', 'स्कोर कार्ड');
 
+      // If result modal is open, re-render cutoff meter bilingual text
+      const resModal = document.getElementById('tt-result-modal');
+      if (resModal && !resModal.classList.contains('hidden') && typeof renderCutoffMeter === 'function') {
+        const scoreEl = document.getElementById('tt-result-score');
+        const totalLabel = document.getElementById('tt-result-total-label');
+        const scoreVal = scoreEl ? parseFloat(scoreEl.textContent) : 0;
+        let totalVal = 150;
+        if (totalLabel && totalLabel.textContent.includes('/')) {
+          const match = totalLabel.textContent.match(/\/\s*(\d+)/);
+          if (match) totalVal = parseInt(match[1], 10);
+        }
+        renderCutoffMeter(scoreVal, totalVal);
+      }
+
       const toastMsg = (lang === 'hi') 
         ? 'माध्यम हिन्दी में बदला गया (Medium set to Hindi)' 
         : 'Medium set to English';
@@ -10664,6 +10758,172 @@ summary:focus-visible,
       closePaletteDrawer();
     }
 
+    // ==========================================
+    // INDICATIVE CUT-OFF THRESHOLDS CONFIG (Feature 2.4)
+    // Edit these values to adjust the scorecard indicative bands.
+    // NOTE: These are strictly an internal rough study benchmark and NOT official BPSC cut-offs or predictions.
+    // ==========================================
+    const SHAKTIQ_CUTOFF_CONFIG = {
+      safe: 98,              // Score >= 98: Safe Zone
+      borderline: 85,        // Score 85 - 97.99: Borderline Zone
+      needsImprovement: 0,   // Score < 85: Needs Improvement Zone
+      maxScore: 150,
+      // Helper for speed drills & varying test sizes
+      getThresholdsForTest: function(totalQ) {
+        const total = (typeof totalQ === 'number' && totalQ > 0) ? totalQ : 150;
+        const scale = total / 150;
+        return {
+          safe: parseFloat((this.safe * scale).toFixed(1)),
+          borderline: parseFloat((this.borderline * scale).toFixed(1)),
+          scale: scale,
+          total: total
+        };
+      }
+    };
+    window.SHAKTIQ_CUTOFF_CONFIG = SHAKTIQ_CUTOFF_CONFIG;
+
+    function getCutoffBand(score, totalQ) {
+      const cfg = SHAKTIQ_CUTOFF_CONFIG.getThresholdsForTest(totalQ);
+      if (score >= cfg.safe) {
+        return {
+          id: 'safe',
+          label: 'Safe Zone',
+          labelHi: 'सुरक्षित क्षेत्र',
+          badgeClass: 'bg-[#10402D] text-white border-[#10402D]',
+          color: '#10402D',
+          summary: 'Strong performance relative to past benchmarks. Continue consistent revision.',
+          summaryHi: 'विगत मानकों की तुलना में उत्कृष्ट प्रदर्शन। नियमित अभ्यास जारी रखें।'
+        };
+      } else if (score >= cfg.borderline) {
+        return {
+          id: 'borderline',
+          label: 'Borderline Zone',
+          labelHi: 'सीमांत क्षेत्र',
+          badgeClass: 'bg-[#FEF6D6] text-[#785600] border-[#F5DF8B]',
+          color: '#785600',
+          summary: 'Within competitive range. Focus on high-yield accuracy and minimizing negative marking.',
+          summaryHi: 'प्रतिस्पर्धी सीमा में। उच्च-अंक विषयों पर सटीकता और नकारात्मक अंक कम करने पर ध्यान दें।'
+        };
+      } else {
+        return {
+          id: 'needs_improvement',
+          label: 'Needs Improvement',
+          labelHi: 'सुधार की आवश्यकता',
+          badgeClass: 'bg-rose-100 text-rose-800 border-rose-300',
+          color: '#9F1239',
+          summary: 'Strengthen fundamental core subjects and utilize Safe Skip (Option E) to avoid unforced penalties.',
+          summaryHi: 'मूल विषयों को मजबूत करें और बिना वजह अंक कटने से बचने के लिए सुरक्षित विकल्प (E) का उपयोग करें।'
+        };
+      }
+    }
+    window.getCutoffBand = getCutoffBand;
+
+    function renderCutoffMeter(score, totalQ) {
+      const isHi = (ShaktiQBilingualEngine && ShaktiQBilingualEngine.currentLang === 'hi');
+      const total = totalQ || 150;
+      const cfg = SHAKTIQ_CUTOFF_CONFIG.getThresholdsForTest(total);
+      const band = getCutoffBand(score, total);
+
+      // Update Meter Headings & Bilingual Labels
+      const headingEl = document.getElementById('cutoff-meter-heading');
+      if (headingEl) {
+        headingEl.textContent = isHi ? 'संकेतक कट-ऑफ मीटर (अध्ययन गाइड)' : 'Indicative Cut-Off Meter';
+      }
+      const subHeadingEl = document.getElementById('cutoff-meter-subheading');
+      if (subHeadingEl) {
+        subHeadingEl.textContent = isHi ? 'केवल स्व-मूल्यांकन हेतु आंतरिक अध्ययन मानक' : 'Rough internal study benchmark for self-evaluation only';
+      }
+      const gaugeLabel = document.getElementById('cutoff-gauge-label');
+      if (gaugeLabel) {
+        gaugeLabel.textContent = isHi ? 'प्राप्तांक मानक गेज' : 'Study Benchmark Gauge';
+      }
+
+      // Update Score Display
+      const scoreDisp = document.getElementById('cutoff-meter-score-display');
+      if (scoreDisp) {
+        scoreDisp.textContent = isHi 
+          ? `आपका प्राप्तांक: ${score} / ${total}` 
+          : `Your Score: ${score} / ${total} Marks`;
+      }
+
+      // Update Band Threshold Labels & Titles
+      const thNeeds = document.getElementById('band-threshold-needs');
+      if (thNeeds) thNeeds.textContent = `< ${cfg.borderline}`;
+      const titleNeeds = document.getElementById('band-title-needs');
+      if (titleNeeds) titleNeeds.textContent = isHi ? 'सुधार की आवश्यकता' : 'Needs Improvement';
+
+      const thBorderline = document.getElementById('band-threshold-borderline');
+      if (thBorderline) {
+        const topRange = cfg.safe - 0.1 >= cfg.borderline ? Math.floor(cfg.safe - 0.1) : cfg.safe;
+        thBorderline.textContent = `${cfg.borderline} – ${topRange}`;
+      }
+      const titleBorderline = document.getElementById('band-title-borderline');
+      if (titleBorderline) titleBorderline.textContent = isHi ? 'सीमांत क्षेत्र' : 'Borderline';
+
+      const thSafe = document.getElementById('band-threshold-safe');
+      if (thSafe) thSafe.textContent = `≥ ${cfg.safe}`;
+      const titleSafe = document.getElementById('band-title-safe');
+      if (titleSafe) titleSafe.textContent = isHi ? 'सुरक्षित क्षेत्र' : 'Safe Zone';
+
+      // Update Active Badge
+      const badgeWrap = document.getElementById('cutoff-active-badge-wrap');
+      if (badgeWrap) {
+        const dotBg = band.id === 'safe' ? 'bg-[#10402D]' : (band.id === 'borderline' ? 'bg-[#785600]' : 'bg-rose-700');
+        badgeWrap.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${band.badgeClass} shadow-2xs">
+            <span class="w-1.5 h-1.5 rounded-full ${dotBg}"></span>
+            <span>${isHi ? band.labelHi : band.label} (${score} M)</span>
+          </span>
+        `;
+      }
+
+      // Position Meter Pointer (clamped between 3% and 97%)
+      const pointer = document.getElementById('cutoff-meter-pointer');
+      const pointerLabel = document.getElementById('cutoff-meter-pointer-label');
+      if (pointer) {
+        const rawPct = (Math.max(0, score) / total) * 100;
+        const clampedPct = Math.min(97, Math.max(3, rawPct));
+        pointer.style.left = `${clampedPct}%`;
+      }
+      if (pointerLabel) {
+        pointerLabel.textContent = isHi ? `प्राप्तांक: ${score}` : `Score: ${score}`;
+      }
+
+      // Highlight Active Band Card
+      const cards = {
+        needs: document.getElementById('band-card-needs'),
+        borderline: document.getElementById('band-card-borderline'),
+        safe: document.getElementById('band-card-safe')
+      };
+
+      if (cards.needs) {
+        if (band.id === 'needs_improvement') {
+          cards.needs.className = 'p-2.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-[#111C15] font-semibold shadow-xs ring-1 ring-rose-400';
+        } else {
+          cards.needs.className = 'p-2.5 rounded-xl border border-rose-200 bg-rose-50/40 text-[#526056] opacity-75';
+        }
+      }
+      if (cards.borderline) {
+        if (band.id === 'borderline') {
+          cards.borderline.className = 'p-2.5 rounded-xl border-2 border-[#785600] bg-[#FFFBEA] text-[#111C15] font-semibold shadow-xs ring-1 ring-amber-400';
+        } else {
+          cards.borderline.className = 'p-2.5 rounded-xl border border-amber-200 bg-amber-50/40 text-[#526056] opacity-75';
+        }
+      }
+      if (cards.safe) {
+        if (band.id === 'safe') {
+          cards.safe.className = 'p-2.5 rounded-xl border-2 border-[#10402D] bg-[#ECF6E7] text-[#111C15] font-semibold shadow-xs ring-1 ring-emerald-500';
+        } else {
+          cards.safe.className = 'p-2.5 rounded-xl border border-[#C6DEC0] bg-[#EBF3E6]/40 text-[#526056] opacity-75';
+        }
+      }
+
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    }
+    window.renderCutoffMeter = renderCutoffMeter;
+
     function submitMockTest() {
       if (mockTimerInterval) clearInterval(mockTimerInterval);
 
@@ -10721,6 +10981,7 @@ summary:focus-visible,
       document.getElementById('tt-result-score').textContent = netScore;
       const totalLabelEl = document.getElementById('tt-result-total-label');
       if (totalLabelEl) totalLabelEl.textContent = `/ ${validQuestions.length} Marks`;
+      renderCutoffMeter(parseFloat(netScore), validQuestions.length);
 
       // Record Student Test Attempt & Sync to Google Sheets IMMEDIATELY
       const currentStudent = getCurrentAspirant() || { name: "Aspirant", email: "aspirant@shaktiq.com", phone: "", district: "Bihar", targetExam: "71st BPSC CCE Prelims" };
