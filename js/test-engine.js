@@ -1057,7 +1057,7 @@ let currentMockQuestions = [];
         }
 
         btnsHtml += `
-          <button type="button" onclick="ttJumpToQuestion(${idx})" class="w-full aspect-square rounded-xl text-xs border flex items-center justify-center transition cursor-pointer ${colorClass}" aria-label="Question ${idx + 1}: ${stateLabel}">
+          <button type="button" id="tt-pal-${idx}" onclick="ttJumpToQuestion(${idx})" class="w-full aspect-square rounded-xl text-xs border flex items-center justify-center transition cursor-pointer ${colorClass}" aria-label="Question ${idx + 1}: ${stateLabel}">
             ${idx + 1}
           </button>
         `;
@@ -1065,6 +1065,13 @@ let currentMockQuestions = [];
 
       if (grid) grid.innerHTML = btnsHtml;
       if (mobileGrid) mobileGrid.innerHTML = btnsHtml;
+
+      const activeTtBtn = document.getElementById(`tt-pal-${currentMockIndex}`);
+      if (activeTtBtn && typeof activeTtBtn.scrollIntoView === 'function') {
+        try {
+          activeTtBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (e) {}
+      }
 
       const setLeg = (id, val) => {
         const el = document.getElementById(id);
@@ -2413,13 +2420,20 @@ Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
         const opacityClass = matchesFilter ? 'opacity-100' : 'opacity-25 hover:opacity-75';
 
         btnsHtml += `
-          <button type="button" onclick="solJumpToQuestion(${idx})" class="w-full aspect-square rounded-xl text-xs border flex items-center justify-center transition cursor-pointer ${colorClass} ${opacityClass}">
+          <button type="button" id="sol-pal-${idx}" onclick="solJumpToQuestion(${idx})" class="w-full aspect-square rounded-xl text-xs border flex items-center justify-center transition cursor-pointer ${colorClass} ${opacityClass}">
             ${idx + 1}
           </button>
         `;
       });
 
       grid.innerHTML = btnsHtml;
+
+      const activeSolBtn = document.getElementById(`sol-pal-${currentReviewIndex}`);
+      if (activeSolBtn && typeof activeSolBtn.scrollIntoView === 'function') {
+        try {
+          activeSolBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (e) {}
+      }
     }
 
     function solJumpToQuestion(idx) {

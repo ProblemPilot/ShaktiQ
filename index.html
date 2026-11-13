@@ -2411,7 +2411,7 @@
         </div>
 
         <!-- Right: Question Palette (4 cols - Desktop Sticky Sidebar in Card View) -->
-        <div id="tt-desktop-palette-sidebar" class="hidden lg:block lg:col-span-4 bg-white border border-[#DCE6DF] rounded-2xl p-5 shadow-sm space-y-5">
+        <div id="tt-desktop-palette-sidebar" class="hidden lg:block lg:col-span-4 bg-white border border-[#DCE6DF] rounded-2xl p-5 shadow-sm space-y-5 lg:sticky lg:top-24">
           
           <h4 class="font-display font-extrabold text-sm text-[#111C15]">Question Palette</h4>
           
@@ -2436,7 +2436,7 @@
           </div>
 
           <!-- Numbers Grid -->
-          <div id="tt-palette-grid" class="grid grid-cols-5 gap-2 max-h-[360px] overflow-y-auto pr-1 no-scrollbar pt-2">
+          <div id="tt-palette-grid" class="grid grid-cols-5 gap-2 pt-2" style="max-height: 420px; overflow-y: auto;">
             <!-- Rendered by renderQuestionPalette() -->
           </div>
         </div>
@@ -2954,7 +2954,7 @@
         </div>
 
         <!-- Right: Solutions Palette (4 cols) -->
-        <div class="lg:col-span-4 bg-white border border-[#DCE6DF] rounded-2xl p-5 shadow-sm space-y-5">
+        <div class="lg:col-span-4 bg-white border border-[#DCE6DF] rounded-2xl p-5 shadow-sm space-y-5 lg:sticky lg:top-24">
           
           <div class="flex items-center justify-between">
             <h4 class="font-display font-extrabold text-sm text-[#111C15]">Solution Palette</h4>
@@ -2976,7 +2976,7 @@
             </div>
           </div>
 
-          <div id="sol-palette-grid" class="grid grid-cols-5 gap-2 max-h-[380px] overflow-y-auto pr-1 no-scrollbar pt-2">
+          <div id="sol-palette-grid" class="grid grid-cols-5 gap-2 pt-2" style="max-height: 420px; overflow-y: auto;">
             <!-- Rendered by renderSolutionPalette() -->
           </div>
         </div>

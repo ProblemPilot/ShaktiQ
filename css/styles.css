@@ -1600,3 +1600,36 @@ summary:focus-visible,
   .subnav-btn.subnav-inactive:hover i {
     color: #10402D !important;
   }
+
+/* Fixed-height scrollable question palette containers */
+#tt-palette-grid,
+#sol-palette-grid {
+  max-height: 420px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #C6DEC0 #F8FAF7;
+}
+
+#tt-palette-grid::-webkit-scrollbar,
+#sol-palette-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+#tt-palette-grid::-webkit-scrollbar-track,
+#sol-palette-grid::-webkit-scrollbar-track {
+  background: #F8FAF7;
+  border-radius: 8px;
+}
+
+#tt-palette-grid::-webkit-scrollbar-thumb,
+#sol-palette-grid::-webkit-scrollbar-thumb {
+  background: #C6DEC0;
+  border-radius: 8px;
+}
+
+#tt-palette-grid::-webkit-scrollbar-thumb:hover,
+#sol-palette-grid::-webkit-scrollbar-thumb:hover {
+  background: #10402D;
+}
