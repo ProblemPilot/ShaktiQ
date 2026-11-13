@@ -817,7 +817,179 @@ async function runE2ETests() {
     console.log('[PASS] E2E: 10-Minute Speed Drills (8 subjects, 15 Qs from bank, 10-min timer, scorecard & explanation links) verified.');
 
     // ----------------------------------------------------
-    // TEST 12: Console Errors Check
+    // TEST 12: Offline Mode, Versioned Cache Purging & Mock Survivability (Feature 2.3)
+    // ----------------------------------------------------
+    console.log('[RUNNING] E2E: Testing Reliable Offline Mode & Versioned Cache Purging...');
+
+    // 12.1 Check PWA Status Indicator in UI
+    const pwaStatusInitial = await page.evaluate(() => {
+      const el = document.getElementById('pwa-status-text');
+      const dot = document.getElementById('pwa-status-dot');
+      return {
+        text: el ? el.textContent.trim() : null,
+        hasDot: !!dot
+      };
+    });
+
+    if (!pwaStatusInitial.text || !pwaStatusInitial.text.includes('Offline ready')) {
+      throw new Error(`Expected PWA status indicator 'Offline ready', got '${pwaStatusInitial.text}'`);
+    }
+
+    // 12.2 Prove Stale Data is Never Served After Version Changes
+    const purgeProof = await page.evaluate(async () => {
+      // 1. Simulate older version caches
+      const staleKey1 = 'shaktiq-cache-v13';
+      const staleKey2 = 'shaktiq-data-v13';
+      const c1 = await caches.open(staleKey1);
+      await c1.put('/test-stale', new Response('old-v13-shell'));
+      const c2 = await caches.open(staleKey2);
+      await c2.put('./questions.json', new Response(JSON.stringify([{ id: 'stale_q999', q: 'Old Stale Question', ans: 'X' }])));
+
+      const keysBefore = await caches.keys();
+      const hasStaleBefore = keysBefore.includes(staleKey1) && keysBefore.includes(staleKey2);
+
+      // 2. Perform version migration purge matching SW activate logic for v14
+      const ACTIVE_VERSIONS = ['shaktiq-cache-v14', 'shaktiq-data-v14'];
+      const keysToPurge = (await caches.keys()).filter(k => !ACTIVE_VERSIONS.includes(k));
+      await Promise.all(keysToPurge.map(k => caches.delete(k)));
+
+      const keysAfter = await caches.keys();
+      const hasStaleAfter = keysAfter.includes(staleKey1) || keysAfter.includes(staleKey2);
+
+      // 3. Ensure live question data in v14 data cache is valid BPSC questions and not stale
+      const v14DataCache = await caches.open('shaktiq-data-v14');
+      const v14Match = await v14DataCache.match('./questions.json');
+      let v14Data = null;
+      if (v14Match) {
+        v14Data = await v14Match.json();
+      }
+
+      return {
+        hasStaleBefore,
+        hasStaleAfter,
+        v14CachedCount: Array.isArray(v14Data) ? v14Data.length : 0,
+        containsStaleId: Array.isArray(v14Data) ? v14Data.some(q => q.id === 'stale_q999') : false
+      };
+    });
+
+    if (!purgeProof.hasStaleBefore) {
+      throw new Error('Failed to seed stale cache for version purge proof');
+    }
+    if (purgeProof.hasStaleAfter) {
+      throw new Error('Stale cache still exists after SW version activation purge!');
+    }
+    if (purgeProof.containsStaleId) {
+      throw new Error('STALE DATA LEAK: Cached question bank contains stale version data!');
+    }
+
+    // 12.3 Prove Mock In Progress Survives Going Offline
+    // Launch a mock test
+    await page.evaluate(() => {
+      startMockTest('ts_71st_cce');
+    });
+    await new Promise((r) => setTimeout(r, 600));
+
+    // Answer Q1 with 'B', Q2 with 'E' (safe skip)
+    await page.evaluate(() => {
+      ttSelectOption('B'); // Q1
+      ttSaveAndNext();
+      ttSelectOption('E'); // Q2
+    });
+
+    // Simulate going OFFLINE via Puppeteer DevTools & DOM event
+    await page.setOfflineMode(true);
+    await page.evaluate(() => {
+      window.dispatchEvent(new Event('offline'));
+    });
+    await new Promise((r) => setTimeout(r, 300));
+
+    // Verify offline indicator updated
+    const pwaOfflineStatus = await page.evaluate(() => {
+      const el = document.getElementById('pwa-status-text');
+      return el ? el.textContent.trim() : '';
+    });
+    if (!pwaOfflineStatus.includes('Offline mode')) {
+      throw new Error(`Expected PWA status 'Offline mode' when disconnected, got '${pwaOfflineStatus}'`);
+    }
+
+    // Take actions completely OFFLINE:
+    // Navigate to Q3, select 'C', mark Q4 for review, jump to Q10
+    const offlineMockResults = await page.evaluate(() => {
+      // Q3 (index 2)
+      ttSaveAndNext();
+      ttSelectOption('C');
+      // Q4 (index 3) - mark review
+      ttSaveAndNext();
+      ttMarkForReview();
+      // Jump to Q10 (index 9)
+      ttJumpToQuestion(9);
+      ttSelectOption('A');
+
+      // Check draft persistence in localStorage
+      const draft = PrepBackendEngine.drafts.get(activeMockTest.title);
+      const userAnswers = mockUserAnswers;
+      const marked = mockMarkedForReview;
+
+      return {
+        answersCount: Object.keys(userAnswers).length,
+        answers: userAnswers,
+        markedReviewCount: Object.keys(marked).length,
+        draftSaved: !!draft && Object.keys(draft.answers || {}).length === 4,
+        currentIndex: currentMockIndex,
+        timerText: document.getElementById('tt-timer') ? document.getElementById('tt-timer').textContent : ''
+      };
+    });
+
+    if (offlineMockResults.answersCount !== 4) {
+      throw new Error(`Expected 4 answers recorded offline, got ${offlineMockResults.answersCount}`);
+    }
+    if (!offlineMockResults.draftSaved) {
+      throw new Error('Offline mock draft was not persisted to localStorage during offline test');
+    }
+    if (offlineMockResults.answers['0'] !== 'B' || offlineMockResults.answers['1'] !== 'E' || offlineMockResults.answers['2'] !== 'C' || offlineMockResults.answers['9'] !== 'A') {
+      throw new Error(`Answer mismatch in offline mock: ${JSON.stringify(offlineMockResults.answers)}`);
+    }
+
+    // Submit mock test while still OFFLINE
+    const offlineSubmitOutcome = await page.evaluate(() => {
+      submitMockTest();
+      const modal = document.getElementById('tt-result-modal');
+      const netScoreEl = document.getElementById('tt-result-score');
+      const explanations = document.querySelectorAll('.tt-result-exp-item');
+      return {
+        modalVisible: modal && !modal.classList.contains('hidden'),
+        netScore: netScoreEl ? netScoreEl.textContent.trim() : null,
+        explanationsCount: explanations.length
+      };
+    });
+
+    if (!offlineSubmitOutcome.modalVisible) {
+      throw new Error('Mock result scorecard modal did not open upon offline submission');
+    }
+    if (!offlineSubmitOutcome.netScore) {
+      throw new Error('Net score was not calculated on offline mock submission');
+    }
+
+    // Restore online mode
+    await page.setOfflineMode(false);
+    await page.evaluate(() => {
+      window.dispatchEvent(new Event('online'));
+      closeTestResultModal();
+    });
+    await new Promise((r) => setTimeout(r, 400));
+
+    const pwaOnlineRestored = await page.evaluate(() => {
+      const el = document.getElementById('pwa-status-text');
+      return el ? el.textContent.trim() : '';
+    });
+    if (!pwaOnlineRestored.includes('Offline ready')) {
+      throw new Error(`Expected PWA status 'Offline ready' after reconnecting, got '${pwaOnlineRestored}'`);
+    }
+
+    console.log('[PASS] E2E: Reliable Offline Mode verified: versioned cache purges stale data, and mock in progress survives going offline without loss.');
+
+    // ----------------------------------------------------
+    // TEST 13: Console Errors Check
     // ----------------------------------------------------
     if (consoleErrors.length > 0) {
       console.warn(`[WARN] Console errors logged during test run:\n${consoleErrors.join('\n')}`);

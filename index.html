@@ -2167,6 +2167,12 @@ summary:focus-visible,
           <i data-lucide="search" class="w-5 h-5"></i>
         </button>
 
+        <!-- PWA Offline / Update Indicator Badge -->
+        <div id="pwa-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0] shadow-2xs transition-all cursor-pointer hover:bg-[#DCE9D5]" onclick="handlePwaBadgeClick()" role="status" aria-live="polite" title="Offline ready: ShaktiQ works without internet connection">
+          <span id="pwa-status-dot" class="w-2 h-2 rounded-full bg-[#10402D]"></span>
+          <span id="pwa-status-text">Offline ready</span>
+        </div>
+
         <!-- Direct Start Mock Test Pill -->
         <button id="nav-mock-cta-pill" type="button" onclick="openTestSeriesMode()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] hover:bg-[#DCE9D5] border border-[#C6DEC0] transition-all shrink-0 cursor-pointer">
           <i data-lucide="award" class="w-3.5 h-3.5 text-[#10402D]"></i>
@@ -2190,6 +2196,10 @@ summary:focus-visible,
 
       <!-- Mobile Right Corner Controls -->
       <div class="flex items-center gap-2 md:hidden">
+        <div id="pwa-status-badge-mobile" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0] cursor-pointer" onclick="handlePwaBadgeClick()" role="status" aria-live="polite" title="Offline ready">
+          <span id="pwa-status-dot-mobile" class="w-1.5 h-1.5 rounded-full bg-[#10402D]"></span>
+          <span id="pwa-status-text-mobile">Offline ready</span>
+        </div>
         <div id="mobile-nav-auth-container" class="inline-flex items-center">
           <button type="button" onclick="openAspirantRegModal()" class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#0A3826]">
             <i data-lucide="user" class="w-3.5 h-3.5 text-[#FCE27B] mr-1"></i>
@@ -2224,6 +2234,13 @@ summary:focus-visible,
         <a href="#mnemonics" class="mobile-nav-link px-3 py-2 text-sm font-medium text-[#223127] hover:bg-[#F3F7F4] rounded-lg">Smart Mnemonics</a>
         <a href="#daily-abhyas" class="mobile-nav-link px-3 py-2 text-sm font-medium text-[#223127] hover:bg-[#F3F7F4] rounded-lg">Daily Abhyas Tracker</a>
         <a href="#about" class="mobile-nav-link px-3 py-2 text-sm font-medium text-[#223127] hover:bg-[#F3F7F4] rounded-lg">About ShaktiQ</a>
+        <div id="drawer-pwa-status" class="mt-2 pt-2 border-t border-[#E5ECE6] flex items-center justify-between text-xs px-3 py-2 rounded-xl bg-[#F6F7F2] text-[#10402D] cursor-pointer" onclick="handlePwaBadgeClick()">
+          <span class="flex items-center gap-1.5 font-semibold">
+            <span id="drawer-pwa-dot" class="w-2 h-2 rounded-full bg-[#10402D]"></span>
+            <span id="drawer-pwa-text">Offline ready</span>
+          </span>
+          <span class="text-[10px] text-[#526056] font-medium">PWA v14</span>
+        </div>
       </div>
     </div>
   </header>
@@ -3711,6 +3728,10 @@ summary:focus-visible,
               </span>
               <button type="button" onclick="setGlobalAppLanguage('en')" data-lang-btn="en" class="lang-switch-btn px-3 py-1 rounded-lg transition-all cursor-pointer font-bold bg-[#10402D] text-white shadow-xs">English</button>
               <button type="button" onclick="setGlobalAppLanguage('hi')" data-lang-btn="hi" class="lang-switch-btn px-3 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#223127] hover:text-[#10402D]">हिन्दी</button>
+            </div>
+            <div id="qb-pwa-status-badge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-[#F6F7F2] text-[#10402D] border border-[#DCE6DF] transition-all cursor-pointer hover:bg-[#EBF3E6]" onclick="handlePwaBadgeClick()" role="status" aria-live="polite" title="Offline ready: ShaktiQ works without internet">
+              <span id="qb-pwa-status-dot" class="w-2 h-2 rounded-full bg-[#10402D]"></span>
+              <span id="qb-pwa-status-text">Offline ready</span>
             </div>
             <div class="bg-[#F6F7F2] border border-[#DCE6DF] rounded-xl px-3 py-1.5 text-xs">
               <span class="text-[#526056]">Total Questions:</span>
@@ -5219,10 +5240,18 @@ summary:focus-visible,
       const container = document.getElementById('toast-container');
       if (!container) return;
 
+      const cleanMsg = String(message ?? '');
+      // Prevent duplicate identical toasts from stacking
+      const existing = container.querySelectorAll('.shaktiq-toast-item');
+      for (let i = 0; i < existing.length; i++) {
+        if (existing[i].getAttribute('data-msg') === cleanMsg) return;
+      }
+
       const toast = document.createElement('div');
       toast.setAttribute('role', 'status');
       toast.setAttribute('aria-live', 'polite');
-      toast.className = 'pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-[#10402D] border border-[#17593F] text-xs text-white font-semibold shadow-xl transition-all duration-300 transform translate-y-3 opacity-0';
+      toast.setAttribute('data-msg', cleanMsg);
+      toast.className = 'shaktiq-toast-item pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-[#10402D] border border-[#17593F] text-xs text-white font-semibold shadow-xl transition-all duration-300 transform translate-y-3 opacity-0';
       
       const iconWrap = document.createElement('span');
       iconWrap.className = 'shrink-0 flex items-center';
@@ -5342,18 +5371,81 @@ summary:focus-visible,
           INITIAL_QUESTIONS = data;
           questionsLoaded = true;
           try {
+            if (typeof caches !== 'undefined') {
+              caches.open('shaktiq-data-v14').then(c => {
+                c.put('./questions.json', new Response(JSON.stringify(data), {
+                  headers: { 'Content-Type': 'application/json; charset=utf-8' }
+                }));
+              }).catch(() => {});
+            }
+          } catch (e) {}
+          try {
+            if (typeof PrepBackendEngine !== 'undefined' && PrepBackendEngine.questions) {
+              PrepBackendEngine.questions.save(data);
+            }
+          } catch (e) {}
+          try {
             if (typeof updateHeaderCounters === 'function') updateHeaderCounters();
             if (typeof populateExamDropdowns === 'function') populateExamDropdowns();
             if (typeof renderSubjectPills === 'function') renderSubjectPills();
             if (typeof renderQuestions === 'function') renderQuestions();
             if (typeof renderTestSeriesCards === 'function') renderTestSeriesCards();
+            if (typeof updatePwaStatus === 'function') updatePwaStatus(navigator.onLine ? 'ready' : 'offline');
           } catch (e) {
             console.warn('Post-load question UI update notice:', e);
           }
           return data;
         })
-        .catch(function(err) {
-          console.error('Failed to load questions.json:', err);
+        .catch(async function(err) {
+          console.warn('Network fetch for questions.json failed, checking offline cache fallback:', err);
+          // 1. Try CacheStorage
+          try {
+            if (typeof caches !== 'undefined') {
+              const dataCache = await caches.open('shaktiq-data-v14');
+              const match = await dataCache.match('./questions.json') || await caches.match('./questions.json');
+              if (match) {
+                const cachedData = await match.json();
+                if (Array.isArray(cachedData) && cachedData.length > 0) {
+                  INITIAL_QUESTIONS = cachedData;
+                  questionsLoaded = true;
+                  try {
+                    if (typeof updateHeaderCounters === 'function') updateHeaderCounters();
+                    if (typeof populateExamDropdowns === 'function') populateExamDropdowns();
+                    if (typeof renderSubjectPills === 'function') renderSubjectPills();
+                    if (typeof renderQuestions === 'function') renderQuestions();
+                    if (typeof renderTestSeriesCards === 'function') renderTestSeriesCards();
+                    if (typeof updatePwaStatus === 'function') updatePwaStatus('offline');
+                  } catch (e) {}
+                  return cachedData;
+                }
+              }
+            }
+          } catch (cErr) {
+            console.warn('CacheStorage offline fallback notice:', cErr);
+          }
+
+          // 2. Try IndexedDB
+          try {
+            if (typeof PrepBackendEngine !== 'undefined' && PrepBackendEngine.questions) {
+              const idbData = await PrepBackendEngine.questions.load();
+              if (Array.isArray(idbData) && idbData.length > 0) {
+                INITIAL_QUESTIONS = idbData;
+                questionsLoaded = true;
+                try {
+                  if (typeof updateHeaderCounters === 'function') updateHeaderCounters();
+                  if (typeof populateExamDropdowns === 'function') populateExamDropdowns();
+                  if (typeof renderSubjectPills === 'function') renderSubjectPills();
+                  if (typeof renderQuestions === 'function') renderQuestions();
+                  if (typeof renderTestSeriesCards === 'function') renderTestSeriesCards();
+                  if (typeof updatePwaStatus === 'function') updatePwaStatus('offline');
+                } catch (e) {}
+                return idbData;
+              }
+            }
+          } catch (idbErr) {
+            console.warn('IndexedDB offline fallback notice:', idbErr);
+          }
+
           return [];
         });
       return questionsLoadPromise;
@@ -8573,11 +8665,11 @@ summary:focus-visible,
     }
 
     // ==========================================
-    // HIGH-CAPACITY ASYNCHRONOUS BACKEND ENGINE (IndexedDB v2 + LocalStorage Fallback)
+    // HIGH-CAPACITY ASYNCHRONOUS BACKEND ENGINE (IndexedDB v3 + LocalStorage Fallback)
     // ==========================================
     const PrepBackendEngine = {
       dbName: 'PrepWithAnkit_BackendDB_v2',
-      dbVersion: 2,
+      dbVersion: 3,
       db: null,
       isReady: false,
 
@@ -8611,6 +8703,9 @@ summary:focus-visible,
               if (!db.objectStoreNames.contains('question_bookmarks')) {
                 const bStore = db.createObjectStore('question_bookmarks', { keyPath: 'id' });
                 bStore.createIndex('by_studentEmail', 'studentEmail', { unique: false });
+              }
+              if (!db.objectStoreNames.contains('cached_questions')) {
+                db.createObjectStore('cached_questions', { keyPath: 'key' });
               }
             };
 
@@ -8777,12 +8872,66 @@ summary:focus-visible,
             localStorage.setItem(key, JSON.stringify(draft));
           } catch (e) {}
         },
+        get: function(examTitle) {
+          if (!examTitle) return null;
+          const key = 'draft_' + examTitle.replace(/[^a-zA-Z0-9]/g, '_');
+          try {
+            const raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : null;
+          } catch (e) {
+            return null;
+          }
+        },
         clear: function(examTitle) {
           if (!examTitle) return;
           const key = 'draft_' + examTitle.replace(/[^a-zA-Z0-9]/g, '_');
           try {
             localStorage.removeItem(key);
           } catch (e) {}
+        }
+      },
+
+      questions: {
+        save: function(questionsList) {
+          if (!Array.isArray(questionsList) || questionsList.length === 0) return Promise.resolve(false);
+          return new Promise((resolve) => {
+            try {
+              if (PrepBackendEngine.db && PrepBackendEngine.db.objectStoreNames.contains('cached_questions')) {
+                const tx = PrepBackendEngine.db.transaction('cached_questions', 'readwrite');
+                const store = tx.objectStore('cached_questions');
+                store.put({ key: 'bank_v14', data: questionsList, count: questionsList.length, savedAt: Date.now() });
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => resolve(false);
+              } else {
+                resolve(false);
+              }
+            } catch (e) {
+              resolve(false);
+            }
+          });
+        },
+        load: function() {
+          return new Promise((resolve) => {
+            try {
+              if (PrepBackendEngine.db && PrepBackendEngine.db.objectStoreNames.contains('cached_questions')) {
+                const tx = PrepBackendEngine.db.transaction('cached_questions', 'readonly');
+                const store = tx.objectStore('cached_questions');
+                const req = store.get('bank_v14');
+                req.onsuccess = () => {
+                  if (req.result && Array.isArray(req.result.data) && req.result.data.length > 0) {
+                    resolve(req.result.data);
+                  } else {
+                    resolve(null);
+                  }
+                };
+                req.onerror = () => resolve(null);
+              } else {
+                resolve(null);
+              }
+            } catch (e) {
+              resolve(null);
+            }
+          });
         }
       },
 
@@ -10138,9 +10287,29 @@ summary:focus-visible,
 
         currentMockQuestions = questions;
         currentMockIndex = 0;
-        mockUserAnswers = {};
-        mockMarkedForReview = {};
-        mockTimeRemaining = test.timeMins * 60;
+
+        // Restore draft if exists for this test, otherwise initialize
+        let restoredDraft = null;
+        try {
+          if (typeof PrepBackendEngine !== 'undefined' && PrepBackendEngine.drafts && PrepBackendEngine.drafts.get) {
+            restoredDraft = PrepBackendEngine.drafts.get(test.title);
+          }
+        } catch (e) {}
+
+        if (restoredDraft && restoredDraft.answers && Object.keys(restoredDraft.answers).length > 0) {
+          mockUserAnswers = restoredDraft.answers || {};
+          mockMarkedForReview = restoredDraft.marked || {};
+          mockTimeRemaining = (typeof restoredDraft.remainingSecs === 'number' && restoredDraft.remainingSecs > 10)
+            ? restoredDraft.remainingSecs
+            : test.timeMins * 60;
+          if (typeof showToast === 'function') {
+            showToast("Resumed your in-progress mock draft.", "info");
+          }
+        } else {
+          mockUserAnswers = {};
+          mockMarkedForReview = {};
+          mockTimeRemaining = test.timeMins * 60;
+        }
         const padInit = (n) => String(n).padStart(2, '0');
         const initH = Math.floor(mockTimeRemaining / 3600);
         const initM = Math.floor((mockTimeRemaining % 3600) / 60);
@@ -10451,6 +10620,9 @@ summary:focus-visible,
       } else {
         mockUserAnswers[currentMockIndex] = letter;
       }
+      if (activeMockTest && typeof PrepBackendEngine !== 'undefined' && PrepBackendEngine.drafts) {
+        PrepBackendEngine.drafts.save(activeMockTest.title, mockUserAnswers, mockMarkedForReview, mockTimeRemaining);
+      }
       renderCurrentQuestion();
     }
 
@@ -10472,11 +10644,17 @@ summary:focus-visible,
 
     function ttClearResponse() {
       delete mockUserAnswers[currentMockIndex];
+      if (activeMockTest && typeof PrepBackendEngine !== 'undefined' && PrepBackendEngine.drafts) {
+        PrepBackendEngine.drafts.save(activeMockTest.title, mockUserAnswers, mockMarkedForReview, mockTimeRemaining);
+      }
       renderCurrentQuestion();
     }
 
     function ttMarkForReview() {
       mockMarkedForReview[currentMockIndex] = !mockMarkedForReview[currentMockIndex];
+      if (activeMockTest && typeof PrepBackendEngine !== 'undefined' && PrepBackendEngine.drafts) {
+        PrepBackendEngine.drafts.save(activeMockTest.title, mockUserAnswers, mockMarkedForReview, mockTimeRemaining);
+      }
       ttSaveAndNext();
     }
 
@@ -11469,30 +11647,151 @@ Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
       }
       if (typeof updateAdminUI === 'function') updateAdminUI();
 
-      // Register Versioned Offline Service Worker (PWA) for weak/offline connections
+      // Register Versioned Offline Service Worker (PWA) with background update check & status indicator
+      window.waitingServiceWorker = null;
+
+      function updatePwaStatus(status, worker) {
+        if (worker) window.waitingServiceWorker = worker;
+
+        const textEls = [
+          document.getElementById('pwa-status-text'),
+          document.getElementById('pwa-status-text-mobile'),
+          document.getElementById('qb-pwa-status-text'),
+          document.getElementById('drawer-pwa-text')
+        ];
+        const dotEls = [
+          document.getElementById('pwa-status-dot'),
+          document.getElementById('pwa-status-dot-mobile'),
+          document.getElementById('qb-pwa-status-dot'),
+          document.getElementById('drawer-pwa-dot')
+        ];
+        const badgeEls = [
+          document.getElementById('pwa-status-badge'),
+          document.getElementById('pwa-status-badge-mobile'),
+          document.getElementById('qb-pwa-status-badge'),
+          document.getElementById('drawer-pwa-status')
+        ];
+
+        let label = 'Offline ready';
+        let dotClass = 'bg-[#10402D]';
+        let title = 'ShaktiQ works offline. All 2,800+ questions and mock tests are cached.';
+
+        if (status === 'update') {
+          label = 'Update available';
+          dotClass = 'bg-[#10402D] animate-ping';
+          title = 'New questions or updates ready! Click to refresh now.';
+          const mobileBadge = document.getElementById('pwa-status-badge-mobile');
+          if (mobileBadge) mobileBadge.classList.remove('hidden');
+        } else if (status === 'offline' || !navigator.onLine) {
+          label = 'Offline mode';
+          dotClass = 'bg-[#8A6400]';
+          title = 'You are currently offline. All tests, answers, and bookmarks are saved on your device.';
+        } else {
+          label = 'Offline ready';
+          dotClass = 'bg-[#10402D]';
+          title = 'ShaktiQ works offline. All 2,800+ questions and mock tests are cached.';
+        }
+
+        textEls.forEach(el => { if (el) el.textContent = label; });
+        dotEls.forEach(el => {
+          if (el) {
+            el.className = `w-2 h-2 rounded-full shrink-0 ${dotClass}`;
+          }
+        });
+        badgeEls.forEach(el => {
+          if (el) {
+            el.title = title;
+            if (status === 'update') {
+              el.classList.add('border-[#F5DF8B]', 'bg-[#FEF6D6]', 'text-[#785600]');
+              el.classList.remove('border-[#C6DEC0]', 'bg-[#EBF3E6]', 'text-[#10402D]');
+            } else if (status === 'offline') {
+              el.classList.add('border-[#F5DF8B]', 'bg-[#FEF6D6]', 'text-[#785600]');
+              el.classList.remove('border-[#C6DEC0]', 'bg-[#EBF3E6]', 'text-[#10402D]');
+            } else {
+              el.classList.remove('border-[#F5DF8B]', 'bg-[#FEF6D6]', 'text-[#785600]');
+              el.classList.add('border-[#C6DEC0]', 'bg-[#EBF3E6]', 'text-[#10402D]');
+            }
+          }
+        });
+      }
+      window.updatePwaStatus = updatePwaStatus;
+
+      function handlePwaBadgeClick() {
+        if (window.waitingServiceWorker) {
+          if (typeof showToast === 'function') {
+            showToast("Updating ShaktiQ with the latest question bank...", "info");
+          }
+          window.waitingServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+          setTimeout(() => {
+            window.location.reload();
+          }, 350);
+          return;
+        }
+        if (!navigator.onLine) {
+          if (typeof showToast === 'function') {
+            showToast("Working offline. All tests, answers, and bookmarks are preserved on your device.", "info");
+          }
+        } else {
+          if (typeof showToast === 'function') {
+            showToast("Offline ready! All 2,800+ questions and mock tests are cached for offline study.", "success");
+          }
+        }
+      }
+      window.handlePwaBadgeClick = handlePwaBadgeClick;
+
       if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js').then((reg) => {
-            reg.update();
+            updatePwaStatus(navigator.onLine ? 'ready' : 'offline');
+
+            reg.update().catch(() => {});
+            window.addEventListener('focus', () => {
+              reg.update().catch(() => {});
+            });
+
+            if (reg.waiting && navigator.serviceWorker.controller) {
+              updatePwaStatus('update', reg.waiting);
+            }
+
             reg.addEventListener('updatefound', () => {
               const newWorker = reg.installing;
               if (newWorker) {
                 newWorker.addEventListener('statechange', () => {
                   if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    updatePwaStatus('update', newWorker);
+                    if (typeof showToast === 'function') {
+                      showToast("New questions or updates ready! Click 'Update available' to refresh.", "info");
+                    }
                   }
                 });
               }
             });
           }).catch(() => {});
+
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+              if (typeof activeMockTest !== 'undefined' && activeMockTest) {
+                if (typeof showToast === 'function') {
+                  showToast("Update ready — will apply automatically after your test.", "info");
+                }
+                return;
+              }
+              refreshing = true;
+              window.location.reload();
+            }
+          });
         });
 
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (!refreshing) {
-            refreshing = true;
-            window.location.reload();
-          }
+        window.addEventListener('online', () => {
+          updatePwaStatus('ready');
+          if (typeof flushPendingSheetsQueue === 'function') flushPendingSheetsQueue();
+          if (typeof showToast === 'function') showToast("Internet connected — syncing progress", "success");
+        });
+
+        window.addEventListener('offline', () => {
+          updatePwaStatus('offline');
+          if (typeof showToast === 'function') showToast("Working offline — test progress is saved locally.", "info");
         });
       }
     });
