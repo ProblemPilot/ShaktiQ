@@ -222,6 +222,20 @@
 .z-60 {
   z-index: 60 !important;
 }
+.bg-whatsapp {
+  background-color: #25D366 !important;
+  color: #ffffff !important;
+}
+.bg-whatsapp:hover {
+  background-color: #1EBE5D !important;
+}
+.bg-telegram {
+  background-color: #229ED9 !important;
+  color: #ffffff !important;
+}
+.bg-telegram:hover {
+  background-color: #1B89BD !important;
+}
 @media (max-width: 639.98px) {
   .mock-hide-header-mobile {
     display: none !important;
@@ -4065,8 +4079,8 @@ summary:focus-visible,
     </div>
 
     <!-- TEST RESULT & SCORECARD MODAL -->
-    <div id="tt-result-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm hidden transition-opacity duration-300">
-      <div class="relative w-full max-w-2xl rounded-3xl bg-white border border-[#DCE6DF] p-6 sm:p-8 shadow-2xl space-y-6 text-[#111C15]">
+    <div id="tt-result-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300 overflow-y-auto overscroll-contain">
+      <div class="relative w-full max-w-2xl my-auto rounded-3xl bg-white border border-[#DCE6DF] p-4 sm:p-7 shadow-2xl space-y-3.5 sm:space-y-5 text-[#111C15]">
         <div class="text-center space-y-2">
           <div class="w-16 h-16 rounded-2xl bg-[#ECF6E7] text-[#10402D] border border-[#C5DEC0] flex items-center justify-center mx-auto mb-2 shadow-sm">
             <i data-lucide="check-circle-2" class="w-8 h-8"></i>
@@ -4119,6 +4133,47 @@ summary:focus-visible,
           </div>
           <p>• <strong>Option (E) Safe Skip:</strong> 0 penalty. When unsure, bubble Option E so no marks are deducted.</p>
           <p>• <strong>Unattempted Blank Penalty:</strong> If a row is left completely blank without darkening Option E, a <strong>-1/3 (-0.33)</strong> deduction is strictly applied.</p>
+        </div>
+
+        <!-- Share Result Section (Feature 1.7) -->
+        <div class="rounded-2xl border border-[#DCE6DF] bg-[#F8FAF7] p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-[#111C15] flex items-center gap-1.5">
+              <i data-lucide="share-2" class="w-4 h-4 text-[#10402D]"></i>
+              <span id="share-modal-title">Share Your Mock Result</span>
+            </span>
+            <span class="text-[11px] font-semibold text-[#526056]">shaktiq.com</span>
+          </div>
+
+          <!-- Hidden Canvas for Scorecard Image Generation -->
+          <canvas id="scorecard-canvas" width="600" height="600" class="hidden"></canvas>
+
+          <!-- Share Action Buttons -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <!-- WhatsApp -->
+            <a id="share-whatsapp-btn" href="#" target="_blank" rel="noopener noreferrer" class="bg-whatsapp flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-white text-xs font-bold transition shadow-xs cursor-pointer" aria-label="Share result on WhatsApp">
+              <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.97.53 1.771.815 2.796.815 3.182 0 5.767-2.587 5.768-5.766 0-3.18-2.586-5.766-5.768-5.766zm9.969 5.766c0 5.503-4.467 9.97-9.969 9.97-1.745 0-3.376-.453-4.796-1.246l-5.235 1.373 1.398-5.105c-.896-1.487-1.41-3.228-1.41-5.092 0-5.503 4.467-9.97 9.969-9.97 5.503 0 9.969 4.467 9.969 9.97z"/></svg>
+              <span>WhatsApp</span>
+            </a>
+
+            <!-- Telegram -->
+            <a id="share-telegram-btn" href="#" target="_blank" rel="noopener noreferrer" class="bg-telegram flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-white text-xs font-bold transition shadow-xs cursor-pointer" aria-label="Share result on Telegram">
+              <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+              <span>Telegram</span>
+            </a>
+
+            <!-- Copy Text Fallback -->
+            <button type="button" id="share-copy-text-btn" onclick="copyMockResultText()" class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white hover:bg-[#EBF3E6] border border-[#DCE6DF] text-[#111C15] text-xs font-bold transition shadow-xs cursor-pointer" aria-label="Copy mock result text to clipboard">
+              <i data-lucide="copy" class="w-4 h-4 text-[#10402D] shrink-0"></i>
+              <span id="copy-btn-label">Copy Text</span>
+            </button>
+
+            <!-- Save / Share Scorecard Image -->
+            <button type="button" id="share-image-btn" onclick="shareOrDownloadScorecard()" class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#10402D] hover:bg-[#17593F] text-white text-xs font-bold transition shadow-xs cursor-pointer" aria-label="Save or share scorecard image">
+              <i data-lucide="download" class="w-4 h-4 text-[#FCE27B] shrink-0"></i>
+              <span id="share-img-label">Score Card</span>
+            </button>
+          </div>
         </div>
 
         
@@ -7439,6 +7494,9 @@ summary:focus-visible,
       setTxt('tt-mobile-palette-submit-btn', 'Submit Test', 'परीक्षा जमा करें');
       setTxt('desktop-print-label', 'Print / Save PDF', 'प्रिंट / पीडीएफ सहेजें');
       setTxt('mobile-more-label-print', 'Print / Save PDF', 'प्रिंट / पीडीएफ सहेजें');
+      setTxt('share-modal-title', 'Share Your Mock Result', 'परीक्षा परिणाम साझा करें');
+      setTxt('copy-btn-label', 'Copy Text', 'टेक्स्ट कॉपी करें');
+      setTxt('share-img-label', 'Score Card', 'स्कोर कार्ड');
 
       const toastMsg = (lang === 'hi') 
         ? 'माध्यम हिन्दी में बदला गया (Medium set to Hindi)' 
@@ -10053,7 +10111,270 @@ summary:focus-visible,
 
       saveTestAttemptRecord(attemptLog);
 
+      // Prepare Social Share Links & Canvas Scorecard (Feature 1.7)
+      prepareMockShare({
+        examTitle: attemptLog.examTitle,
+        score: attemptLog.score,
+        correct: attemptLog.correct,
+        wrong: attemptLog.wrong,
+        safeSkip: attemptLog.safeSkip,
+        blank: attemptLog.blank,
+        totalMarks: attemptLog.totalQ
+      });
+
       document.getElementById('tt-result-modal').classList.remove('hidden');
+    }
+
+    // ==========================================
+    // RESULT SHARING & SCORECARD ENGINE (Feature 1.7)
+    // ==========================================
+    let latestShareData = null;
+
+    function prepareMockShare(resultData) {
+      latestShareData = resultData;
+      const examTitle = resultData.examTitle || 'BPSC Full-Length Mock Test';
+      const score = resultData.score;
+      const totalMarks = resultData.totalMarks || 150;
+      const correct = resultData.correct;
+      const wrong = resultData.wrong;
+      const safeSkip = resultData.safeSkip;
+      const blank = resultData.blank;
+
+      // STRICT PRIVACY: ZERO personal data (no name, email, phone)
+      const shareText = 
+`🎯 My BPSC Mock Test Result on ShaktiQ:
+📝 Exam: ${examTitle}
+🏆 Net Score: ${score} / ${totalMarks}
+✅ Correct (+1.0): ${correct}
+❌ Wrong (-1/3): ${wrong}
+🛡️ Option E Safe-Skip (0): ${safeSkip}
+⚠️ Blank Unbubbled (-1/3): ${blank}
+
+Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
+
+      const waBtn = document.getElementById('share-whatsapp-btn');
+      if (waBtn) {
+        waBtn.href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+      }
+
+      const tgBtn = document.getElementById('share-telegram-btn');
+      if (tgBtn) {
+        tgBtn.href = `https://t.me/share/url?url=${encodeURIComponent('https://shaktiq.com')}&text=${encodeURIComponent(shareText)}`;
+      }
+
+      drawScorecardCanvas(resultData);
+    }
+
+    function copyMockResultText() {
+      if (!latestShareData) return;
+      const examTitle = latestShareData.examTitle || 'BPSC Full-Length Mock Test';
+      const shareText = 
+`🎯 My BPSC Mock Test Result on ShaktiQ:
+📝 Exam: ${examTitle}
+🏆 Net Score: ${latestShareData.score} / ${latestShareData.totalMarks || 150}
+✅ Correct (+1.0): ${latestShareData.correct}
+❌ Wrong (-1/3): ${latestShareData.wrong}
+🛡️ Option E Safe-Skip (0): ${latestShareData.safeSkip}
+⚠️ Blank Unbubbled (-1/3): ${latestShareData.blank}
+
+Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareText).then(() => {
+          const copyLabel = document.getElementById('copy-btn-label');
+          if (copyLabel) {
+            const orig = copyLabel.textContent;
+            copyLabel.textContent = 'Copied! ✓';
+            setTimeout(() => { copyLabel.textContent = orig; }, 2000);
+          }
+          showToast('Result copied to clipboard! (Zero personal data included)', 'info');
+        }).catch(() => {
+          fallbackCopyText(shareText);
+        });
+      } else {
+        fallbackCopyText(shareText);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('Result copied to clipboard!', 'info');
+      } catch (e) {
+        showToast('Unable to copy text automatically.', 'error');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function drawScorecardCanvas(data) {
+      const canvas = document.getElementById('scorecard-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Background gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+      bgGrad.addColorStop(0, '#10402D');
+      bgGrad.addColorStop(1, '#082217');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Outer border
+      ctx.strokeStyle = 'rgba(252, 226, 123, 0.3)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(16, 16, w - 32, h - 32);
+
+      // Top header branding
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('ShaktiQ', 40, 65);
+
+      ctx.fillStyle = '#FCE27B';
+      ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('BPSC PATTERN MOCK SCORECARD', 40, 88);
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('shaktiq.com', w - 40, 65);
+
+      // Exam Title
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      const titleText = data.examTitle || 'BPSC Prelims Mock Test';
+      ctx.fillText(titleText.length > 38 ? titleText.slice(0, 36) + '...' : titleText, 40, 135);
+
+      // Score Hero Box
+      ctx.fillStyle = 'rgba(252, 226, 123, 0.12)';
+      ctx.strokeStyle = '#FCE27B';
+      ctx.lineWidth = 1.5;
+      if (typeof ctx.roundRect === 'function') {
+        ctx.beginPath();
+        ctx.roundRect(40, 160, w - 80, 130, 16);
+        ctx.fill();
+        ctx.stroke();
+      } else {
+        ctx.fillRect(40, 160, w - 80, 130);
+        ctx.strokeRect(40, 160, w - 80, 130);
+      }
+
+      ctx.fillStyle = '#FCE27B';
+      ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('OFFICIAL NET SCORE', 60, 195);
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '900 48px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText(String(data.score || '0.00'), 60, 250);
+
+      ctx.fillStyle = '#DCE6DF';
+      ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText(`/ ${data.totalMarks || 150} Marks`, 220, 248);
+
+      // 4 Metric Boxes
+      const metrics = [
+        { label: 'Correct (+1.0)', val: data.correct || 0, color: '#85E0A3' },
+        { label: 'Wrong (-1/3)', val: data.wrong || 0, color: '#FFA8A8' },
+        { label: 'Opt E Skip (0)', val: data.safeSkip || 0, color: '#FCE27B' },
+        { label: 'Blank (-1/3)', val: data.blank || 0, color: '#E5ECE6' }
+      ];
+
+      const boxW = (w - 80 - 36) / 4;
+      metrics.forEach((m, idx) => {
+        const x = 40 + idx * (boxW + 12);
+        const y = 310;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 1;
+        if (typeof ctx.roundRect === 'function') {
+          ctx.beginPath();
+          ctx.roundRect(x, y, boxW, 100, 12);
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          ctx.fillRect(x, y, boxW, 100);
+          ctx.strokeRect(x, y, boxW, 100);
+        }
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.font = '10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText(m.label, x + 10, y + 28);
+
+        ctx.fillStyle = m.color;
+        ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText(String(m.val), x + 10, y + 72);
+      });
+
+      // BPSC Negative Marking Protocol
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+      if (typeof ctx.roundRect === 'function') {
+        ctx.beginPath();
+        ctx.roundRect(40, 430, w - 80, 75, 12);
+        ctx.fill();
+      } else {
+        ctx.fillRect(40, 430, w - 80, 75);
+      }
+
+      ctx.fillStyle = '#FCE27B';
+      ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('BPSC Marking Rules Applied:', 55, 455);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('• Option E Safe-Skip: 0 penalty when bubbled.', 55, 475);
+      ctx.fillText('• Blank Unbubbled Penalty: -1/3 penalty strictly applied.', 55, 492);
+
+      // Footer
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Attempt-First Active Recall • 2800+ PYQs • https://shaktiq.com', w / 2, 550);
+    }
+
+    function shareOrDownloadScorecard() {
+      const canvas = document.getElementById('scorecard-canvas');
+      if (!canvas) return;
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], 'shaktiq-mock-scorecard.png', { type: 'image/png' });
+        
+        // Check Web Share API
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              title: 'My ShaktiQ BPSC Mock Result',
+              text: `Scored ${latestShareData?.score || 0} on ${latestShareData?.examTitle || 'BPSC Mock Test'} on ShaktiQ (shaktiq.com)!`,
+              files: [file]
+            });
+            return;
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              console.warn('Web share failed, falling back to download', err);
+            } else {
+              return;
+            }
+          }
+        }
+
+        // Fallback: download
+        const link = document.createElement('a');
+        link.download = 'shaktiq-mock-scorecard.png';
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('Scorecard image downloaded!', 'info');
+      }, 'image/png');
     }
 
     function exitMockTest() {

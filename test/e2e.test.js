@@ -490,7 +490,79 @@ async function runE2ETests() {
     console.log('[PASS] E2E: Dynamic meta tags, per-page titles, and 1200x630 share card verified.');
 
     // ----------------------------------------------------
-    // TEST 9: Console Errors Check
+    // TEST 9: Mock Result Sharing & Canvas Scorecard (1.7)
+    // ----------------------------------------------------
+    // Launch a mock test and submit it
+    await page.evaluate(() => {
+      startMockTest('ts_71st_cce');
+      ttSelectOption('A');
+      submitMockTest();
+    });
+
+    const shareCheck = await page.evaluate(() => {
+      const modal = document.getElementById('tt-result-modal');
+      const waBtn = document.getElementById('share-whatsapp-btn');
+      const tgBtn = document.getElementById('share-telegram-btn');
+      const copyBtn = document.getElementById('share-copy-text-btn');
+      const imgBtn = document.getElementById('share-image-btn');
+      const canvas = document.getElementById('scorecard-canvas');
+
+      const modalVisible = modal && !modal.classList.contains('hidden');
+      const waHref = waBtn ? waBtn.getAttribute('href') : '';
+      const tgHref = tgBtn ? tgBtn.getAttribute('href') : '';
+      const copyExists = !!copyBtn;
+      const imgExists = !!imgBtn;
+      const canvasReady = canvas && canvas.width === 600 && canvas.height === 600;
+
+      // Extract decoded text from WhatsApp href
+      const urlObj = new URL(waHref);
+      const textParam = urlObj.searchParams.get('text') || '';
+
+      return {
+        modalVisible,
+        waHref,
+        tgHref,
+        copyExists,
+        imgExists,
+        canvasReady,
+        textParam
+      };
+    });
+
+    if (!shareCheck.modalVisible) {
+      throw new Error('#tt-result-modal not visible after submitMockTest()');
+    }
+    if (!shareCheck.waHref.startsWith('https://wa.me/?text=')) {
+      throw new Error(`WhatsApp share button href invalid: ${shareCheck.waHref}`);
+    }
+    if (!shareCheck.tgHref.startsWith('https://t.me/share/url?')) {
+      throw new Error(`Telegram share button href invalid: ${shareCheck.tgHref}`);
+    }
+    if (!shareCheck.copyExists || !shareCheck.imgExists) {
+      throw new Error('Copy text or Scorecard image button missing from result modal');
+    }
+    if (!shareCheck.canvasReady) {
+      throw new Error('Scorecard canvas not initialized with 600x600');
+    }
+
+    // Check shared text contents
+    const text = shareCheck.textParam;
+    if (!text.includes('Net Score:') || !text.includes('shaktiq.com') || !text.includes('Option E Safe-Skip')) {
+      throw new Error(`Shared text missing required summary elements: "${text}"`);
+    }
+
+    // STRICT PRIVACY CHECK: Ensure zero PII in shared text
+    const piiTokens = ['Aspirant Tester', 'tester@shaktiq.com', '9876543210'];
+    piiTokens.forEach(token => {
+      if (text.includes(token)) {
+        throw new Error(`PRIVACY VIOLATION: Personal data "${token}" leaked in shared text!`);
+      }
+    });
+
+    console.log('[PASS] E2E: Share Result (WhatsApp, Telegram, Copy, 600x600 Canvas) verified without PII leaks.');
+
+    // ----------------------------------------------------
+    // TEST 10: Console Errors Check
     // ----------------------------------------------------
     if (consoleErrors.length > 0) {
       console.warn(`[WARN] Console errors logged during test run:\n${consoleErrors.join('\n')}`);
