@@ -562,7 +562,122 @@ async function runE2ETests() {
     console.log('[PASS] E2E: Share Result (WhatsApp, Telegram, Copy, 600x600 Canvas) verified without PII leaks.');
 
     // ----------------------------------------------------
-    // TEST 10: Console Errors Check
+    // TEST 10: My Mistake Register & Retry Mode (2.1)
+    // ----------------------------------------------------
+    // Navigate to PYQ bank
+    await page.evaluate(() => {
+      localStorage.setItem('pwa_current_aspirant', JSON.stringify({
+        name: 'Aspirant Tester',
+        email: 'tester@shaktiq.com',
+        phone: '9876543210',
+        district: 'Patna',
+        targetExam: '71st BPSC CCE Prelims'
+      }));
+      openPyqBankMode();
+      // Clear mistake register for clean test baseline
+      saveMistakeRegister({});
+    });
+
+    // Check empty state
+    await page.evaluate(() => {
+      toggleMistakesFilter(true);
+    });
+    const emptyStateText = await page.evaluate(() => {
+      const container = document.getElementById('questionsContainer');
+      const badge = document.getElementById('mistakeBadgeCount');
+      return {
+        html: container ? container.innerHTML : '',
+        badgeCount: badge ? badge.textContent.trim() : null
+      };
+    });
+
+    if (emptyStateText.badgeCount !== '0') {
+      throw new Error(`Expected mistake badge count 0, got ${emptyStateText.badgeCount}`);
+    }
+    if (!emptyStateText.html.includes('Clean Slate! Your Mistake Register is empty')) {
+      throw new Error('Mistake register empty state missing friendly clean slate wording');
+    }
+
+    // Attempt a question wrongly in practice
+    const mistakeRegistered = await page.evaluate(() => {
+      resetAllFilters();
+      const firstQ = getAllQuestions()[0];
+      const wrongOpt = (firstQ.ans === 'A') ? 'B' : 'A';
+      // Simulate selecting wrong option
+      handlePracticeMistakeRegister(firstQ.id, wrongOpt);
+      const reg = loadMistakeRegister();
+      return {
+        exists: !!reg[firstQ.id],
+        entry: reg[firstQ.id],
+        badge: document.getElementById('mistakeBadgeCount').textContent.trim()
+      };
+    });
+
+    if (!mistakeRegistered.exists || mistakeRegistered.entry.wrongCount !== 1) {
+      throw new Error('Failed to register mistake on incorrect practice answer');
+    }
+    if (mistakeRegistered.badge !== '1') {
+      throw new Error(`Expected badge count 1 after mistake, got ${mistakeRegistered.badge}`);
+    }
+
+    // Now test streak tracking and graduation rule:
+    // 1st correct answer -> consecutiveCorrect = 1 (remains in register)
+    const afterFirstCorrect = await page.evaluate(() => {
+      const firstQ = getAllQuestions()[0];
+      handlePracticeMistakeRegister(firstQ.id, firstQ.ans);
+      const reg = loadMistakeRegister();
+      return {
+        stillInRegister: !!reg[firstQ.id],
+        consecutiveCorrect: reg[firstQ.id] ? reg[firstQ.id].consecutiveCorrect : 0,
+        badge: document.getElementById('mistakeBadgeCount').textContent.trim()
+      };
+    });
+
+    if (!afterFirstCorrect.stillInRegister || afterFirstCorrect.consecutiveCorrect !== 1) {
+      throw new Error(`Expected question to remain in register with streak 1, got streak: ${afterFirstCorrect.consecutiveCorrect}`);
+    }
+
+    // Wrong answer -> streak resets to 0
+    const afterStreakReset = await page.evaluate(() => {
+      const firstQ = getAllQuestions()[0];
+      const wrongOpt = (firstQ.ans === 'A') ? 'B' : 'A';
+      handlePracticeMistakeRegister(firstQ.id, wrongOpt);
+      const reg = loadMistakeRegister();
+      return {
+        consecutiveCorrect: reg[firstQ.id] ? reg[firstQ.id].consecutiveCorrect : -1,
+        wrongCount: reg[firstQ.id] ? reg[firstQ.id].wrongCount : 0
+      };
+    });
+
+    if (afterStreakReset.consecutiveCorrect !== 0 || afterStreakReset.wrongCount !== 2) {
+      throw new Error(`Expected streak reset to 0 and wrongCount 2, got: ${JSON.stringify(afterStreakReset)}`);
+    }
+
+    // Answer correctly twice in a row -> graduates and leaves register!
+    const afterGraduation = await page.evaluate(() => {
+      const firstQ = getAllQuestions()[0];
+      // 1st correct answer
+      handlePracticeMistakeRegister(firstQ.id, firstQ.ans);
+      // 2nd correct answer in a row
+      handlePracticeMistakeRegister(firstQ.id, firstQ.ans);
+      const reg = loadMistakeRegister();
+      return {
+        inRegister: !!reg[firstQ.id],
+        badge: document.getElementById('mistakeBadgeCount').textContent.trim()
+      };
+    });
+
+    if (afterGraduation.inRegister) {
+      throw new Error('Question should have graduated and left the register after 2 consecutive correct answers!');
+    }
+    if (afterGraduation.badge !== '0') {
+      throw new Error(`Expected badge count 0 after graduation, got ${afterGraduation.badge}`);
+    }
+
+    console.log('[PASS] E2E: Mistake Register (wrong logging, streak tracking, graduation after 2x correct, empty state) verified.');
+
+    // ----------------------------------------------------
+    // TEST 11: Console Errors Check
     // ----------------------------------------------------
     if (consoleErrors.length > 0) {
       console.warn(`[WARN] Console errors logged during test run:\n${consoleErrors.join('\n')}`);

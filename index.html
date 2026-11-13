@@ -4388,7 +4388,12 @@ summary:focus-visible,
               <button type="button" onclick="setGlobalAppLanguage('hi')" data-lang-btn="hi" class="lang-switch-btn px-3 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#223127] hover:text-[#10402D]">हिन्दी माध्यम</button>
             </div>
           </div>
-          <span class="text-[11px] text-[#526056]">Switching language updates questions, options &amp; published answer keys</span>
+          <div class="flex items-center gap-2">
+            <button type="button" id="filterMistakesBtn" onclick="toggleMistakesFilter()" title="Filter questions answered incorrectly to review and retry" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 font-bold text-xs transition cursor-pointer shadow-2xs">
+              <span id="filterMistakesBtnText">🎯 Only My Incorrect Questions</span>
+              <span id="mistakeBadgeCount" class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[11px] font-extrabold leading-none">0</span>
+            </button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
@@ -4427,6 +4432,7 @@ summary:focus-visible,
             <label for="typeFilter" class="block text-xs font-bold text-[#223127] mb-1">Question Type / Saved</label>
             <select id="typeFilter" class="w-full rounded-xl border border-[#DCE6DF] px-3 py-2 text-sm bg-[#F8FAF7] text-[#111C15]  focus:border-[#10402D]">
               <option value="ALL">All Types (MCQ + Mains)</option>
+              <option value="MISTAKES">❌ Only My Incorrect Questions (0)</option>
               <option value="MCQ">Objective Prelims / MCQs Only</option>
               <option value="Mains">Descriptive Mains Only</option>
               <option value="BOOKMARKED">★ Bookmarked Questions</option>
@@ -5129,6 +5135,9 @@ summary:focus-visible,
     window.addEventListener('popstate', () => {
       if (window.location.hash === '#test-series') {
         openTestSeriesMode();
+      } else if (window.location.hash === '#mistakes') {
+        openPyqBankMode();
+        if (typeof toggleMistakesFilter === 'function') toggleMistakesFilter(true);
       } else if (window.location.hash === '#pyq-bank' || window.location.hash === '#practice-bpsc-pyq') {
         openPyqBankMode();
       } else if ((window.location.hash || '').toLowerCase().includes('#admin')) {
@@ -5145,6 +5154,9 @@ summary:focus-visible,
       if ((window.location.hash || '').toLowerCase().includes('#admin')) {
         openPyqBankMode();
         switchView('manage');
+      } else if (window.location.hash === '#mistakes') {
+        openPyqBankMode();
+        if (typeof toggleMistakesFilter === 'function') toggleMistakesFilter(true);
       }
     });
 
@@ -5663,12 +5675,15 @@ summary:focus-visible,
     const STORAGE_KEY_CUSTOM_QS = "bpsc_cracked_custom_questions_v1";
     const STORAGE_KEY_BOOKMARKS = "bpsc_cracked_bookmarks_v1";
     const STORAGE_KEY_CUSTOM_EXAMS = "bpsc_cracked_custom_exams_v1";
+    const STORAGE_KEY_MISTAKES = "shaktiq_mistake_register_v1";
 
     let customQuestions = [];
     let customExams = [];
     let bookmarkedIds = {};
     let userAttempts = {}; // { qid: selectedLetter }
     let practiceFilterStatus = 'all'; // 'all', 'unattempted', 'attempted'
+    let isMistakeRetryMode = false;
+    let mistakeRetryAttempts = {};
 
     function getStudentStoragePrefix() {
       const user = getCurrentAspirant();
@@ -5676,6 +5691,143 @@ summary:focus-visible,
         return 'shaktiq_usr_' + user.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
       }
       return 'shaktiq_usr_default';
+    }
+
+    function getMistakeRegisterKey() {
+      const prefix = getStudentStoragePrefix();
+      return prefix + '_mistakes';
+    }
+
+    function loadMistakeRegister() {
+      const key = getMistakeRegisterKey();
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) return JSON.parse(raw) || {};
+        const legacy = localStorage.getItem(STORAGE_KEY_MISTAKES);
+        if (legacy) {
+          const parsed = JSON.parse(legacy) || {};
+          localStorage.setItem(key, JSON.stringify(parsed));
+          return parsed;
+        }
+      } catch (e) {}
+      return {};
+    }
+
+    function saveMistakeRegister(register) {
+      const key = getMistakeRegisterKey();
+      try {
+        localStorage.setItem(key, JSON.stringify(register));
+        localStorage.setItem(STORAGE_KEY_MISTAKES, JSON.stringify(register));
+      } catch (e) {}
+      updateMistakeCountBadge();
+    }
+
+    function handlePracticeMistakeRegister(qid, opt) {
+      const all = getAllQuestions();
+      const q = all.find(item => item.id === qid);
+      if (!q) return;
+
+      const reg = loadMistakeRegister();
+      const isCorrect = (opt === q.ans);
+
+      if (reg[qid]) {
+        if (isCorrect) {
+          reg[qid].consecutiveCorrect = (reg[qid].consecutiveCorrect || 0) + 1;
+          reg[qid].lastAttempted = Date.now();
+          if (reg[qid].consecutiveCorrect >= 2) {
+            delete reg[qid];
+            saveMistakeRegister(reg);
+            showToast("🎉 Mastered! Solved correctly twice in a row - cleared from Mistake Register!", "✨");
+          } else {
+            saveMistakeRegister(reg);
+            showToast("✓ Correct! (1/2 consecutive correct answers to clear from register)", "🎯");
+          }
+        } else if (opt && opt !== 'E') {
+          reg[qid].wrongCount = (reg[qid].wrongCount || 0) + 1;
+          reg[qid].consecutiveCorrect = 0;
+          reg[qid].lastAttempted = Date.now();
+          reg[qid].lastWrongOpt = opt;
+          saveMistakeRegister(reg);
+          showToast("❌ Incorrect. Mistake streak reset to 0/2.", "⚠");
+        }
+      } else {
+        if (opt && opt !== 'E' && !isCorrect) {
+          reg[qid] = {
+            id: qid,
+            wrongCount: 1,
+            consecutiveCorrect: 0,
+            lastAttempted: Date.now(),
+            lastWrongOpt: opt,
+            source: 'practice'
+          };
+          saveMistakeRegister(reg);
+          showToast("Added to My Mistake Register for revision.", "📌");
+        }
+      }
+    }
+
+    function toggleMistakesFilter(forceValue) {
+      if (typeof forceValue === "boolean") {
+        selectedType = forceValue ? "MISTAKES" : "ALL";
+      } else {
+        selectedType = (selectedType === "MISTAKES") ? "ALL" : "MISTAKES";
+      }
+      const typeFilter = document.getElementById("typeFilter");
+      if (typeFilter) typeFilter.value = selectedType;
+      displayLimit = (selectedType === "MISTAKES") ? 99999 : 60;
+      try {
+        if (selectedType === "MISTAKES") {
+          history.replaceState(null, null, '#mistakes');
+        } else if (window.location.hash === '#mistakes') {
+          history.replaceState(null, null, '#pyq-bank');
+        }
+      } catch (e) {}
+      updateMistakeCountBadge();
+      renderQuestions();
+    }
+
+    function toggleMistakeRetryMode(active) {
+      isMistakeRetryMode = !!active;
+      renderQuestions();
+    }
+
+    function clearMistakeAttemptsForRetry() {
+      mistakeRetryAttempts = {};
+      isMistakeRetryMode = true;
+      renderQuestions();
+      showToast("Ready for fresh retry! All mistake questions reset for re-attempt.", "🔄");
+    }
+
+    function updateMistakeCountBadge() {
+      const reg = loadMistakeRegister();
+      const count = Object.keys(reg).length;
+      const isHi = (typeof ShaktiQBilingualEngine !== 'undefined' && ShaktiQBilingualEngine.currentLang === 'hi');
+      const badgeEl = document.getElementById("mistakeBadgeCount");
+      if (badgeEl) {
+        badgeEl.textContent = count;
+      }
+      const btnText = document.getElementById("filterMistakesBtnText");
+      if (btnText) {
+        btnText.textContent = isHi ? "🎯 केवल गलत प्रश्न" : "🎯 Only My Incorrect Questions";
+      }
+      const typeFilterOpt = document.querySelector('#typeFilter option[value="MISTAKES"]');
+      if (typeFilterOpt) {
+        typeFilterOpt.textContent = isHi ? `❌ केवल मेरे गलत प्रश्न (${count})` : `❌ Only My Incorrect Questions (${count})`;
+      }
+      const bannerCount = document.getElementById("mistakeBannerCount");
+      if (bannerCount) {
+        bannerCount.textContent = `${count} ${isHi ? 'प्रश्न' : (count === 1 ? 'question' : 'questions')}`;
+      }
+      const btn = document.getElementById("filterMistakesBtn");
+      if (btn) {
+        if (selectedType === "MISTAKES") {
+          btn.classList.remove("border-rose-200", "bg-rose-50", "text-rose-800", "hover:bg-rose-100");
+          btn.classList.add("bg-[#10402D]", "text-white", "border-[#10402D]", "shadow-sm");
+        } else {
+          btn.classList.remove("bg-[#10402D]", "text-white", "border-[#10402D]", "shadow-sm");
+          btn.classList.add("border-rose-200", "bg-rose-50", "text-rose-800", "hover:bg-rose-100");
+        }
+      }
     }
 
     function loadStudentPracticeAttempts() {
@@ -5739,6 +5891,7 @@ summary:focus-visible,
       } catch (e) {
         customExams = [];
       }
+      if (typeof updateMistakeCountBadge === 'function') updateMistakeCountBadge();
     }
 
     function saveCustomQuestions() {
@@ -5890,18 +6043,33 @@ summary:focus-visible,
       const isAdmin = isAdminMode();
       const manageBtn = document.getElementById("subnav-btn-manage");
       if (manageBtn) {
-        if (isAdmin) manageBtn.classList.remove("hidden");
-        else manageBtn.classList.add("hidden");
+        if (isAdmin) {
+          manageBtn.classList.remove("hidden");
+          manageBtn.style.display = "";
+        } else {
+          manageBtn.classList.add("hidden");
+          manageBtn.style.display = "none";
+        }
       }
       const quickAddBtn = document.getElementById("quickAddQuestionBtn");
       if (quickAddBtn) {
-        if (isAdmin) quickAddBtn.classList.remove("hidden");
-        else quickAddBtn.classList.add("hidden");
+        if (isAdmin) {
+          quickAddBtn.classList.remove("hidden");
+          quickAddBtn.style.display = "";
+        } else {
+          quickAddBtn.classList.add("hidden");
+          quickAddBtn.style.display = "none";
+        }
       }
       const customWrapper = document.getElementById("headerCustomCountWrapper");
       if (customWrapper) {
-        if (isAdmin) customWrapper.classList.remove("hidden");
-        else customWrapper.classList.add("hidden");
+        if (isAdmin) {
+          customWrapper.classList.remove("hidden");
+          customWrapper.style.display = "";
+        } else {
+          customWrapper.classList.add("hidden");
+          customWrapper.style.display = "none";
+        }
       }
     }
 
@@ -5979,13 +6147,15 @@ summary:focus-visible,
       Object.keys(subnavMap).forEach(key => {
         const btn = document.getElementById(subnavMap[key]);
         if (btn) {
+          const hideClass = (key === 'manage' && !isAdminMode()) ? ' hidden' : '';
           if (key === viewName) {
-            btn.className = 'subnav-btn subnav-active px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer shadow-2xs inline-flex items-center gap-1.5';
+            btn.className = 'subnav-btn subnav-active px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer shadow-2xs inline-flex items-center gap-1.5' + hideClass;
           } else {
-            btn.className = 'subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#111C15] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs inline-flex items-center gap-1.5';
+            btn.className = 'subnav-btn subnav-inactive px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#111C15] hover:text-[#10402D] bg-white border border-[#DCE6DF] hover:bg-[#F8FAF7] cursor-pointer shadow-2xs inline-flex items-center gap-1.5' + hideClass;
           }
         }
       });
+      if (typeof updateAdminUI === 'function') updateAdminUI();
 
       // Synchronize workspace mode buttons with viewName
       const btnTS = document.getElementById('workspace-mode-btn-testseries');
@@ -6042,6 +6212,10 @@ summary:focus-visible,
         if (selectedType === "Mains" && item.type !== "Mains") return false;
         if (selectedType === "BOOKMARKED" && !bookmarkedIds[item.id]) return false;
         if (selectedType === "CUSTOM" && !item.custom) return false;
+        if (selectedType === "MISTAKES") {
+          const reg = loadMistakeRegister();
+          if (!reg[item.id]) return false;
+        }
         if (selectedType === "UNATTEMPTED" && userAttempts[item.id]) return false;
         if (selectedType === "ATTEMPTED" && !userAttempts[item.id]) return false;
         if (practiceFilterStatus === 'unattempted' && userAttempts[item.id]) return false;
@@ -6344,7 +6518,10 @@ summary:focus-visible,
       const subjBadgeClass = SUBJECT_COLORS[item.subject] || "bg-slate-100 text-slate-800 border-slate-200";
       const isBookmarked = !!bookmarkedIds[item.id];
       const isMains = isMainsDescriptiveQuestion(item);
-      const userChoice = userAttempts[item.id];
+      const reg = (typeof loadMistakeRegister === 'function') ? loadMistakeRegister() : {};
+      const mistakeEntry = reg[item.id];
+      const inMistakeView = (selectedType === "MISTAKES");
+      const userChoice = (inMistakeView && isMistakeRetryMode) ? (mistakeRetryAttempts[item.id] || null) : userAttempts[item.id];
       const isAttempted = !!userChoice;
       const revealAnswer = showAllAnswers || isAttempted;
       const isGlobalHi = (typeof ShaktiQBilingualEngine !== 'undefined' && ShaktiQBilingualEngine.currentLang === 'hi');
@@ -6438,6 +6615,11 @@ summary:focus-visible,
             <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">📅 ${escapeHtml(item.date)} (${escapeHtml(item.year)})</span>
             <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">${isMains ? 'Descriptive Mains' : escapeHtml(item.type)}</span>
             ${item.custom ? '<span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#0A2E20] text-emerald-200 border border-[#17593F]">Custom Added</span>' : ''}
+            ${mistakeEntry ? `
+              <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${mistakeEntry.consecutiveCorrect === 1 ? 'bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]' : 'bg-[#FFF5F5] text-rose-800 border border-rose-300'} flex items-center gap-1 shadow-2xs">
+                <span>${mistakeEntry.consecutiveCorrect === 1 ? '⚡ 1/2 Correct (Needs 1 more to clear)' : '❌ Mistake Register (' + (mistakeEntry.wrongCount || 1) + ' wrong)'}</span>
+              </span>
+            ` : ''}
             ${isAttempted ? `
               <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${userChoice === item.ans ? 'bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]' : 'bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]'} flex items-center gap-1 shadow-2xs">
                 <i data-lucide="${userChoice === item.ans ? 'check-circle' : 'alert-circle'}" class="w-3.5 h-3.5"></i>
@@ -6584,13 +6766,31 @@ summary:focus-visible,
         return;
       }
 
+      const isHiLang = (typeof ShaktiQBilingualEngine !== 'undefined' && ShaktiQBilingualEngine.currentLang === 'hi');
+
       if (filtered.length === 0) {
+        if (selectedType === "MISTAKES") {
+          container.innerHTML = `<div class="bg-white rounded-3xl border border-[#DCE6DF] p-10 text-center space-y-4 max-w-lg mx-auto shadow-sm my-6 scroll-mt-32">
+            <div class="w-16 h-16 rounded-full bg-[#EBF3E6] text-[#10402D] flex items-center justify-center text-3xl mx-auto shadow-xs">🎯</div>
+            <div class="text-xl font-extrabold text-[#111C15]">${isHiLang ? 'शानदार! कोई गलत प्रश्न नहीं है' : 'Clean Slate! Your Mistake Register is empty'}</div>
+            <p class="text-sm text-[#526056] leading-relaxed">
+              ${isHiLang ? 'शानदार! आपके पास अभी कोई अनसुलझी गलतियाँ नहीं हैं। PYQ अभ्यास या मॉक टेस्ट के दौरान आपके द्वारा गलत उत्तर दिए गए प्रश्न यहाँ दिखाई देंगे, जब तक कि आप उन्हें लगातार दो बार सही हल नहीं कर लेते।' : 'Outstanding! You have no unresolved mistakes right now. Any questions you answer incorrectly during PYQ practice or mock tests will automatically appear here until you solve them correctly twice in a row.'}
+            </p>
+            <div class="pt-2 flex justify-center gap-3">
+              <button type="button" onclick="resetAllFilters()" class="bg-[#10402D] hover:bg-[#17593F] text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-sm transition cursor-pointer">${isHiLang ? 'सभी प्रश्न देखें' : 'Browse All Questions'}</button>
+            </div>
+          </div>`;
+          if (jumpBar) jumpBar.classList.add("hidden");
+          if (loadMoreWrapper) loadMoreWrapper.classList.add("hidden");
+          return;
+        }
+
         container.innerHTML = `<div class="bg-white rounded-2xl border border-slate-200 p-10 text-center space-y-3">
           <div class="text-lg font-bold text-slate-800">No questions match your current filters</div>
           <p class="text-xs sm:text-sm text-slate-500">Try clearing your search query, switching the Subject/Year filter, or adding a new question to this category.</p>
           <div class="pt-2 flex justify-center gap-3">
             <button type="button" id="emptyResetBtn" class="bg-emerald-900 text-white text-xs font-bold px-4 py-2 rounded-xl">Reset Filters</button>
-            <button type="button" id="emptyAddBtn" class="bg-amber-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-xl">+ Add Question Here</button>
+            ${isAdminMode() ? '<button type="button" id="emptyAddBtn" class="bg-amber-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-xl">+ Add Question Here</button>' : ''}
           </div>
         </div>`;
         if (jumpBar) jumpBar.classList.add("hidden");
@@ -6600,6 +6800,33 @@ summary:focus-visible,
         const emptyAddBtn = document.getElementById("emptyAddBtn");
         if (emptyAddBtn) emptyAddBtn.addEventListener("click", () => switchView("manage"));
         return;
+      }
+
+      let mistakeBannerHtml = "";
+      if (selectedType === "MISTAKES") {
+        mistakeBannerHtml = `<div id="mistakeRegisterBanner" class="p-4 rounded-2xl bg-[#FFF5F5] border border-rose-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 scroll-mt-32">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 font-extrabold flex items-center justify-center text-lg shrink-0">🎯</div>
+            <div>
+              <div class="text-sm font-extrabold text-[#111C15] flex items-center gap-2">
+                <span>${isHiLang ? 'मेरी भूल सुधार पुस्तिका (Mistake Register)' : 'My Mistake Register'}</span>
+                <span id="mistakeBannerCount" class="px-2 py-0.5 rounded-full text-xs font-bold bg-rose-600 text-white">${filtered.length} ${isHiLang ? 'प्रश्न' : (filtered.length === 1 ? 'question' : 'questions')}</span>
+              </div>
+              <div class="text-xs text-[#526056] mt-0.5">
+                ${isHiLang ? 'नियम: किसी प्रश्न को <strong>लगातार 2 बार सही (2/2)</strong> हल करने पर वह यहाँ से हट जाता है।' : 'Mastery rule: A question leaves this register after being answered <strong>correctly twice in a row (2/2)</strong>.'}
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <label class="inline-flex items-center gap-2 text-xs font-bold text-[#111C15] bg-white px-3.5 py-2 rounded-xl border border-[#DCE6DF] shadow-2xs cursor-pointer hover:bg-slate-50 transition">
+              <input type="checkbox" id="mistakeRetryModeToggle" ${isMistakeRetryMode ? 'checked' : ''} onchange="toggleMistakeRetryMode(this.checked)" class="rounded text-[#10402D] focus:ring-emerald-700">
+              <span>${isHiLang ? '🔄 पुनः प्रयास मोड (उत्तर छिपाएं और अभ्यास करें)' : '🔄 Retry Mode (Hide past answers & re-test)'}</span>
+            </label>
+            <button type="button" onclick="clearMistakeAttemptsForRetry()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-rose-800 hover:bg-rose-50 border border-rose-200 transition cursor-pointer shadow-2xs">
+              ${isHiLang ? 'सत्र रीसेट करें' : 'Reset Retry Session'}
+            </button>
+          </div>
+        </div>`;
       }
 
       const sliced = filtered.slice(0, displayLimit);
@@ -6661,10 +6888,10 @@ summary:focus-visible,
             });
           });
         }
-        container.innerHTML = sectionsHtml;
+        container.innerHTML = mistakeBannerHtml + sectionsHtml;
       } else {
         if (jumpBar) jumpBar.classList.add("hidden");
-        container.innerHTML = `<div class="space-y-3.5">${sliced.map((item, i) => buildQuestionCardHtml(item, i)).join("")}</div>`;
+        container.innerHTML = mistakeBannerHtml + `<div class="space-y-3.5">${sliced.map((item, i) => buildQuestionCardHtml(item, i)).join("")}</div>`;
       }
 
       if (loadMoreWrapper) {
@@ -6694,6 +6921,12 @@ summary:focus-visible,
             const opt = btn.getAttribute("data-opt");
             userAttempts[qid] = opt;
             saveStudentPracticeAttempt(qid, opt);
+            if (selectedType === "MISTAKES" && isMistakeRetryMode) {
+              mistakeRetryAttempts[qid] = opt;
+            }
+            if (typeof handlePracticeMistakeRegister === "function") {
+              handlePracticeMistakeRegister(qid, opt);
+            }
             updateSubjectProgressUI();
             logPyqInteraction(aspirant, qid, opt);
             renderQuestions();
@@ -6994,6 +7227,7 @@ summary:focus-visible,
       document.getElementById("examFilter").value = "ALL";
       document.getElementById("typeFilter").value = "ALL";
       if (typeof updateYearPillsUI === "function") updateYearPillsUI();
+      if (typeof updateMistakeCountBadge === "function") updateMistakeCountBadge();
       renderSubjectPills();
       renderQuestions();
     }
@@ -7293,7 +7527,7 @@ summary:focus-visible,
         safeScrollToTop();
         initIcons();
         try {
-          if (!window.location.hash.toLowerCase().includes('#admin')) {
+          if (!window.location.hash.toLowerCase().includes('#admin') && !window.location.hash.toLowerCase().includes('#mistakes')) {
             history.pushState(null, null, '#pyq-bank');
           }
         } catch(e){}
@@ -7303,6 +7537,13 @@ summary:focus-visible,
           title: "Question Management Portal (Admin) | ShaktiQ",
           description: "Internal administration interface for ShaktiQ question bank management.",
           url: "https://shaktiq.com/#admin",
+          image: "https://shaktiq.com/share-card.png"
+        });
+      } else if (window.location.hash.toLowerCase().includes('#mistakes')) {
+        updatePageMeta({
+          title: "My Mistake Register | ShaktiQ BPSC Prep",
+          description: "Track, review, and master your incorrect BPSC questions until you solve them correctly twice in a row.",
+          url: "https://shaktiq.com/#mistakes",
           image: "https://shaktiq.com/share-card.png"
         });
       } else {
@@ -7619,7 +7860,15 @@ summary:focus-visible,
       });
       document.getElementById("typeFilter").addEventListener("change", (e) => {
         selectedType = e.target.value;
-        displayLimit = 100;
+        displayLimit = (selectedType === "MISTAKES") ? 99999 : 100;
+        try {
+          if (selectedType === "MISTAKES") {
+            history.replaceState(null, null, '#mistakes');
+          } else if (window.location.hash === '#mistakes') {
+            history.replaceState(null, null, '#pyq-bank');
+          }
+        } catch (err) {}
+        if (typeof updateMistakeCountBadge === "function") updateMistakeCountBadge();
         renderQuestions();
       });
       document.getElementById("resetFiltersBtn").addEventListener("click", resetAllFilters);
@@ -10088,6 +10337,43 @@ summary:focus-visible,
         localStorage.setItem(prefix + '_timestamps', JSON.stringify(tsMap));
       } catch (e) {}
 
+      // Save mistakes from mock test into Mistake Register
+      try {
+        const reg = (typeof loadMistakeRegister === 'function') ? loadMistakeRegister() : {};
+        (attemptLog.questionResults || []).forEach(qr => {
+          if (qr.userOpt && qr.userOpt !== 'E') {
+            if (qr.isCorrect) {
+              if (reg[qr.id]) {
+                reg[qr.id].consecutiveCorrect = (reg[qr.id].consecutiveCorrect || 0) + 1;
+                reg[qr.id].lastAttempted = Date.now();
+                if (reg[qr.id].consecutiveCorrect >= 2) {
+                  delete reg[qr.id];
+                }
+              }
+            } else {
+              // Answered wrong
+              if (reg[qr.id]) {
+                reg[qr.id].wrongCount = (reg[qr.id].wrongCount || 0) + 1;
+                reg[qr.id].consecutiveCorrect = 0;
+                reg[qr.id].lastAttempted = Date.now();
+                reg[qr.id].lastWrongOpt = qr.userOpt;
+                reg[qr.id].source = 'mock';
+              } else {
+                reg[qr.id] = {
+                  id: qr.id,
+                  wrongCount: 1,
+                  consecutiveCorrect: 0,
+                  lastAttempted: Date.now(),
+                  lastWrongOpt: qr.userOpt,
+                  source: 'mock'
+                };
+              }
+            }
+          }
+        });
+        if (typeof saveMistakeRegister === 'function') saveMistakeRegister(reg);
+      } catch (e) {}
+
       // Fire Google Sheets sync immediately
       syncAspirantToGoogleSheets({
         event: 'test_completed',
@@ -10805,6 +11091,9 @@ Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
 
       if (window.location.hash === '#practice-bpsc-pyq' || window.location.hash === '#pyq-bank') {
         openPyqBankMode();
+      } else if (window.location.hash === '#mistakes') {
+        openPyqBankMode();
+        if (typeof toggleMistakesFilter === 'function') toggleMistakesFilter(true);
       } else if (window.location.hash === '#test-series') {
         openTestSeriesMode();
       } else if ((window.location.hash || '').toLowerCase().includes('#admin')) {
