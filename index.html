@@ -242,6 +242,42 @@
   }
 }
 
+/* Virtual OMR Sheet Mode (Feature 3.1) */
+.mock-view-omr #tt-desktop-palette-sidebar {
+  display: none !important;
+}
+.mock-view-omr #tt-omr-container {
+  display: block !important;
+}
+
+@media (max-width: 1023px) {
+  .mock-view-omr #tt-question-container {
+    display: none !important;
+  }
+  .mock-view-omr #tt-floating-grid-btn {
+    display: none !important;
+  }
+  .mock-view-omr #tt-mobile-bottom-bar {
+    display: none !important;
+  }
+  .mock-view-omr #tt-omr-mobile-bottom-bar {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mock-view-omr #tt-question-container {
+    display: block !important;
+    grid-column: span 7 / span 7 !important;
+  }
+  .mock-view-omr #tt-omr-container {
+    grid-column: span 5 / span 5 !important;
+  }
+  .mock-view-omr #tt-omr-mobile-bottom-bar {
+    display: none !important;
+  }
+}
+
 /* Anti-Scraping & Copy Protection */
 .no-copy,
 #page-bpsc-pyq-view,
@@ -3897,6 +3933,24 @@ summary:focus-visible,
         </div>
       </div>
 
+      <!-- Mobile Mock View Bar (<640px) -->
+      <div id="tt-view-toggle-mobile" class="sm:hidden flex items-center justify-between bg-white border border-[#DCE6DF] rounded-xl px-3 py-1.5 shadow-2xs">
+        <div class="flex items-center gap-1.5 text-xs text-[#526056]">
+          <i data-lucide="layout-template" class="w-3.5 h-3.5 text-[#10402D]"></i>
+          <span class="font-extrabold text-[#111C15]" id="tt-mobile-view-heading">Mode:</span>
+        </div>
+        <div class="inline-flex items-center p-0.5 rounded-lg bg-[#EBF3E6] border border-[#C6DEC0] text-[11px] font-bold">
+          <button type="button" id="tt-view-btn-card-mobile" onclick="setMockViewMode('card')" class="px-2.5 py-1 rounded-md transition-all cursor-pointer font-bold bg-[#10402D] text-white shadow-xs flex items-center gap-1" aria-label="Card View" aria-pressed="true">
+            <i data-lucide="layout" class="w-3 h-3"></i>
+            <span class="tt-view-card-text">Card</span>
+          </button>
+          <button type="button" id="tt-view-btn-omr-mobile" onclick="setMockViewMode('omr')" class="px-2.5 py-1 rounded-md transition-all cursor-pointer font-bold text-[#223127] hover:text-[#10402D] flex items-center gap-1" aria-label="Virtual OMR Sheet View" aria-pressed="false">
+            <i data-lucide="circle-dot" class="w-3 h-3"></i>
+            <span class="tt-view-omr-text">OMR</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Desktop Top Test Header (>=640px) -->
       <div class="hidden sm:flex bg-white/95 backdrop-blur-md border border-[#DCE6DF] rounded-2xl p-4 sm:p-5 flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm sticky top-20 z-30">
         <div>
@@ -3908,6 +3962,18 @@ summary:focus-visible,
         </div>
 
         <div class="flex items-center gap-3 flex-wrap">
+          <!-- Mock View Toggle (Card vs OMR) -->
+          <div id="tt-view-toggle-desktop" class="inline-flex items-center p-1 rounded-xl bg-[#EBF3E6] border border-[#C6DEC0] text-xs font-bold shrink-0 shadow-2xs">
+            <button type="button" id="tt-view-btn-card-desktop" onclick="setMockViewMode('card')" class="px-3 py-1 rounded-lg transition-all cursor-pointer font-bold bg-[#10402D] text-white shadow-xs flex items-center gap-1.5" aria-label="Card View" aria-pressed="true">
+              <i data-lucide="layout" class="w-3.5 h-3.5"></i>
+              <span class="tt-view-card-text">Card View</span>
+            </button>
+            <button type="button" id="tt-view-btn-omr-desktop" onclick="setMockViewMode('omr')" class="px-3 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#223127] hover:text-[#10402D] flex items-center gap-1.5" aria-label="Virtual OMR Sheet View" aria-pressed="false">
+              <i data-lucide="circle-dot" class="w-3.5 h-3.5"></i>
+              <span class="tt-view-omr-text">OMR Sheet</span>
+            </button>
+          </div>
+
           <!-- Mock Test Top Language Switcher -->
           <div class="inline-flex items-center p-1 rounded-xl bg-[#EBF3E6] border border-[#C6DEC0] text-xs font-bold shrink-0 shadow-2xs">
             <span class="text-[11px] font-bold text-[#10402D] px-1.5 flex items-center gap-1">
@@ -3938,8 +4004,8 @@ summary:focus-visible,
       <!-- Test Split View (Question vs Palette) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <!-- Left: Question & Options View (8 cols) -->
-        <div class="lg:col-span-8 bg-white border border-[#DCE6DF] rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <!-- Left: Question & Options View (8 cols in card mode, 7 cols in desktop split OMR mode) -->
+        <div id="tt-question-container" class="lg:col-span-8 bg-white border border-[#DCE6DF] rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
           
           <div class="flex items-center justify-between pb-4 border-b border-[#E5ECE6] text-xs text-[#526056] flex-wrap gap-2">
             <span class="font-bold text-[#111C15] text-sm" id="tt-q-index-label">Question 1 of 150</span>
@@ -3988,8 +4054,8 @@ summary:focus-visible,
           </div>
         </div>
 
-        <!-- Right: Question Palette (4 cols - Desktop Sticky Sidebar) -->
-        <div class="hidden lg:block lg:col-span-4 bg-white border border-[#DCE6DF] rounded-2xl p-5 shadow-sm space-y-5">
+        <!-- Right: Question Palette (4 cols - Desktop Sticky Sidebar in Card View) -->
+        <div id="tt-desktop-palette-sidebar" class="hidden lg:block lg:col-span-4 bg-white border border-[#DCE6DF] rounded-2xl p-5 shadow-sm space-y-5">
           
           <h4 class="font-display font-extrabold text-sm text-[#111C15]">Question Palette</h4>
           
@@ -4016,6 +4082,100 @@ summary:focus-visible,
           <!-- Numbers Grid -->
           <div id="tt-palette-grid" class="grid grid-cols-5 gap-2 max-h-[360px] overflow-y-auto pr-1 no-scrollbar pt-2">
             <!-- Rendered by renderQuestionPalette() -->
+          </div>
+        </div>
+
+        <!-- Virtual OMR Sheet Mode (Split on desktop >=1024px, full width on mobile/tablet <1024px) -->
+        <div id="tt-omr-container" class="hidden bg-white border border-[#DCE6DF] rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
+          <!-- OMR Sheet Header -->
+          <div class="border-b border-[#E5ECE6] pb-4 space-y-2">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-[#10402D] text-white flex items-center justify-center shrink-0">
+                  <i data-lucide="circle-dot" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h3 id="tt-omr-title" class="font-display font-extrabold text-base text-[#111C15]">BPSC Virtual OMR Answer Sheet</h3>
+                  <p id="tt-omr-subtitle" class="text-xs text-[#526056]">Darken one bubble per question (A to E). Option E indicates Safe Skip (0 deduction).</p>
+                </div>
+              </div>
+
+              <!-- Quick View Toggle Inside OMR Header for Convenience -->
+              <div class="hidden sm:inline-flex items-center p-0.5 rounded-xl bg-[#EBF3E6] border border-[#C6DEC0] text-xs font-bold">
+                <button type="button" onclick="setMockViewMode('card')" class="px-2.5 py-1 rounded-lg text-[#223127] hover:text-[#10402D] transition flex items-center gap-1 cursor-pointer">
+                  <i data-lucide="layout" class="w-3.5 h-3.5"></i>
+                  <span class="tt-view-card-text">Card View</span>
+                </button>
+                <button type="button" onclick="setMockViewMode('omr')" class="px-2.5 py-1 rounded-lg bg-[#10402D] text-white transition flex items-center gap-1 cursor-pointer">
+                  <i data-lucide="circle-dot" class="w-3.5 h-3.5"></i>
+                  <span class="tt-view-omr-text">OMR Sheet</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Live OMR Stats Pills -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+              <div class="p-2 rounded-xl bg-[#F8FAF7] border border-[#DCE6DF] flex flex-col items-center">
+                <span id="tt-omr-label-total" class="text-[10px] text-[#526056] font-semibold">Total Questions</span>
+                <span id="tt-omr-stat-total" class="font-mono font-black text-sm text-[#111C15]">150</span>
+              </div>
+              <div class="p-2 rounded-xl bg-[#ECF6E7] border border-[#C6DEC0] flex flex-col items-center">
+                <span id="tt-omr-label-answered" class="text-[10px] text-[#10402D] font-semibold">Bubbled</span>
+                <span id="tt-omr-stat-answered" class="font-mono font-black text-sm text-[#10402D]">0</span>
+              </div>
+              <div class="p-2 rounded-xl bg-[#FEF6D6] border border-[#F5DF8B] flex flex-col items-center">
+                <span id="tt-omr-label-safeskip" class="text-[10px] text-[#785600] font-semibold">Safe Skip (E)</span>
+                <span id="tt-omr-stat-safeskip" class="font-mono font-black text-sm text-[#785600]">0</span>
+              </div>
+              <div class="p-2 rounded-xl bg-rose-50 border border-rose-200 flex flex-col items-center">
+                <span id="tt-omr-label-blank" class="text-[10px] text-rose-700 font-semibold">Blank</span>
+                <span id="tt-omr-stat-blank" class="font-mono font-black text-sm text-rose-700">150</span>
+              </div>
+            </div>
+
+            <!-- OMR Sheet Legend & Filter Bar -->
+            <div class="flex items-center justify-between flex-wrap gap-2 pt-2 text-xs">
+              <div class="flex items-center gap-3 text-[#526056] text-[11px] flex-wrap">
+                <span class="flex items-center gap-1">
+                  <span class="w-3.5 h-3.5 rounded-full border-2 border-[#526056] bg-white inline-block"></span>
+                  <span>Unfilled</span>
+                </span>
+                <span class="flex items-center gap-1">
+                  <span class="w-3.5 h-3.5 rounded-full border-2 border-[#10402D] bg-[#10402D] inline-block"></span>
+                  <span class="font-bold text-[#10402D]">Filled</span>
+                </span>
+                <span class="flex items-center gap-1">
+                  <span class="w-3.5 h-3.5 rounded-full border-2 border-[#7AA975] bg-[#EBF3E6] inline-block"></span>
+                  <span class="text-[#10402D] font-bold">Option E (Safe)</span>
+                </span>
+              </div>
+
+              <!-- Quick Filter Pills -->
+              <div class="inline-flex items-center p-0.5 rounded-lg bg-[#F8FAF7] border border-[#DCE6DF] text-[11px] font-bold">
+                <button type="button" id="tt-omr-filter-all" onclick="filterOmrRows('all')" class="omr-filter-btn px-2.5 py-0.5 rounded-md bg-[#10402D] text-white cursor-pointer font-bold">All</button>
+                <button type="button" id="tt-omr-filter-unanswered" onclick="filterOmrRows('unanswered')" class="omr-filter-btn px-2.5 py-0.5 rounded-md text-[#526056] hover:text-[#10402D] cursor-pointer font-bold">Blank</button>
+                <button type="button" id="tt-omr-filter-answered" onclick="filterOmrRows('answered')" class="omr-filter-btn px-2.5 py-0.5 rounded-md text-[#526056] hover:text-[#10402D] cursor-pointer font-bold">Answered</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- OMR Sheet Scrollable Rows Container -->
+          <div id="tt-omr-sheet-scroll" class="max-h-[580px] sm:max-h-[640px] overflow-y-auto pr-1 border border-[#E5ECE6] rounded-xl bg-[#FAFBF9] divide-y divide-[#E5ECE6]/80 no-scrollbar">
+            <div id="tt-omr-rows-container" class="p-1 sm:p-2 space-y-1">
+              <!-- Dynamically populated by renderVirtualOmrSheet() -->
+            </div>
+          </div>
+
+          <!-- OMR Desktop Footer -->
+          <div class="hidden sm:flex items-center justify-between pt-2 border-t border-[#E5ECE6]">
+            <button type="button" onclick="setMockViewMode('card')" class="px-4 py-2 rounded-xl text-xs font-bold text-[#223127] bg-[#F8FAF7] border border-[#DCE6DF] hover:bg-[#EBF3E6] transition cursor-pointer flex items-center gap-1.5">
+              <i data-lucide="layout" class="w-4 h-4"></i>
+              <span class="tt-view-card-text">Back to Card View</span>
+            </button>
+            <button type="button" onclick="submitMockTest()" class="px-5 py-2 rounded-xl text-xs font-extrabold text-white bg-[#10402D] hover:bg-[#17593F] shadow-sm transition cursor-pointer flex items-center gap-1.5">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              <span>Submit Mock Test</span>
+            </button>
           </div>
         </div>
 
@@ -4107,6 +4267,18 @@ summary:focus-visible,
         <!-- Next Button -->
         <button type="button" id="tt-mobile-next-btn" onclick="ttSaveAndNext()" class="mobile-bottom-btn flex-1 px-3 py-2 rounded-xl text-xs font-extrabold text-white bg-[#10402D] active:bg-[#17593F] shadow-sm transition cursor-pointer" aria-label="Next Question">
           <span>Next →</span>
+        </button>
+      </div>
+
+      <!-- Mobile OMR Bottom Action Bar (<640px) -->
+      <div id="tt-omr-mobile-bottom-bar" class="hidden sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#DCE6DF] px-3 py-2 shadow-lg items-center justify-between gap-3 mobile-bottom-bar">
+        <button type="button" onclick="setMockViewMode('card')" class="mobile-bottom-btn flex-1 px-3 py-2.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] active:bg-[#C6DEC0] transition cursor-pointer flex items-center justify-center gap-1.5" aria-label="Switch back to Card View">
+          <i data-lucide="layout" class="w-4 h-4"></i>
+          <span id="tt-mobile-omr-switch-card-btn">Card View</span>
+        </button>
+        <button type="button" onclick="submitMockTest()" class="mobile-bottom-btn flex-1 px-4 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#10402D] active:bg-[#17593F] shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5" aria-label="Submit Mock Test">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span id="tt-mobile-omr-submit-btn">Submit Test</span>
         </button>
       </div>
 
@@ -7989,6 +8161,19 @@ summary:focus-visible,
       setTxt('copy-btn-label', 'Copy Text', 'टेक्स्ट कॉपी करें');
       setTxt('share-img-label', 'Score Card', 'स्कोर कार्ड');
 
+      // OMR bilingual labels
+      setTxt('tt-omr-title', 'BPSC Virtual OMR Answer Sheet', 'बीपीएससी वर्चुअल ओएमआर उत्तर पत्रक');
+      setTxt('tt-omr-subtitle', 'Darken one bubble per question (A to E). Option E indicates Safe Skip (0 deduction).', 'प्रत्येक प्रश्न के लिए एक गोला भरें (A से E)। विकल्प E सुरक्षित छोड़ें (0 अंक कटेगा)।');
+      setTxt('tt-omr-label-total', 'Total Questions', 'कुल प्रश्न');
+      setTxt('tt-omr-label-answered', 'Bubbled', 'भरे गए');
+      setTxt('tt-omr-label-safeskip', 'Safe Skip (E)', 'सुरक्षित छोड़ें (E)');
+      setTxt('tt-omr-label-blank', 'Blank', 'रिक्त');
+      setTxt('tt-mobile-view-heading', 'Mode:', 'मोड:');
+      setTxt('tt-mobile-omr-switch-card-btn', 'Card View', 'कार्ड व्यू');
+      setTxt('tt-mobile-omr-submit-btn', 'Submit Test', 'परीक्षा जमा करें');
+      document.querySelectorAll('.tt-view-card-text').forEach(el => el.textContent = isHi ? 'कार्ड व्यू' : 'Card View');
+      document.querySelectorAll('.tt-view-omr-text').forEach(el => el.textContent = isHi ? 'ओएमआर शीट' : 'OMR Sheet');
+
       // If result modal is open, re-render cutoff meter bilingual text
       const resModal = document.getElementById('tt-result-modal');
       if (resModal && !resModal.classList.contains('hidden') && typeof renderCutoffMeter === 'function') {
@@ -9708,6 +9893,7 @@ summary:focus-visible,
     let currentMockQuestions = [];
     let currentMockIndex = 0;
     let mockUserAnswers = {}; // { qIndex: selectedLetter }
+    window.mockUserAnswers = mockUserAnswers;
     let mockMarkedForReview = {}; // { qIndex: true }
     let mockTimerInterval = null;
     let mockTimeRemaining = 7200; // seconds
@@ -10392,6 +10578,7 @@ summary:focus-visible,
 
         if (restoredDraft && restoredDraft.answers && Object.keys(restoredDraft.answers).length > 0) {
           mockUserAnswers = restoredDraft.answers || {};
+          window.mockUserAnswers = mockUserAnswers;
           mockMarkedForReview = restoredDraft.marked || {};
           mockTimeRemaining = (typeof restoredDraft.remainingSecs === 'number' && restoredDraft.remainingSecs > 10)
             ? restoredDraft.remainingSecs
@@ -10401,6 +10588,7 @@ summary:focus-visible,
           }
         } else {
           mockUserAnswers = {};
+          window.mockUserAnswers = mockUserAnswers;
           mockMarkedForReview = {};
           mockTimeRemaining = test.timeMins * 60;
         }
@@ -10439,8 +10627,15 @@ summary:focus-visible,
         if (mockTimerInterval) clearInterval(mockTimerInterval);
         mockTimerInterval = setInterval(updateMockTimer, 1000);
 
+        currentMockViewMode = 'card';
+        const wsEl = document.getElementById('test-taking-workspace');
+        if (wsEl) wsEl.classList.remove('mock-view-omr');
+        const omrContainer = document.getElementById('tt-omr-container');
+        if (omrContainer) omrContainer.classList.add('hidden');
+        updateViewToggleButtons();
         renderCurrentQuestion();
         renderQuestionPalette();
+        renderVirtualOmrSheet();
         safeScrollToTop();
       }, 'Please sign in with your profile before starting a full-length Mock Test.');
     }
@@ -10718,12 +10913,15 @@ summary:focus-visible,
         PrepBackendEngine.drafts.save(activeMockTest.title, mockUserAnswers, mockMarkedForReview, mockTimeRemaining);
       }
       renderCurrentQuestion();
+      if (typeof updateSingleOmrRow === 'function') updateSingleOmrRow(currentMockIndex);
+      if (typeof updateOmrStats === 'function') updateOmrStats();
     }
 
     function ttSaveAndNext() {
       if (currentMockIndex < currentMockQuestions.length - 1) {
         currentMockIndex += 1;
         renderCurrentQuestion();
+        if (typeof highlightOmrRow === 'function') highlightOmrRow(currentMockIndex, true);
       } else {
         showToast("You've reached the last question. Click 'Submit Test' when finished.", "info");
       }
@@ -10733,6 +10931,7 @@ summary:focus-visible,
       if (currentMockIndex > 0) {
         currentMockIndex -= 1;
         renderCurrentQuestion();
+        if (typeof highlightOmrRow === 'function') highlightOmrRow(currentMockIndex, true);
       }
     }
 
@@ -10742,6 +10941,8 @@ summary:focus-visible,
         PrepBackendEngine.drafts.save(activeMockTest.title, mockUserAnswers, mockMarkedForReview, mockTimeRemaining);
       }
       renderCurrentQuestion();
+      if (typeof updateSingleOmrRow === 'function') updateSingleOmrRow(currentMockIndex);
+      if (typeof updateOmrStats === 'function') updateOmrStats();
     }
 
     function ttMarkForReview() {
@@ -10749,13 +10950,267 @@ summary:focus-visible,
       if (activeMockTest && typeof PrepBackendEngine !== 'undefined' && PrepBackendEngine.drafts) {
         PrepBackendEngine.drafts.save(activeMockTest.title, mockUserAnswers, mockMarkedForReview, mockTimeRemaining);
       }
+      if (typeof updateSingleOmrRow === 'function') updateSingleOmrRow(currentMockIndex);
       ttSaveAndNext();
     }
 
     function ttJumpToQuestion(idx) {
       currentMockIndex = idx;
       renderCurrentQuestion();
+      if (typeof highlightOmrRow === 'function') highlightOmrRow(currentMockIndex, true);
       closePaletteDrawer();
+    }
+
+    // ==========================================
+    // VIRTUAL OMR SHEET MODE (Feature 3.1)
+    // ==========================================
+    let currentMockViewMode = 'card';
+    let currentOmrFilter = 'all';
+
+    function setMockViewMode(mode) {
+      currentMockViewMode = (mode === 'omr') ? 'omr' : 'card';
+      const ws = document.getElementById('test-taking-workspace');
+      const omrContainer = document.getElementById('tt-omr-container');
+      if (ws) {
+        if (currentMockViewMode === 'omr') {
+          ws.classList.add('mock-view-omr');
+          if (omrContainer) omrContainer.classList.remove('hidden');
+          renderVirtualOmrSheet();
+          highlightOmrRow(currentMockIndex, true);
+        } else {
+          ws.classList.remove('mock-view-omr');
+          if (omrContainer) omrContainer.classList.add('hidden');
+          renderCurrentQuestion();
+          renderQuestionPalette();
+        }
+      }
+      updateViewToggleButtons();
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    }
+    window.setMockViewMode = setMockViewMode;
+
+    function updateViewToggleButtons() {
+      const isOmr = (currentMockViewMode === 'omr');
+      const activeClass = 'bg-[#10402D] text-white shadow-xs';
+      const inactiveClass = 'text-[#223127] hover:text-[#10402D] bg-transparent';
+
+      const cardDesktop = document.getElementById('tt-view-btn-card-desktop');
+      const omrDesktop = document.getElementById('tt-view-btn-omr-desktop');
+      if (cardDesktop && omrDesktop) {
+        cardDesktop.className = `px-3 py-1 rounded-lg transition-all cursor-pointer font-bold flex items-center gap-1.5 ${!isOmr ? activeClass : inactiveClass}`;
+        omrDesktop.className = `px-3 py-1 rounded-lg transition-all cursor-pointer font-bold flex items-center gap-1.5 ${isOmr ? activeClass : inactiveClass}`;
+        cardDesktop.setAttribute('aria-pressed', String(!isOmr));
+        omrDesktop.setAttribute('aria-pressed', String(isOmr));
+      }
+
+      const cardMobile = document.getElementById('tt-view-btn-card-mobile');
+      const omrMobile = document.getElementById('tt-view-btn-omr-mobile');
+      if (cardMobile && omrMobile) {
+        cardMobile.className = `px-2.5 py-1 rounded-md transition-all cursor-pointer font-bold flex items-center gap-1 ${!isOmr ? activeClass : inactiveClass}`;
+        omrMobile.className = `px-2.5 py-1 rounded-md transition-all cursor-pointer font-bold flex items-center gap-1 ${isOmr ? activeClass : inactiveClass}`;
+        cardMobile.setAttribute('aria-pressed', String(!isOmr));
+        omrMobile.setAttribute('aria-pressed', String(isOmr));
+      }
+    }
+
+    function renderVirtualOmrSheet() {
+      const container = document.getElementById('tt-omr-rows-container');
+      if (!container || !currentMockQuestions || currentMockQuestions.length === 0) return;
+
+      const total = currentMockQuestions.length;
+      let html = '';
+      for (let idx = 0; idx < total; idx++) {
+        html += getOmrRowHtml(idx);
+      }
+      container.innerHTML = html;
+      updateOmrStats();
+      applyOmrFilter();
+      highlightOmrRow(currentMockIndex, false);
+    }
+    window.renderVirtualOmrSheet = renderVirtualOmrSheet;
+
+    function getOmrRowHtml(idx) {
+      const chosen = mockUserAnswers[idx];
+      const isReview = !!mockMarkedForReview[idx];
+      const isCurrent = (idx === currentMockIndex);
+
+      let rowBorderBg = 'bg-white border-[#E5ECE6] hover:border-[#C6DEC0] hover:bg-[#F2F6F1]';
+      if (isCurrent) {
+        rowBorderBg = 'bg-[#ECF6E7] border-[#10402D] shadow-2xs ring-1 ring-[#10402D]/30';
+      } else if (chosen) {
+        rowBorderBg = 'bg-[#F9FCF8] border-[#DCE6DF]';
+      }
+
+      const letters = ['A', 'B', 'C', 'D', 'E'];
+      const bubblesHtml = letters.map(letter => {
+        const isSelected = (chosen === letter);
+        const isSafeSkip = (letter === 'E');
+
+        let bubbleClasses = 'w-8 h-8 sm:w-7 sm:h-7 rounded-full border-2 flex items-center justify-center font-black text-xs transition cursor-pointer select-none active:scale-95';
+
+        if (isSelected) {
+          if (isSafeSkip) {
+            bubbleClasses += ' border-[#10402D] bg-[#10402D] text-white shadow-inner ring-2 ring-[#7AA975]/60';
+          } else {
+            bubbleClasses += ' border-[#10402D] bg-[#10402D] text-white shadow-inner';
+          }
+        } else {
+          if (isSafeSkip) {
+            bubbleClasses += ' border-[#7AA975] text-[#10402D] bg-[#F4F9F2] hover:border-[#10402D] hover:bg-[#EBF3E6]';
+          } else {
+            bubbleClasses += ' border-[#526056] text-[#223127] bg-white hover:border-[#10402D] hover:bg-[#EBF3E6]/60';
+          }
+        }
+
+        const ariaLabel = `Q${idx + 1} ${letter}${isSafeSkip ? ' (Safe Skip)' : ''}`;
+        return `<button type="button" onclick="selectOmrOption(${idx}, '${letter}')" class="${bubbleClasses}" aria-label="${ariaLabel}" aria-pressed="${isSelected}">${letter}</button>`;
+      }).join('');
+
+      let statusBadge = `<button type="button" onclick="jumpFromOmrToQuestion(${idx})" class="text-[11px] text-[#526056] hover:text-[#10402D] font-bold hover:underline cursor-pointer">View</button>`;
+      if (chosen) {
+        const badgeColor = (chosen === 'E') 
+          ? 'bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]' 
+          : 'bg-[#10402D] text-white';
+        statusBadge = `<span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-black ${badgeColor}">[ ${chosen} ]</span>`;
+      }
+
+      return `
+        <div id="omr-row-${idx}" data-q-idx="${idx}" data-answered="${!!chosen}" class="omr-row p-2 sm:p-2.5 rounded-xl border ${rowBorderBg} transition flex items-center justify-between gap-1.5 sm:gap-2">
+          <button type="button" onclick="jumpFromOmrToQuestion(${idx})" class="w-12 sm:w-14 text-left font-mono font-bold text-xs sm:text-sm text-[#111C15] hover:text-[#10402D] flex items-center gap-1 cursor-pointer shrink-0" aria-label="Question ${idx + 1}">
+            <span>Q.${idx + 1}</span>
+            ${isReview ? '<span class="text-amber-500 font-bold text-xs" title="Marked for review">★</span>' : ''}
+          </button>
+          <div class="flex items-center gap-2 sm:gap-2.5 shrink-0" role="group" aria-label="Question ${idx + 1} options">
+            ${bubblesHtml}
+          </div>
+          <div class="flex items-center justify-end shrink-0 w-12 sm:w-16">
+            ${statusBadge}
+          </div>
+        </div>
+      `;
+    }
+
+    function updateSingleOmrRow(idx) {
+      const rowEl = document.getElementById(`omr-row-${idx}`);
+      if (!rowEl) return;
+      const temp = document.createElement('div');
+      temp.innerHTML = getOmrRowHtml(idx).trim();
+      const newRow = temp.firstElementChild;
+      if (newRow) {
+        rowEl.replaceWith(newRow);
+      }
+      applyOmrFilter();
+    }
+
+    function highlightOmrRow(idx, scrollIntoView = false) {
+      document.querySelectorAll('.omr-row').forEach(r => {
+        const rIdx = parseInt(r.getAttribute('data-q-idx'), 10);
+        if (rIdx === idx) {
+          r.classList.add('bg-[#ECF6E7]', 'border-[#10402D]', 'shadow-2xs', 'ring-1', 'ring-[#10402D]/30');
+          r.classList.remove('bg-white', 'border-[#E5ECE6]');
+          if (scrollIntoView) {
+            r.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        } else {
+          r.classList.remove('bg-[#ECF6E7]', 'border-[#10402D]', 'shadow-2xs', 'ring-1', 'ring-[#10402D]/30');
+          if (r.getAttribute('data-answered') === 'false') {
+            r.classList.add('bg-white', 'border-[#E5ECE6]');
+          }
+        }
+      });
+    }
+
+    function updateOmrStats() {
+      if (!currentMockQuestions) return;
+      const total = currentMockQuestions.length;
+      let answered = 0;
+      let safeSkip = 0;
+
+      for (let i = 0; i < total; i++) {
+        const ans = mockUserAnswers[i];
+        if (ans) {
+          answered++;
+          if (ans === 'E') safeSkip++;
+        }
+      }
+
+      const blank = total - answered;
+
+      const setEl = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+
+      setEl('tt-omr-stat-total', total);
+      setEl('tt-omr-stat-answered', answered);
+      setEl('tt-omr-stat-safeskip', safeSkip);
+      setEl('tt-omr-stat-blank', blank);
+    }
+
+    function selectOmrOption(idx, letter) {
+      if (mockUserAnswers[idx] === letter) {
+        delete mockUserAnswers[idx];
+      } else {
+        mockUserAnswers[idx] = letter;
+      }
+
+      if (activeMockTest && typeof PrepBackendEngine !== 'undefined' && PrepBackendEngine.drafts) {
+        PrepBackendEngine.drafts.save(activeMockTest.title, mockUserAnswers, mockMarkedForReview, mockTimeRemaining);
+      }
+
+      currentMockIndex = idx;
+      renderCurrentQuestion();
+      updateSingleOmrRow(idx);
+      updateOmrStats();
+      renderQuestionPalette();
+    }
+    window.selectOmrOption = selectOmrOption;
+
+    function jumpFromOmrToQuestion(idx) {
+      currentMockIndex = idx;
+      renderCurrentQuestion();
+      highlightOmrRow(idx, false);
+      if (window.innerWidth < 1024) {
+        setMockViewMode('card');
+      } else {
+        const qContainer = document.getElementById('tt-question-container');
+        if (qContainer) {
+          qContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+    window.jumpFromOmrToQuestion = jumpFromOmrToQuestion;
+
+    function filterOmrRows(filter) {
+      currentOmrFilter = filter;
+      ['all', 'unanswered', 'answered'].forEach(f => {
+        const btn = document.getElementById(`tt-omr-filter-${f}`);
+        if (btn) {
+          if (f === filter) {
+            btn.className = 'omr-filter-btn px-2.5 py-0.5 rounded-md bg-[#10402D] text-white font-bold cursor-pointer';
+          } else {
+            btn.className = 'omr-filter-btn px-2.5 py-0.5 rounded-md text-[#526056] hover:text-[#10402D] font-bold cursor-pointer';
+          }
+        }
+      });
+      applyOmrFilter();
+    }
+    window.filterOmrRows = filterOmrRows;
+
+    function applyOmrFilter() {
+      const rows = document.querySelectorAll('.omr-row');
+      rows.forEach(r => {
+        const isAnswered = (r.getAttribute('data-answered') === 'true');
+        if (currentOmrFilter === 'all') {
+          r.style.display = '';
+        } else if (currentOmrFilter === 'unanswered') {
+          r.style.display = !isAnswered ? '' : 'none';
+        } else if (currentOmrFilter === 'answered') {
+          r.style.display = isAnswered ? '' : 'none';
+        }
+      });
     }
 
     // ==========================================

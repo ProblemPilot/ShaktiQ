@@ -1069,7 +1069,222 @@ async function runE2ETests() {
     console.log('[PASS] E2E: Indicative Cut-Off Meter verified: configurable 3-band thresholds (Safe >= 98, Borderline 85-97, Needs Improvement < 85), clear non-official disclaimer, and proportional drill scaling.');
 
     // ----------------------------------------------------
-    // TEST 14: Console Errors Check
+    // TEST 14: Virtual OMR Sheet Mode (Feature 3.1)
+    // ----------------------------------------------------
+    console.log('[RUNNING] E2E: Testing Virtual OMR Sheet Mode (5-bubble sheet, state sync, split/mobile views)...');
+    
+    // Launch a mock test
+    await page.evaluate(() => {
+      // Close any modal
+      const resModal = document.getElementById('tt-result-modal');
+      if (resModal) resModal.classList.add('hidden');
+      
+      // Clear previous test drafts for deterministic count in test
+      try {
+        Object.keys(localStorage).forEach(k => {
+          if (k.startsWith('draft_')) localStorage.removeItem(k);
+        });
+      } catch (e) {}
+
+      // Start curated mock
+      if (typeof startMockTest === 'function') {
+        startMockTest('ts_71st_cce');
+      }
+    });
+
+    await page.waitForSelector('#test-taking-workspace:not(.hidden)', { timeout: 8000 });
+    await page.waitForFunction(() => typeof currentMockQuestions !== 'undefined' && currentMockQuestions.length > 0, { timeout: 8000 });
+    await new Promise(r => setTimeout(r, 250));
+
+    // Verify initial Card View default
+    const initialViewAudit = await page.evaluate(() => {
+      const ws = document.getElementById('test-taking-workspace');
+      const qContainer = document.getElementById('tt-question-container');
+      const omrContainer = document.getElementById('tt-omr-container');
+      const palette = document.getElementById('tt-desktop-palette-sidebar');
+      return {
+        isOmrClass: ws ? ws.classList.contains('mock-view-omr') : false,
+        qContainerVisible: qContainer ? !qContainer.classList.contains('hidden') : false,
+        omrContainerHidden: omrContainer ? omrContainer.classList.contains('hidden') : true,
+        paletteVisible: palette ? !palette.classList.contains('hidden') : false
+      };
+    });
+
+    if (initialViewAudit.isOmrClass || !initialViewAudit.qContainerVisible) {
+      throw new Error('Initial mock view should default to Card View with question container visible');
+    }
+
+    // Answer Q1 in Card View with option 'B'
+    await page.evaluate(() => {
+      if (typeof ttSelectOption === 'function') {
+        ttSelectOption('B');
+      }
+    });
+
+    // Toggle to OMR View
+    await page.evaluate(() => {
+      if (typeof setMockViewMode === 'function') {
+        setMockViewMode('omr');
+      }
+    });
+    await new Promise(r => setTimeout(r, 250));
+
+    // Audit OMR View
+    const omrAudit = await page.evaluate(() => {
+      const ws = document.getElementById('test-taking-workspace');
+      const omrContainer = document.getElementById('tt-omr-container');
+      const rows = document.querySelectorAll('.omr-row');
+      const row0 = document.getElementById('omr-row-0');
+      const row0Ans = row0 ? row0.getAttribute('data-answered') : null;
+      const row0Chosen = row0 ? row0.querySelector('[aria-label="Q1 B"]') : null;
+      const row0ChosenPressed = row0Chosen ? row0Chosen.getAttribute('aria-pressed') : null;
+      
+      const statTotal = document.getElementById('tt-omr-stat-total');
+      const statAnswered = document.getElementById('tt-omr-stat-answered');
+      const statBlank = document.getElementById('tt-omr-stat-blank');
+
+      return {
+        isOmrClass: ws ? ws.classList.contains('mock-view-omr') : false,
+        omrContainerVisible: omrContainer ? !omrContainer.classList.contains('hidden') : false,
+        rowCount: rows.length,
+        row0Ans,
+        row0ChosenPressed,
+        totalText: statTotal ? statTotal.textContent : '',
+        answeredText: statAnswered ? statAnswered.textContent : '',
+        blankText: statBlank ? statBlank.textContent : ''
+      };
+    });
+
+    if (!omrAudit.isOmrClass || !omrAudit.omrContainerVisible) {
+      throw new Error('OMR container was not visible after switching to OMR view');
+    }
+    if (omrAudit.rowCount !== 150) {
+      throw new Error(`Expected 150 OMR rows, found ${omrAudit.rowCount}`);
+    }
+    if (omrAudit.row0Ans !== 'true' || omrAudit.row0ChosenPressed !== 'true') {
+      throw new Error('Option B selected in Card View was not reflected in OMR Row 0');
+    }
+    if (omrAudit.answeredText !== '1') {
+      throw new Error(`Expected OMR stat answered 1, got ${omrAudit.answeredText}`);
+    }
+
+    // Now in OMR View, click Option E (Safe Skip) on Question 2 (idx 1)
+    await page.evaluate(() => {
+      if (typeof selectOmrOption === 'function') {
+        selectOmrOption(1, 'E');
+      }
+    });
+
+    const omrSafeSkipAudit = await page.evaluate(() => {
+      const statSafe = document.getElementById('tt-omr-stat-safeskip');
+      const statAns = document.getElementById('tt-omr-stat-answered');
+      const row1Chosen = document.querySelector('[aria-label="Q2 E (Safe Skip)"]');
+      return {
+        safeText: statSafe ? statSafe.textContent : '',
+        ansText: statAns ? statAns.textContent : '',
+        row1EPressed: row1Chosen ? row1Chosen.getAttribute('aria-pressed') : null
+      };
+    });
+
+    if (omrSafeSkipAudit.safeText !== '1' || omrSafeSkipAudit.row1EPressed !== 'true') {
+      throw new Error('Safe Skip Option E selection in OMR failed to record or update stats');
+    }
+
+    // Switch back to Card View and verify Q2 shows Option E selected without answer loss
+    await page.evaluate(() => {
+      if (typeof setMockViewMode === 'function') {
+        setMockViewMode('card');
+      }
+    });
+    await new Promise(r => setTimeout(r, 250));
+
+    const cardSyncAudit = await page.evaluate(() => {
+      return {
+        q1Ans: window.mockUserAnswers[0],
+        q2Ans: window.mockUserAnswers[1],
+        totalAnswers: Object.keys(window.mockUserAnswers).length
+      };
+    });
+
+    if (cardSyncAudit.q1Ans !== 'B' || cardSyncAudit.q2Ans !== 'E' || cardSyncAudit.totalAnswers !== 2) {
+      throw new Error(`Card view sync error: answers lost on view toggle (got ${JSON.stringify(cardSyncAudit)})`);
+    }
+
+    // Test OMR Quick Filter: Blank vs Answered
+    await page.evaluate(() => {
+      setMockViewMode('omr');
+      filterOmrRows('unanswered');
+    });
+    const filterAudit = await page.evaluate(() => {
+      const rows = Array.from(document.querySelectorAll('.omr-row'));
+      const visibleRows = rows.filter(r => r.style.display !== 'none');
+      const hiddenRows = rows.filter(r => r.style.display === 'none');
+      // Reset filter to all
+      filterOmrRows('all');
+      return {
+        visibleCount: visibleRows.length,
+        hiddenCount: hiddenRows.length
+      };
+    });
+
+    if (filterAudit.visibleCount !== 148 || filterAudit.hiddenCount !== 2) {
+      throw new Error(`OMR Unanswered filter failed: expected 148 visible and 2 hidden, got ${filterAudit.visibleCount} visible, ${filterAudit.hiddenCount} hidden`);
+    }
+
+    // Test mobile breakpoint (<1024px) for OMR full-width and question container hidden
+    await page.setViewport({ width: 390, height: 844 });
+    await new Promise(r => setTimeout(r, 250));
+    const mobileOmrAudit = await page.evaluate(() => {
+      setMockViewMode('omr');
+      const qContainer = document.getElementById('tt-question-container');
+      const omrContainer = document.getElementById('tt-omr-container');
+      const mobileOmrBar = document.getElementById('tt-omr-mobile-bottom-bar');
+      const cardMobileBtn = document.getElementById('tt-view-btn-card-mobile');
+      const omrMobileBtn = document.getElementById('tt-view-btn-omr-mobile');
+
+      const qDisplay = window.getComputedStyle(qContainer).display;
+      const omrDisplay = window.getComputedStyle(omrContainer).display;
+      const omrBarDisplay = window.getComputedStyle(mobileOmrBar).display;
+
+      return {
+        qDisplay,
+        omrDisplay,
+        omrBarDisplay,
+        cardAriaPressed: cardMobileBtn ? cardMobileBtn.getAttribute('aria-pressed') : '',
+        omrAriaPressed: omrMobileBtn ? omrMobileBtn.getAttribute('aria-pressed') : ''
+      };
+    });
+
+    if (mobileOmrAudit.qDisplay !== 'none') {
+      throw new Error(`On mobile (<1024px) in OMR mode, question container should be hidden, got display: ${mobileOmrAudit.qDisplay}`);
+    }
+    if (mobileOmrAudit.omrDisplay === 'none') {
+      throw new Error('On mobile (<1024px) in OMR mode, OMR sheet should be visible');
+    }
+    if (mobileOmrAudit.omrBarDisplay !== 'flex') {
+      throw new Error(`On mobile in OMR mode, mobile OMR bottom bar should be flex, got ${mobileOmrAudit.omrBarDisplay}`);
+    }
+
+    // Restore desktop viewport
+    await page.setViewport({ width: 1280, height: 800 });
+    await new Promise(r => setTimeout(r, 250));
+    const desktopSplitAudit = await page.evaluate(() => {
+      setMockViewMode('omr');
+      const qContainer = document.getElementById('tt-question-container');
+      const omrContainer = document.getElementById('tt-omr-container');
+      const qDisplay = window.getComputedStyle(qContainer).display;
+      const omrDisplay = window.getComputedStyle(omrContainer).display;
+      return { qDisplay, omrDisplay };
+    });
+
+    if (desktopSplitAudit.qDisplay === 'none' || desktopSplitAudit.omrDisplay === 'none') {
+      throw new Error(`On desktop (>=1024px) in OMR mode, split view requires BOTH question and OMR sheet visible (qDisplay: ${desktopSplitAudit.qDisplay}, omrDisplay: ${desktopSplitAudit.omrDisplay})`);
+    }
+
+    console.log('[PASS] E2E: Virtual OMR Sheet Mode verified: 150 5-bubble rows (A to E), Safe Skip E indicator, seamless bidirectional answer state sync, OMR quick filters, desktop split view (>=1024px), and mobile full switch (<1024px).');
+
+    // ----------------------------------------------------
+    // TEST 15: Console Errors Check
     // ----------------------------------------------------
     if (consoleErrors.length > 0) {
       console.warn(`[WARN] Console errors logged during test run:\n${consoleErrors.join('\n')}`);
