@@ -751,23 +751,20 @@ async function runE2ETests() {
       submitMockTest();
     });
 
-    // 4. Verify result screen & explanation links
+    // 4. Verify result screen & solution review trigger
     const drillResult = await page.evaluate(() => {
       const modal = document.getElementById('tt-result-modal');
       const modalVisible = modal && !modal.classList.contains('hidden');
       const totalLabel = document.getElementById('tt-result-total-label')?.textContent.trim();
       const attempted = document.getElementById('tt-result-attempted')?.textContent.trim();
       const safeSkip = document.getElementById('tt-result-safe-skip')?.textContent.trim();
-      const explanationsCard = document.getElementById('tt-result-explanations-card');
-      const explanationsVisible = explanationsCard && !explanationsCard.classList.contains('hidden');
-      const listItems = document.querySelectorAll('#tt-result-questions-list > div');
+      const reviewBtn = modal ? modal.querySelector('button[onclick="ttReviewSolutions()"]') : null;
       return {
         modalVisible,
         totalLabel,
         attempted,
         safeSkip,
-        explanationsVisible,
-        listCount: listItems.length
+        hasReviewBtn: !!reviewBtn
       };
     });
 
@@ -780,13 +777,13 @@ async function runE2ETests() {
     if (drillResult.safeSkip !== '1') {
       throw new Error(`Expected safe skip 1, got ${drillResult.safeSkip}`);
     }
-    if (!drillResult.explanationsVisible || drillResult.listCount !== 15) {
-      throw new Error(`Expected 15 explanation list items in result screen, got ${drillResult.listCount}`);
+    if (!drillResult.hasReviewBtn) {
+      throw new Error('Result modal missing "View Full Solutions & Explanations" button');
     }
 
-    // 5. Test jump to explanation from result screen
+    // 5. Test jump to dedicated solution review workspace
     await page.evaluate(() => {
-      ttReviewSpecificSolution(0);
+      ttReviewSolutions();
     });
 
     const solViewStatus = await page.evaluate(() => {
