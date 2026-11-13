@@ -59,8 +59,8 @@ function runStaticChecks() {
   // Collect all internal hash links <a href="#...">
   const hrefHashRegex = /<a\s+[^>]*href=["']#([^"']*)["']/gi;
   const knownRouteHashes = new Set([
-    '', 'top', 'test-series', 'pyq-bank', 'practice-bpsc-pyq',
-    'analytics', 'admin', 'manage', 'exams', 'practice'
+    '', 'top', 'test-series', 'speed-drills', 'pyq-bank', 'practice-bpsc-pyq',
+    'mistakes', 'analytics', 'admin', 'manage', 'exams', 'practice'
   ]);
 
   const brokenAnchors = [];

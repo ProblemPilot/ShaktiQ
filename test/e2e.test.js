@@ -677,7 +677,147 @@ async function runE2ETests() {
     console.log('[PASS] E2E: Mistake Register (wrong logging, streak tracking, graduation after 2x correct, empty state) verified.');
 
     // ----------------------------------------------------
-    // TEST 11: Console Errors Check
+    // TEST 11: 10-Minute Speed Drills by Subject & Explanations (2.2)
+    // ----------------------------------------------------
+    // 1. Navigate to #speed-drills
+    await page.evaluate(() => {
+      openSpeedDrills();
+    });
+
+    const drillsState = await page.evaluate(() => {
+      const activeFilter = document.querySelector('.ts-filter-btn.bg-\\[\\#10402D\\]')?.getAttribute('data-ts-filter');
+      const cards = document.querySelectorAll('#testseries-grid > div.bg-white');
+      return {
+        activeFilter,
+        cardCount: cards.length
+      };
+    });
+
+    if (drillsState.activeFilter !== 'SPEED_DRILLS') {
+      throw new Error(`Expected active filter SPEED_DRILLS, got: ${drillsState.activeFilter}`);
+    }
+    if (drillsState.cardCount !== 8) {
+      throw new Error(`Expected 8 subject speed drills, got: ${drillsState.cardCount}`);
+    }
+
+    // 2. Start a speed drill: Bihar Special
+    await page.evaluate(() => {
+      startMockTest('drill_bihar_special');
+    });
+
+    await page.waitForSelector('#test-taking-workspace:not(.hidden)');
+    const drillLaunch = await page.evaluate(() => {
+      const qCount = currentMockQuestions ? currentMockQuestions.length : 0;
+      const allQuestions = getAllQuestions();
+      // Verify every single question exists in the bank (zero invented questions)
+      const allExistInBank = currentMockQuestions.every(mq => allQuestions.some(aq => aq.id === mq.id));
+      // Verify subject matches
+      const allBiharSubject = currentMockQuestions.every(mq => mq.subject === 'Bihar Special');
+      const timerText = document.getElementById('tt-timer')?.textContent.trim();
+      const mobileTimer = document.getElementById('tt-mobile-timer')?.textContent.trim();
+      const mobileQIdx = document.getElementById('tt-mobile-q-index')?.textContent.trim();
+      const paletteBtns = document.querySelectorAll('#tt-palette-grid button').length;
+      return {
+        qCount,
+        allExistInBank,
+        allBiharSubject,
+        timerText,
+        mobileTimer,
+        mobileQIdx,
+        paletteBtns
+      };
+    });
+
+    if (drillLaunch.qCount !== 15) {
+      throw new Error(`Expected exactly 15 questions in speed drill, got ${drillLaunch.qCount}`);
+    }
+    if (!drillLaunch.allExistInBank) {
+      throw new Error('Speed drill contains questions NOT present in official question bank!');
+    }
+    if (!drillLaunch.allBiharSubject) {
+      throw new Error('Speed drill contains questions outside selected subject!');
+    }
+    if (drillLaunch.timerText !== '00:10:00' || drillLaunch.mobileTimer !== '00:10:00') {
+      throw new Error(`Expected timer 00:10:00, got desktop: ${drillLaunch.timerText}, mobile: ${drillLaunch.mobileTimer}`);
+    }
+    if (drillLaunch.paletteBtns !== 15) {
+      throw new Error(`Expected 15 buttons in question palette, got ${drillLaunch.paletteBtns}`);
+    }
+
+    // 3. Attempt Q1 and Q2, then submit
+    await page.evaluate(() => {
+      ttSelectOption('A'); // Q1
+      ttSaveAndNext();
+      ttSelectOption('E'); // Q2 Safe-Skip
+      submitMockTest();
+    });
+
+    // 4. Verify result screen & explanation links
+    const drillResult = await page.evaluate(() => {
+      const modal = document.getElementById('tt-result-modal');
+      const modalVisible = modal && !modal.classList.contains('hidden');
+      const totalLabel = document.getElementById('tt-result-total-label')?.textContent.trim();
+      const attempted = document.getElementById('tt-result-attempted')?.textContent.trim();
+      const safeSkip = document.getElementById('tt-result-safe-skip')?.textContent.trim();
+      const explanationsCard = document.getElementById('tt-result-explanations-card');
+      const explanationsVisible = explanationsCard && !explanationsCard.classList.contains('hidden');
+      const listItems = document.querySelectorAll('#tt-result-questions-list > div');
+      return {
+        modalVisible,
+        totalLabel,
+        attempted,
+        safeSkip,
+        explanationsVisible,
+        listCount: listItems.length
+      };
+    });
+
+    if (!drillResult.modalVisible) {
+      throw new Error('Result modal not visible after speed drill submission');
+    }
+    if (drillResult.totalLabel !== '/ 15 Marks') {
+      throw new Error(`Expected total label "/ 15 Marks", got "${drillResult.totalLabel}"`);
+    }
+    if (drillResult.safeSkip !== '1') {
+      throw new Error(`Expected safe skip 1, got ${drillResult.safeSkip}`);
+    }
+    if (!drillResult.explanationsVisible || drillResult.listCount !== 15) {
+      throw new Error(`Expected 15 explanation list items in result screen, got ${drillResult.listCount}`);
+    }
+
+    // 5. Test jump to explanation from result screen
+    await page.evaluate(() => {
+      ttReviewSpecificSolution(0);
+    });
+
+    const solViewStatus = await page.evaluate(() => {
+      const solWs = document.getElementById('test-solution-workspace');
+      const visible = solWs && !solWs.classList.contains('hidden');
+      const expText = document.getElementById('sol-explanation-text')?.textContent.trim();
+      const keyPill = document.getElementById('sol-correct-answer-pill')?.textContent.trim();
+      const paletteCount = document.querySelectorAll('#sol-palette-grid button').length;
+      return {
+        visible,
+        hasExp: !!expText && expText.length > 5,
+        hasKey: !!keyPill && keyPill.includes('Option'),
+        paletteCount
+      };
+    });
+
+    if (!solViewStatus.visible) {
+      throw new Error('Solution workspace not visible after clicking explanation link');
+    }
+    if (!solViewStatus.hasExp) {
+      throw new Error('Solution explanation text missing in solution workspace');
+    }
+    if (solViewStatus.paletteCount !== 15) {
+      throw new Error(`Expected 15 solution palette buttons, got ${solViewStatus.paletteCount}`);
+    }
+
+    console.log('[PASS] E2E: 10-Minute Speed Drills (8 subjects, 15 Qs from bank, 10-min timer, scorecard & explanation links) verified.');
+
+    // ----------------------------------------------------
+    // TEST 12: Console Errors Check
     // ----------------------------------------------------
     if (consoleErrors.length > 0) {
       console.warn(`[WARN] Console errors logged during test run:\n${consoleErrors.join('\n')}`);

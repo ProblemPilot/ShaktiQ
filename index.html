@@ -2149,6 +2149,11 @@ summary:focus-visible,
           Mock Tests
         </button>
 
+        <button type="button" onclick="openSpeedDrills()" class="px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1">
+          <i data-lucide="zap" class="w-3.5 h-3.5 text-[#785600]"></i>
+          <span>Speed Drills</span>
+        </button>
+
         <a href="#revision-sheets" class="nav-extra-link px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">Revision Sheets</a>
         <a href="#mnemonics" class="nav-extra-link px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">Mnemonics</a>
         <a href="#daily-abhyas" class="nav-extra-link px-3 py-1.5 text-sm font-semibold text-[#223127] hover:text-[#10402D] rounded-lg transition-colors">Daily Abhyas</a>
@@ -2211,6 +2216,10 @@ summary:focus-visible,
         <a href="#choose-exam-section" class="mobile-nav-link px-3 py-2 text-sm font-medium text-[#223127] hover:bg-[#F3F7F4] rounded-lg">Exams</a>
         <button type="button" onclick="openPyqBankMode()" class="text-left px-3 py-2 text-sm font-medium text-[#223127] hover:bg-[#F3F7F4] rounded-lg">Practice 2,800+ PYQ Bank</button>
         <button type="button" onclick="openTestSeriesMode()" class="text-left px-3 py-2 text-sm font-medium text-[#223127] hover:bg-[#F3F7F4] rounded-lg">22 Full-Length Mock Tests</button>
+        <button type="button" onclick="openSpeedDrills()" class="text-left px-3 py-2 text-sm font-medium text-[#10402D] hover:bg-[#EBF3E6] rounded-lg flex items-center justify-between">
+          <span>⚡ 10-Min Speed Drills (8)</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]">15 Qs</span>
+        </button>
         <a href="#revision-sheets" class="mobile-nav-link px-3 py-2 text-sm font-medium text-[#223127] hover:bg-[#F3F7F4] rounded-lg">Rapid Revision Sheets</a>
         <a href="#mnemonics" class="mobile-nav-link px-3 py-2 text-sm font-medium text-[#223127] hover:bg-[#F3F7F4] rounded-lg">Smart Mnemonics</a>
         <a href="#daily-abhyas" class="mobile-nav-link px-3 py-2 text-sm font-medium text-[#223127] hover:bg-[#F3F7F4] rounded-lg">Daily Abhyas Tracker</a>
@@ -3799,9 +3808,13 @@ summary:focus-visible,
       </div>
 
       <!-- Test Category Filter Buttons -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+      <div id="speed-drills" class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
         <button type="button" onclick="filterTestSeries('ALL')" class="ts-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#10402D] text-white shadow-sm border border-[#10402D] cursor-pointer whitespace-nowrap" data-ts-filter="ALL">
-          All BPSC-Pattern Tests (22)
+          All Full Mocks (22)
+        </button>
+        <button type="button" id="ts-filter-speed-drills" onclick="filterTestSeries('SPEED_DRILLS')" class="ts-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5" data-ts-filter="SPEED_DRILLS">
+          <i data-lucide="zap" class="w-3.5 h-3.5 text-[#785600]"></i>
+          <span>10-Min Speed Drills (8)</span>
         </button>
         <button type="button" onclick="filterTestSeries('BPSC_CCE')" class="ts-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] cursor-pointer whitespace-nowrap" data-ts-filter="BPSC_CCE">
           71st &amp; 70th CCE (3)
@@ -3867,7 +3880,7 @@ summary:focus-visible,
       <div class="hidden sm:flex bg-white/95 backdrop-blur-md border border-[#DCE6DF] rounded-2xl p-4 sm:p-5 flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm sticky top-20 z-30">
         <div>
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">LIVE MOCK TEST</span>
+            <span id="tt-live-mock-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">LIVE MOCK TEST</span>
             <span id="tt-exam-name" class="font-extrabold text-[#111C15] text-base sm:text-lg">71st BPSC CCE Prelims Mock</span>
           </div>
           <p class="text-xs text-[#526056] mt-0.5">BPSC Marking Scheme: <span class="text-[#10402D] font-bold">+1.0</span> for correct • <span class="text-rose-600 font-bold">-1/3</span> for wrong / blank • <span class="text-[#10402D] font-bold">0</span> for Option E (Safe Skip)</p>
@@ -4085,7 +4098,7 @@ summary:focus-visible,
           <div class="w-16 h-16 rounded-2xl bg-[#ECF6E7] text-[#10402D] border border-[#C5DEC0] flex items-center justify-center mx-auto mb-2 shadow-sm">
             <i data-lucide="check-circle-2" class="w-8 h-8"></i>
           </div>
-          <h3 class="text-2xl sm:text-3xl font-display font-extrabold text-[#111C15]">Test Completed!</h3>
+          <h3 id="tt-result-heading" class="text-2xl sm:text-3xl font-display font-extrabold text-[#111C15]">Test Completed!</h3>
           <p id="tt-result-exam-title" class="text-sm text-[#3B493F]">71st BPSC CCE Prelims Mock Test</p>
         </div>
 
@@ -4176,15 +4189,28 @@ summary:focus-visible,
           </div>
         </div>
 
-        
+        <!-- Question-by-Question Explanations List (Feature 2.2) -->
+        <div id="tt-result-explanations-card" class="rounded-2xl border border-[#DCE6DF] bg-[#F8FAF7] p-3.5 sm:p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-[#111C15] flex items-center gap-1.5">
+              <i data-lucide="book-open" class="w-4 h-4 text-[#10402D]"></i>
+              <span id="tt-result-explanations-title">Question Explanations &amp; Answers</span>
+            </span>
+            <span id="tt-result-explanations-subtitle" class="text-[11px] font-semibold text-[#10402D]">Review Answers</span>
+          </div>
+          <div id="tt-result-questions-list" class="space-y-2 max-h-56 sm:max-h-64 overflow-y-auto pr-1">
+            <!-- Dynamically populated with question cards & instant explanation links -->
+          </div>
+        </div>
 
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
-          <button type="button" onclick="ttReviewSolutions()" class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#10402D] hover:bg-[#17593F] transition shadow-sm cursor-pointer">
-            View Solution &amp; Explanations
+          <button type="button" onclick="ttReviewSolutions()" class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#10402D] hover:bg-[#17593F] transition shadow-sm cursor-pointer flex items-center justify-center gap-2">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>View Full Solutions &amp; Explanations</span>
           </button>
           <button type="button" onclick="closeTestResultModal()" class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-xs sm:text-sm text-[#223127] hover:bg-[#EBF3E6] bg-white border border-[#DCE6DF] transition cursor-pointer">
-            Back to Test Series
+            Back to Tests &amp; Drills
           </button>
         </div>
       </div>
@@ -4296,7 +4322,11 @@ summary:focus-visible,
               ← Previous Solution
             </button>
             
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" id="sol-practice-pyq-btn" onclick="solPracticeInPyqBank()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-[#10402D] hover:bg-[#EBF3E6] bg-[#F4F9F2] border border-[#C6DEC0] transition cursor-pointer inline-flex items-center gap-1.5">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                <span>Practice in PYQ Bank</span>
+              </button>
               <button type="button" onclick="exitTestSolutionReview()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-[#3B493F] hover:bg-[#F6F7F2] bg-white border border-[#DCE6DF] transition cursor-pointer">
                 Exit to Test Series
               </button>
@@ -4343,6 +4373,26 @@ summary:focus-visible,
     <!-- VIEW 2: 2,800+ SUBJECT-WISE PYQ BANK       -->
     <!-- ========================================== -->
     <section id="view-bank" class="space-y-5 hidden">
+
+      <!-- 10-Minute Speed Drills Retention Strip (Feature 2.2) -->
+      <div class="bg-linear-to-r from-[#ECF6E7] to-[#F4F9F2] border border-[#C6DEC0] rounded-2xl p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs no-print">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#10402D] text-[#FCE27B] flex items-center justify-center font-bold shrink-0 shadow-xs">
+            <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-display font-extrabold text-sm sm:text-base text-[#10402D]">10-Minute Subject Speed Drills</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]">15 Qs • 10 Mins</span>
+            </div>
+            <p class="text-xs text-[#3B493F] mt-0.5">Test your speed under official BPSC negative marking (+1.0 / -1/3). Built strictly from genuine bank questions.</p>
+          </div>
+        </div>
+        <button type="button" onclick="openSpeedDrills()" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#10402D] hover:bg-[#17593F] transition cursor-pointer shadow-xs shrink-0">
+          <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+          <span>Start 10-Min Drill</span>
+        </button>
+      </div>
 
       <!-- Subject Bar (12 Core Subjects + All) -->
       <div class="bg-white rounded-2xl shadow-sm border border-[#DCE6DF] p-4 no-print">
@@ -5135,6 +5185,8 @@ summary:focus-visible,
     window.addEventListener('popstate', () => {
       if (window.location.hash === '#test-series') {
         openTestSeriesMode();
+      } else if (window.location.hash === '#speed-drills') {
+        openSpeedDrills();
       } else if (window.location.hash === '#mistakes') {
         openPyqBankMode();
         if (typeof toggleMistakesFilter === 'function') toggleMistakesFilter(true);
@@ -5157,6 +5209,8 @@ summary:focus-visible,
       } else if (window.location.hash === '#mistakes') {
         openPyqBankMode();
         if (typeof toggleMistakesFilter === 'function') toggleMistakesFilter(true);
+      } else if (window.location.hash === '#speed-drills') {
+        openSpeedDrills();
       }
     });
 
@@ -7515,6 +7569,30 @@ summary:focus-visible,
       });
     }
 
+    function openSpeedDrills() {
+      const portal = document.getElementById('page-portal-view');
+      const qb = document.getElementById('page-bpsc-pyq-view');
+      const qbHeader = document.getElementById('qb-sticky-header');
+      if (qbHeader) qbHeader.classList.remove('mock-hide-header-mobile');
+      if (portal && qb) {
+        portal.classList.add('hidden');
+        qb.classList.remove('hidden');
+        switchMainMode('testseries');
+        if (typeof filterTestSeries === 'function') {
+          filterTestSeries('SPEED_DRILLS');
+        }
+        safeScrollToTop();
+        initIcons();
+        try { history.pushState(null, null, '#speed-drills'); } catch(e){}
+      }
+      updatePageMeta({
+        title: "10-Minute BPSC Speed Drills (15 Qs by Subject) | ShaktiQ",
+        description: "Attempt rapid 10-minute subject speed drills for BPSC Prelims with 15 questions from verified PYQs under official negative marking.",
+        url: "https://shaktiq.com/#speed-drills",
+        image: "https://shaktiq.com/share-card.png"
+      });
+    }
+
     function openPyqBankMode() {
       const portal = document.getElementById('page-portal-view');
       const qb = document.getElementById('page-bpsc-pyq-view');
@@ -9272,6 +9350,118 @@ summary:focus-visible,
   }
 ];
 
+    // ==========================================
+    // 10-MINUTE SPEED DRILLS ENGINE (Feature 2.2)
+    // 15 Questions strictly from existing PYQ bank by Subject
+    // Zero Invented Questions
+    // ==========================================
+    const SPEED_DRILLS_CONFIG = [
+      {
+        id: "drill_bihar_special",
+        title: "Bihar Special & Heritage 10-Min Speed Drill",
+        category: "SPEED_DRILLS",
+        subject: "Bihar Special",
+        subjectFilter: ["Bihar Special"],
+        questionsCount: 15,
+        marks: 15,
+        timeMins: 10,
+        statusLabel: "10-Min Subject Drill",
+        desc: "15 high-frequency questions on Bihar history, geography, heritage & state schemes under strict 10-minute exam pressure.",
+        isSpeedDrill: true
+      },
+      {
+        id: "drill_polity",
+        title: "Indian Polity & Constitution 10-Min Speed Drill",
+        category: "SPEED_DRILLS",
+        subject: "Polity",
+        subjectFilter: ["Polity"],
+        questionsCount: 15,
+        marks: 15,
+        timeMins: 10,
+        statusLabel: "10-Min Subject Drill",
+        desc: "15 high-yield MCQs on the Indian Constitution, Fundamental Rights, Parliament & Panchayati Raj under BPSC negative marking.",
+        isSpeedDrill: true
+      },
+      {
+        id: "drill_economy",
+        title: "Indian & Bihar Economy 10-Min Speed Drill",
+        category: "SPEED_DRILLS",
+        subject: "Economics",
+        subjectFilter: ["Economics"],
+        questionsCount: 15,
+        marks: 15,
+        timeMins: 10,
+        statusLabel: "10-Min Subject Drill",
+        desc: "15 rapid questions on Union & Bihar budgets, economic survey, fiscal policy & inflation.",
+        isSpeedDrill: true
+      },
+      {
+        id: "drill_history",
+        title: "History of India & Bihar 10-Min Speed Drill",
+        category: "SPEED_DRILLS",
+        subject: "History",
+        subjectFilter: ["History"],
+        questionsCount: 15,
+        marks: 15,
+        timeMins: 10,
+        statusLabel: "10-Min Subject Drill",
+        desc: "15 questions covering Ancient, Medieval, and Modern Indian National Movement with Bihar freedom fighters.",
+        isSpeedDrill: true
+      },
+      {
+        id: "drill_geography",
+        title: "Geography & Environment 10-Min Speed Drill",
+        category: "SPEED_DRILLS",
+        subject: "Geography",
+        subjectFilter: ["Geography", "Environment"],
+        questionsCount: 15,
+        marks: 15,
+        timeMins: 10,
+        statusLabel: "10-Min Subject Drill",
+        desc: "15 targeted MCQs on Indian & Bihar rivers, climate, soil types, forests & sanctuaries.",
+        isSpeedDrill: true
+      },
+      {
+        id: "drill_science",
+        title: "General Science (Bio, Phy, Chem) 10-Min Speed Drill",
+        category: "SPEED_DRILLS",
+        subject: "General Science",
+        subjectFilter: ["Biology", "Physics", "Chemistry"],
+        questionsCount: 15,
+        marks: 15,
+        timeMins: 10,
+        statusLabel: "10-Min Subject Drill",
+        desc: "15 everyday science questions spanning Human Biology, Everyday Physics, and Chemical Reactions.",
+        isSpeedDrill: true
+      },
+      {
+        id: "drill_current_affairs",
+        title: "Current Affairs & Schemes 10-Min Speed Drill",
+        category: "SPEED_DRILLS",
+        subject: "Current Affairs",
+        subjectFilter: ["Current Affairs"],
+        questionsCount: 15,
+        marks: 15,
+        timeMins: 10,
+        statusLabel: "10-Min Subject Drill",
+        desc: "15 questions testing national events, sports awards, summits & key Bihar government initiatives.",
+        isSpeedDrill: true
+      },
+      {
+        id: "drill_reasoning",
+        title: "Mental Ability & Reasoning 10-Min Speed Drill",
+        category: "SPEED_DRILLS",
+        subject: "Reasoning",
+        subjectFilter: ["Reasoning", "Mathematics"],
+        questionsCount: 15,
+        marks: 15,
+        timeMins: 10,
+        statusLabel: "10-Min Subject Drill",
+        desc: "15 sharp aptitude, series, coding-decoding, and quantitative reasoning questions for Prelims Paper 1.",
+        isSpeedDrill: true
+      }
+    ];
+
     let currentMockQuestions = [];
     let currentMockIndex = 0;
     let mockUserAnswers = {}; // { qIndex: selectedLetter }
@@ -9296,9 +9486,29 @@ summary:focus-visible,
       const grid = document.getElementById('testseries-grid');
       if (!grid) return;
 
-      const filtered = CURATED_TESTS.filter(t => category === 'ALL' || t.category === category);
+      const isDrill = (category === 'SPEED_DRILLS');
+      const filtered = isDrill
+        ? SPEED_DRILLS_CONFIG
+        : CURATED_TESTS.filter(t => category === 'ALL' || t.category === category);
 
       let cardsHtml = '';
+      if (isDrill) {
+        cardsHtml += `
+          <div class="col-span-full bg-linear-to-r from-[#10402D] to-[#1E5638] text-white p-5 sm:p-6 rounded-3xl shadow-sm space-y-2 mb-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FEF6D6] text-[#785600] flex items-center gap-1">
+                <i data-lucide="zap" class="w-3.5 h-3.5 fill-current"></i> 10-Minute Rapid Drills
+              </span>
+              <span class="text-xs text-white/80 font-medium">15 Questions • 10 Minutes • Official BPSC Pattern</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-display font-extrabold text-white">Subject-Wise 10-Minute Speed Drills</h2>
+            <p class="text-xs sm:text-sm text-white/90 max-w-2xl leading-relaxed">
+              Sharpen your time management and accuracy under pressure. Built 100% strictly from verified BPSC previous year questions with official negative marking (+1.0 correct, -1/3 wrong, 0 safe-skip, -1/3 blank).
+            </p>
+          </div>
+        `;
+      }
+
       filtered.forEach(test => {
         const attempts = getTestAttemptsForTest(test.id);
         const attemptCount = attempts.length;
@@ -9310,7 +9520,7 @@ summary:focus-visible,
         });
 
         cardsHtml += `
-          <div class="bg-white border border-[#DCE6DF] hover:border-[#10402D] rounded-3xl p-6 shadow-sm hover:shadow-md flex flex-col justify-between transition-all group">
+          <div class="bg-white border ${test.isSpeedDrill ? 'border-[#C6DEC0] hover:border-[#10402D]' : 'border-[#DCE6DF] hover:border-[#10402D]'} rounded-3xl p-6 shadow-sm hover:shadow-md flex flex-col justify-between transition-all group">
             <div class="space-y-4">
               <div class="flex items-center justify-between gap-2 flex-wrap">
                 ${attemptCount > 0 ? `
@@ -9319,8 +9529,9 @@ summary:focus-visible,
                     Attempted: ${attemptCount} ${attemptCount === 1 ? 'time' : 'times'}
                   </span>
                 ` : `
-                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F6F7F2] text-[#223127] border border-[#DCE6DF]">
-                    ${escapeHtml(test.statusLabel || "100% Complete Full Paper")}
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${test.isSpeedDrill ? 'bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]' : 'bg-[#F6F7F2] text-[#223127] border border-[#DCE6DF]'} flex items-center gap-1">
+                    ${test.isSpeedDrill ? '<i data-lucide="zap" class="w-3 h-3"></i>' : ''}
+                    ${escapeHtml(test.statusLabel || (test.isSpeedDrill ? "⚡ 10-Min Speed Drill" : "100% Complete Full Paper"))}
                   </span>
                 `}
                 <span class="text-xs font-bold text-[#526056] flex items-center gap-1">
@@ -9375,8 +9586,8 @@ summary:focus-visible,
 
             <div class="pt-5">
               <button type="button" onclick="startMockTest('${escapeHtml(test.id)}')" class="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl font-display font-bold text-xs sm:text-sm text-white bg-[#10402D] hover:bg-[#17593F] shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer">
-                <i data-lucide="${attemptCount > 0 ? 'rotate-ccw' : 'play'}" class="w-4 h-4 fill-current"></i>
-                <span>${attemptCount > 0 ? 'Re-Attempt Mock Test' : 'Start Mock Test'}</span>
+                <i data-lucide="${attemptCount > 0 ? 'rotate-ccw' : (test.isSpeedDrill ? 'zap' : 'play')}" class="w-4 h-4 fill-current"></i>
+                <span>${attemptCount > 0 ? (test.isSpeedDrill ? 'Re-Attempt Speed Drill' : 'Re-Attempt Mock Test') : (test.isSpeedDrill ? 'Start 10-Min Speed Drill' : 'Start Mock Test')}</span>
               </button>
             </div>
           </div>
@@ -9390,9 +9601,9 @@ summary:focus-visible,
     function filterTestSeries(cat) {
       document.querySelectorAll('.ts-filter-btn').forEach(btn => {
         if (btn.getAttribute('data-ts-filter') === cat) {
-          btn.className = 'ts-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#10402D] text-white shadow-sm border border-[#10402D] cursor-pointer';
+          btn.className = 'ts-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#10402D] text-white shadow-sm border border-[#10402D] cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5';
         } else {
-          btn.className = 'ts-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] cursor-pointer';
+          btn.className = 'ts-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#223127] hover:bg-[#EBF3E6] border border-[#DCE6DF] cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5';
         }
       });
       renderTestSeriesCards(cat);
@@ -9880,28 +10091,52 @@ summary:focus-visible,
           if (typeof showToast === 'function') showToast("Loading test questions...", "info");
           await loadQuestionsData();
         }
-        const test = CURATED_TESTS.find(t => t.id === testId);
+        const test = CURATED_TESTS.find(t => t.id === testId) || SPEED_DRILLS_CONFIG.find(t => t.id === testId);
         if (!test) return;
 
         activeMockTest = test;
         // DATA QUALITY: Strictly exclude descriptive Mains questions (ids q_2620 onward, ans="Mains", empty options)
         const allMcq = getAllQuestions().filter(q => !isMainsDescriptiveQuestion(q));
-        let questions = allMcq.filter(q => q.exam === test.examMatch);
+        let questions = [];
 
-        if (questions.length === 0) {
-          questions = allMcq.filter(q => q.exam.toLowerCase().includes(test.examMatch.toLowerCase().split(' ')[0]));
+        if (test.isSpeedDrill) {
+          // Select questions strictly from existing bank matching this drill's subject(s)
+          const subjectPool = allMcq.filter(q => {
+            if (Array.isArray(test.subjectFilter)) {
+              return test.subjectFilter.includes(q.subject);
+            }
+            return q.subject === test.subject;
+          });
+
+          if (subjectPool.length === 0) {
+            showToast("Questions for this drill are loading...", "info");
+            return;
+          }
+
+          // Deterministic rotation on re-attempts
+          const attempts = getTestAttemptsForTest(test.id);
+          const offset = (attempts.length * 15) % Math.max(1, subjectPool.length - 15);
+          questions = subjectPool.slice(offset, offset + 15);
+        } else {
+          questions = allMcq.filter(q => q.exam === test.examMatch);
+
+          if (questions.length === 0) {
+            questions = allMcq.filter(q => q.exam.toLowerCase().includes(test.examMatch.toLowerCase().split(' ')[0]));
+          }
+
+          if (questions.length === 0) {
+            showToast("Questions for this test are loading...", "info");
+            return;
+          }
+
+          if (test.id === 'ts_tre_4_0') {
+            // Curate distinct order for TRE 4.0 Mock
+            questions = [...questions].reverse();
+          }
+          questions = questions.slice(0, test.questionsCount);
         }
 
-        if (questions.length === 0) {
-          showToast("Questions for this test are loading...", "info");
-          return;
-        }
-
-        if (test.id === 'ts_tre_4_0') {
-          // Curate distinct order for TRE 4.0 Mock
-          questions = [...questions].reverse();
-        }
-        currentMockQuestions = questions.slice(0, test.questionsCount);
+        currentMockQuestions = questions;
         currentMockIndex = 0;
         mockUserAnswers = {};
         mockMarkedForReview = {};
@@ -9926,10 +10161,14 @@ summary:focus-visible,
         document.getElementById('test-taking-workspace').classList.remove('hidden');
 
         document.getElementById('tt-exam-name').textContent = test.title;
+        const liveBadge = document.getElementById('tt-live-mock-badge');
+        if (liveBadge) {
+          liveBadge.textContent = test.isSpeedDrill ? '10-MIN SPEED DRILL' : 'LIVE MOCK TEST';
+        }
 
         updatePageMeta({
-          title: `${test.title} (Live Mock) | ShaktiQ`,
-          description: `Attempt ${test.title} under official 2-hour timed exam conditions with real BPSC scoring rules on ShaktiQ.`,
+          title: `${test.title} (${test.isSpeedDrill ? '10-Min Live Drill' : 'Live Mock'}) | ShaktiQ`,
+          description: `Attempt ${test.title} under official timed exam conditions with real BPSC scoring rules on ShaktiQ.`,
           url: `https://shaktiq.com/#mock-${test.id}`,
           image: "https://shaktiq.com/share-card.png"
         });
@@ -10284,6 +10523,15 @@ summary:focus-visible,
       // Blank (Unattempted row): -1/3 (-0.33 penalty)
       const netScore = ((correct * 3 - wrong - blank) / 3).toFixed(2);
 
+      const isHindiMode = (ShaktiQBilingualEngine && ShaktiQBilingualEngine.currentLang === 'hi');
+      const isSpeed = activeMockTest && activeMockTest.isSpeedDrill;
+      const headingEl = document.getElementById('tt-result-heading');
+      if (headingEl) {
+        headingEl.textContent = isSpeed 
+          ? (isHindiMode ? '10-मिनट स्पीड ड्रिल पूर्ण!' : '10-Minute Speed Drill Completed!') 
+          : (isHindiMode ? 'परीक्षण पूर्ण हुआ!' : 'Test Completed!');
+      }
+
       document.getElementById('tt-result-exam-title').textContent = activeMockTest ? activeMockTest.title : "BPSC Mock Test";
       document.getElementById('tt-result-attempted').textContent = `${attempted} / ${validQuestions.length}`;
       document.getElementById('tt-result-correct').textContent = `${correct}`;
@@ -10407,6 +10655,9 @@ summary:focus-visible,
         blank: attemptLog.blank,
         totalMarks: attemptLog.totalQ
       });
+
+      // Populate Question-by-Question Explanations List in Result Modal (Feature 2.2)
+      renderResultQuestionsList(validQuestions, mockUserAnswers);
 
       document.getElementById('tt-result-modal').classList.remove('hidden');
     }
@@ -10680,6 +10931,120 @@ Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
       document.getElementById('test-taking-workspace').classList.add('hidden');
       document.getElementById('view-testseries').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================
+    // RESULT QUESTION EXPLANATIONS ENGINE (Feature 2.2)
+    // Instant Question-by-Question Explanations & Links
+    // ==========================================
+    function renderResultQuestionsList(questions, userAnswers) {
+      const container = document.getElementById('tt-result-questions-list');
+      const titleEl = document.getElementById('tt-result-explanations-title');
+      const subtitleEl = document.getElementById('tt-result-explanations-subtitle');
+      if (!container) return;
+
+      const isSpeed = activeMockTest && activeMockTest.isSpeedDrill;
+      const isHindi = (ShaktiQBilingualEngine && ShaktiQBilingualEngine.currentLang === 'hi');
+
+      if (titleEl) {
+        titleEl.textContent = isSpeed 
+          ? (isHindi ? '10-मिनट स्पीड ड्रिल: सभी 15 प्रश्नों के उत्तर व विस्तृत व्याख्या' : '10-Min Speed Drill: All 15 Question Explanations') 
+          : (isHindi ? 'प्रश्नों के उत्तर व आधिकारिक व्याख्या' : 'Question Explanations & Published Keys');
+      }
+
+      let correctCount = 0;
+      let wrongCount = 0;
+      questions.forEach((q, idx) => {
+        const uPick = userAnswers[idx];
+        if (uPick && uPick !== 'E') {
+          if (uPick === q.ans) correctCount++;
+          else wrongCount++;
+        }
+      });
+
+      if (subtitleEl) {
+        subtitleEl.textContent = `${questions.length} Qs (${correctCount} ✓ / ${wrongCount} ✗)`;
+      }
+
+      let listHtml = '';
+      questions.forEach((q, idx) => {
+        const userOpt = userAnswers[idx];
+        const isCorrect = (userOpt === q.ans);
+        const isSafeSkip = (userOpt === 'E');
+        const isBlank = !userOpt;
+
+        let statusPill = '';
+        let borderClass = 'border-[#E5ECE6]';
+        if (isSafeSkip) {
+          statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">${isHindi ? 'सुरक्षित छोड़ा (0)' : 'Safe Skip (0)'}</span>`;
+        } else if (isBlank) {
+          statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">${isHindi ? 'खाली छोड़ा (-1/3)' : 'Blank (-1/3)'}</span>`;
+          borderClass = 'border-rose-100';
+        } else if (isCorrect) {
+          statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ECF6E7] text-[#10402D] border border-[#C5DEC0]">✓ ${isHindi ? 'सही (+1.0)' : 'Correct (+1.0)'}</span>`;
+        } else {
+          statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">✗ ${isHindi ? 'गलत (-1/3)' : 'Wrong (-1/3)'}</span>`;
+          borderClass = 'border-rose-100';
+        }
+
+        const cleanStem = cleanQuestionStem(q.q || '');
+        const previewStem = cleanStem.length > 95 ? cleanStem.substring(0, 92) + '...' : cleanStem;
+
+        listHtml += `
+          <div class="p-3 rounded-xl bg-white border ${borderClass} shadow-2xs hover:border-[#10402D] transition space-y-1.5">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-md bg-[#F4F9F2] text-[#10402D] font-bold text-[11px] flex items-center justify-center shrink-0 border border-[#DCE6DF]">
+                  ${idx + 1}
+                </span>
+                <span class="text-xs font-semibold text-[#111C15]">${escapeHtml(q.subject || 'General Studies')}</span>
+              </div>
+              ${statusPill}
+            </div>
+            <p class="text-xs text-[#3B493F] leading-snug font-serif line-clamp-2">${escapeHtml(previewStem)}</p>
+            <div class="flex items-center justify-between gap-2 pt-1 border-t border-[#F0F4F1] text-xs">
+              <span class="text-[11px] text-[#526056]">
+                ${userOpt ? `Chosen: <strong>Opt ${userOpt}</strong>` : '<span class="text-rose-600 font-semibold">Not Attempted</span>'} 
+                • Key: <strong class="text-[#10402D]">Opt ${q.ans}</strong>
+              </span>
+              <button type="button" onclick="ttReviewSpecificSolution(${idx})" class="inline-flex items-center gap-1 text-[11px] font-bold text-[#10402D] hover:underline cursor-pointer">
+                <span>Read Explanation</span>
+                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = listHtml;
+      initIcons();
+    }
+
+    function ttReviewSpecificSolution(targetIdx) {
+      ttReviewSolutions();
+      currentReviewIndex = targetIdx;
+      buildFilteredReviewIndices();
+      renderCurrentSolutionQuestion();
+      renderSolutionPalette();
+      const targetEl = document.getElementById('sol-question-text');
+      if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function solPracticeInPyqBank() {
+      const currentQ = reviewMockQuestions[currentReviewIndex];
+      const subj = currentQ ? currentQ.subject : null;
+      document.getElementById('test-solution-workspace').classList.add('hidden');
+      openPyqBankMode();
+      if (subj) {
+        setTimeout(() => {
+          if (typeof selectSubjectFilter === 'function') {
+            selectSubjectFilter(subj);
+          } else {
+            const pill = document.querySelector(`[data-subject-pill="${subj}"]`);
+            if (pill) pill.click();
+          }
+        }, 150);
+      }
     }
 
     // ==========================================
@@ -11096,6 +11461,8 @@ Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
         if (typeof toggleMistakesFilter === 'function') toggleMistakesFilter(true);
       } else if (window.location.hash === '#test-series') {
         openTestSeriesMode();
+      } else if (window.location.hash === '#speed-drills') {
+        openSpeedDrills();
       } else if ((window.location.hash || '').toLowerCase().includes('#admin')) {
         openPyqBankMode();
         switchView('manage');
