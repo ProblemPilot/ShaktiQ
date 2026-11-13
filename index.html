@@ -166,6 +166,9 @@
   .sm\:flex {
     display: flex !important;
   }
+  .sm\:inline-flex {
+    display: inline-flex !important;
+  }
 }
 
 .mobile-bottom-bar {
@@ -3694,9 +3697,25 @@ summary:focus-visible,
             <button type="button" id="quickAddQuestionBtn" class="bg-white hover:bg-[#EBF3E6] text-[#10402D] font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-sm border border-white/80 transition flex items-center gap-1.5 cursor-pointer hidden">
               <span>+ Add Question</span>
             </button>
-            <button type="button" id="printPageBtn" class="bg-white hover:bg-[#EBF3E6] text-[#111C15] text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-[#DCE6DF] transition cursor-pointer">
-              Print / Save PDF
+            <!-- Desktop Print / Save PDF Button (>=640px) -->
+            <button type="button" id="printPageBtn" class="hidden sm:inline-flex items-center gap-1.5 bg-white hover:bg-[#EBF3E6] text-[#111C15] text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border border-[#DCE6DF] transition cursor-pointer">
+              <i data-lucide="printer" class="w-4 h-4 text-[#526056]"></i>
+              <span id="desktop-print-label">Print / Save PDF</span>
             </button>
+
+            <!-- Mobile Secondary "More" Menu (<640px) -->
+            <div class="relative sm:hidden inline-block" id="mobile-more-menu-wrapper">
+              <button type="button" id="mobileMoreMenuBtn" onclick="toggleMobileMoreMenu(event)" class="bg-white hover:bg-[#EBF3E6] text-[#111C15] text-xs font-semibold px-2.5 py-2 rounded-xl border border-[#DCE6DF] transition flex items-center gap-1.5 cursor-pointer shadow-2xs" aria-label="More options" aria-expanded="false">
+                <i data-lucide="more-horizontal" class="w-4 h-4 text-[#526056]"></i>
+                <span class="text-[11px] font-bold text-[#526056]">More</span>
+              </button>
+              <div id="mobileMoreMenuDropdown" class="hidden absolute left-0 mt-2 w-48 bg-white border border-[#DCE6DF] rounded-2xl shadow-xl py-1.5 z-50 transition-all">
+                <button type="button" id="mobilePrintPdfBtn" class="w-full text-left px-3.5 py-2.5 text-xs font-semibold text-[#111C15] hover:bg-[#EBF3E6] flex items-center gap-2.5 cursor-pointer">
+                  <i data-lucide="printer" class="w-4 h-4 text-[#10402D]"></i>
+                  <span id="mobile-more-label-print">Print / Save PDF</span>
+                </button>
+              </div>
+            </div>
             <div id="qb-auth-container" class="inline-flex items-center"></div>
           </div>
         </div>
@@ -4982,6 +5001,33 @@ summary:focus-visible,
         try { history.pushState(null, null, '#'); } catch(e){}
       }
     }
+
+    function toggleMobileMoreMenu(e) {
+      if (e && typeof e.stopPropagation === 'function') {
+        e.stopPropagation();
+      }
+      const menu = document.getElementById('mobileMoreMenuDropdown');
+      const btn = document.getElementById('mobileMoreMenuBtn');
+      if (!menu) return;
+      const isHidden = menu.classList.contains('hidden');
+      if (isHidden) {
+        menu.classList.remove('hidden');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+      } else {
+        menu.classList.add('hidden');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('mobile-more-menu-wrapper');
+      const menu = document.getElementById('mobileMoreMenuDropdown');
+      const btn = document.getElementById('mobileMoreMenuBtn');
+      if (wrapper && menu && !wrapper.contains(e.target)) {
+        menu.classList.add('hidden');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    });
 
     window.addEventListener('popstate', () => {
       if (window.location.hash === '#test-series') {
@@ -7298,6 +7344,8 @@ summary:focus-visible,
       setTxt('tt-mobile-label-unvisited', 'Not Visited', 'नहीं देखा');
       setTxt('tt-mobile-palette-continue-btn', 'Continue Test', 'परीक्षा जारी रखें');
       setTxt('tt-mobile-palette-submit-btn', 'Submit Test', 'परीक्षा जमा करें');
+      setTxt('desktop-print-label', 'Print / Save PDF', 'प्रिंट / पीडीएफ सहेजें');
+      setTxt('mobile-more-label-print', 'Print / Save PDF', 'प्रिंट / पीडीएफ सहेजें');
 
       const toastMsg = (lang === 'hi') 
         ? 'माध्यम हिन्दी में बदला गया (Medium set to Hindi)' 
@@ -7343,9 +7391,19 @@ summary:focus-visible,
       document.getElementById("quickAddQuestionBtn").addEventListener("click", () => {
         switchView("manage");
       });
-      document.getElementById("printPageBtn").addEventListener("click", () => {
-        window.print();
-      });
+      const printBtn = document.getElementById("printPageBtn");
+      if (printBtn) {
+        printBtn.addEventListener("click", () => {
+          window.print();
+        });
+      }
+      const mobPrintBtn = document.getElementById("mobilePrintPdfBtn");
+      if (mobPrintBtn) {
+        mobPrintBtn.addEventListener("click", () => {
+          window.print();
+          toggleMobileMoreMenu();
+        });
+      }
 
       // Group by subject & Show answers toggles
       document.getElementById("groupBySubjectToggle").addEventListener("change", (e) => {

@@ -348,7 +348,85 @@ async function runE2ETests() {
     console.log('[PASS] E2E: Admin tools strictly gated behind #admin and question creation verified.');
 
     // ----------------------------------------------------
-    // TEST 7: Console Errors Check
+    // TEST 7: Secondary "More" Menu & Print / Save PDF under 640px (1.5)
+    // ----------------------------------------------------
+    // Desktop check (1280px):
+    await page.setViewport({ width: 1280, height: 800 });
+    const desktopPrintStatus = await page.evaluate(() => {
+      const desktopBtn = document.getElementById('printPageBtn');
+      const mobileWrapper = document.getElementById('mobile-more-menu-wrapper');
+      const isVisible = (el) => el && window.getComputedStyle(el).display !== 'none';
+      return {
+        desktopVisible: isVisible(desktopBtn),
+        mobileWrapperHidden: !mobileWrapper || window.getComputedStyle(mobileWrapper).display === 'none'
+      };
+    });
+    if (!desktopPrintStatus.desktopVisible) {
+      throw new Error('Desktop "Print / Save PDF" (#printPageBtn) not visible at 1280px');
+    }
+    if (!desktopPrintStatus.mobileWrapperHidden) {
+      throw new Error('Mobile More menu wrapper (#mobile-more-menu-wrapper) should be hidden on desktop at 1280px');
+    }
+    console.log('[PASS] E2E: Desktop "Print / Save PDF" visible and mobile "More" menu hidden on >=640px.');
+
+    // Mobile check (360px):
+    await page.setViewport({ width: 360, height: 800 });
+    const mobileMoreStatus = await page.evaluate(() => {
+      const desktopBtn = document.getElementById('printPageBtn');
+      const mobileWrapper = document.getElementById('mobile-more-menu-wrapper');
+      const moreBtn = document.getElementById('mobileMoreMenuBtn');
+      const dropdown = document.getElementById('mobileMoreMenuDropdown');
+      const isVisible = (el) => el && window.getComputedStyle(el).display !== 'none';
+
+      const desktopHiddenOnMobile = !desktopBtn || window.getComputedStyle(desktopBtn).display === 'none';
+      const moreBtnVisibleOnMobile = isVisible(moreBtn);
+      const dropdownHiddenInitially = dropdown && dropdown.classList.contains('hidden');
+
+      // Click more button to open dropdown
+      if (typeof toggleMobileMoreMenu === 'function') {
+        toggleMobileMoreMenu();
+      }
+
+      const dropdownOpenNow = dropdown && !dropdown.classList.contains('hidden') && window.getComputedStyle(dropdown).display !== 'none';
+      const mobPrintBtn = document.getElementById('mobilePrintPdfBtn');
+      const printBtnInDropdownVisible = isVisible(mobPrintBtn);
+
+      // Close dropdown
+      toggleMobileMoreMenu();
+      const dropdownClosedAfterToggle = dropdown && (dropdown.classList.contains('hidden') || window.getComputedStyle(dropdown).display === 'none');
+
+      return {
+        desktopHiddenOnMobile,
+        moreBtnVisibleOnMobile,
+        dropdownHiddenInitially,
+        dropdownOpenNow,
+        printBtnInDropdownVisible,
+        dropdownClosedAfterToggle
+      };
+    });
+
+    if (!mobileMoreStatus.desktopHiddenOnMobile) {
+      throw new Error('Desktop #printPageBtn should be hidden on mobile <640px');
+    }
+    if (!mobileMoreStatus.moreBtnVisibleOnMobile) {
+      throw new Error('Mobile #mobileMoreMenuBtn should be visible on mobile <640px');
+    }
+    if (!mobileMoreStatus.dropdownHiddenInitially) {
+      throw new Error('#mobileMoreMenuDropdown should be hidden initially');
+    }
+    if (!mobileMoreStatus.dropdownOpenNow) {
+      throw new Error('#mobileMoreMenuDropdown failed to open on toggleMobileMoreMenu()');
+    }
+    if (!mobileMoreStatus.printBtnInDropdownVisible) {
+      throw new Error('#mobilePrintPdfBtn is not visible inside opened dropdown');
+    }
+    if (!mobileMoreStatus.dropdownClosedAfterToggle) {
+      throw new Error('#mobileMoreMenuDropdown failed to close on second toggle');
+    }
+    console.log('[PASS] E2E: Secondary "More" menu with "Print / Save PDF" verified on mobile <640px.');
+
+    // ----------------------------------------------------
+    // TEST 8: Console Errors Check
     // ----------------------------------------------------
     if (consoleErrors.length > 0) {
       console.warn(`[WARN] Console errors logged during test run:\n${consoleErrors.join('\n')}`);
