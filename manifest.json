@@ -2,7 +2,7 @@
   "name": "ShaktiQ – Bihar Exam Prep",
   "short_name": "ShaktiQ",
   "description": "Practice 2800+ BPSC PYQs based on published answer keys, 22 full-length tests on BPSC pattern, rapid revision sheets, and exam mnemonics",
-  "start_url": "/index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#F8FAF7",
   "theme_color": "#10402D",
