@@ -179,23 +179,28 @@
   }
 }
 
-/* Anti-Scraping & Copy Protection */
-.no-copy,
+/* Question Text Selection & Mouse Copying Enabled */
 #page-bpsc-pyq-view,
 #active-test-view,
 #test-review-modal,
+#test-solution-workspace,
 #modalQuestionContent,
 .question-card,
 .pyq-card,
 .practice-option-btn,
 .ans-box,
 .exam-question-item,
-[data-qid] {
-  -webkit-user-select: none !important;
-  -moz-user-select: none !important;
-  -ms-user-select: none !important;
-  user-select: none !important;
-  -webkit-touch-callout: none !important;
+[data-qid],
+#tt-question-text,
+#tt-options-container,
+#sol-question-text,
+#sol-options-container,
+#sol-explanation-text {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default !important;
 }
 
 

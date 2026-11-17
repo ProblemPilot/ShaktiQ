@@ -223,3 +223,26 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
   - Matched the font size and styling of the Daily Abhyas target count (`#abhyas-daily-target-label`) with the solved count (`#abhyas-solved-today`).
   - Both numbers now consistently render as `text-2xl sm:text-3xl font-display font-black text-[#10402D]` separated by an aligned `/` divider, giving equal visual balance to `30 / 100`.
 - **Verification**: 38/38 automated regression tests passed. Full JavaScript compilation verified with 0 syntax errors. SHA-256 question bank checksums byte-identical.
+
+
+---
+
+## Feature: Mouse Text Selection and Copying for Questions
+- **Status**: PASSED
+- **Changes Implemented**:
+  1. *Mouse Text Selection Enabled in CSS*:
+     - Removed `-webkit-user-select: none !important; user-select: none !important;` from question containers in `css/styles.css`.
+     - Explicitly enabled text selection (`user-select: text !important; -webkit-user-select: text !important;`) across `#page-bpsc-pyq-view`, `.question-card`, `.pyq-card`, `#active-test-view`, `#test-solution-workspace`, `#test-review-modal`, `#modalQuestionContent`, `.ans-box`, and question statements (`#tt-question-text`, `#sol-question-text`, etc.).
+     - Students can now freely highlight and select question stems, options, and explanations with their mouse cursor.
+  2. *Right-Click Context Menu Unblocked*:
+     - Removed `e.preventDefault()` on `contextmenu` event listeners in `js/app.js` (`initContentProtection()`).
+     - Right-click mouse context menu is restored on questions, enabling native "Copy" from the mouse context menu.
+  3. *Clipboard Copy Event Unblocked*:
+     - Removed the hijacking `copy` event listener that overwrote copied text with copyright warning text. Users can now copy their selected text cleanly.
+  4. *Enhanced 1-Click Mouse Copy Buttons*:
+     - Enhanced `[data-copy]` on PYQ cards in `js/question-bank.js`: copies bilingual question/answer/explanation matching active card language, with visual `"✓ Copied"` button feedback.
+     - Added dedicated mouse 1-click "Copy" buttons to the active Mock Test question header (`ttCopyCurrentQuestion`) and dedicated Solution Workspace question header (`solCopyCurrentQuestion`).
+- **Verification**:
+  - All 38/38 automated regression tests passed (100%).
+  - Zero JavaScript syntax errors across all modules.
+  - Question bank SHA-256 data checksums byte-identical.

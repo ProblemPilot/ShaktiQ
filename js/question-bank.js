@@ -1732,15 +1732,37 @@
         });
       });
 
-      // Copy question
+      // Copy question with mouse click
       container.querySelectorAll("[data-copy]").forEach(btn => {
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
           const qid = btn.getAttribute("data-copy");
           const item = getAllQuestions().find(x => x.id === qid);
           if (!item) return;
-          const text = `[${item.exam} | ${item.date} | ${item.subject}] ${item.qno}. ${item.q}\n${(item.options || []).join("\n")}\nAnswer: ${item.ansText}\nExplanation: ${item.exp}`;
+          
+          let qText = item.q;
+          let opts = item.options || [];
+          let expText = item.exp || '';
+          const qTextEl = document.getElementById('pyq-qtext-' + qid);
+          const isHi = qTextEl && qTextEl.getAttribute('data-lang') === 'hi';
+          if (isHi && typeof ShaktiQBilingualEngine !== 'undefined') {
+            const cached = ShaktiQBilingualEngine.getCachedQuestion(qid || item.q);
+            if (cached) {
+              if (cached.q) qText = cached.q;
+              if (cached.options && cached.options.length) opts = cached.options;
+              if (cached.exp) expText = cached.exp;
+            }
+          }
+          const text = `[${item.exam || 'BPSC'} | ${item.date || ''} | ${item.subject || ''}] ${item.qno || ''}. ${cleanQuestionStem(qText)}\n${(opts || []).join("\n")}\nAnswer: ${item.ansText || item.ans || ''}\nExplanation: ${expText}`;
           copyTextSafe(text);
-          showToast("Question & explanation copied to clipboard!");
+          const origHtml = btn.innerHTML;
+          btn.innerHTML = '<span class="text-emerald-700 font-bold">✓ Copied</span>';
+          btn.classList.add('bg-emerald-50', 'border-emerald-300');
+          setTimeout(() => {
+            btn.innerHTML = origHtml;
+            btn.classList.remove('bg-emerald-50', 'border-emerald-300');
+          }, 2000);
+          showToast("Question & explanation copied to clipboard!", "success");
         });
       });
 

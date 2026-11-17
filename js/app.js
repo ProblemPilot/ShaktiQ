@@ -1392,44 +1392,23 @@
 
 
     // ==========================================
-    // ANTI-SCRAPING & CONTENT PROTECTION SUITE
+    // CONTENT INTEGRITY & ACCESSIBILITY SUITE
     // ==========================================
     function initContentProtection() {
-      // 1. Block Context Menu (Right-Click) on Question Views
-      document.addEventListener('contextmenu', function(e) {
-        const protectedTarget = e.target.closest('#page-bpsc-pyq-view, #active-test-view, #test-review-modal, #modalQuestionContent, .question-card, .pyq-card');
-        if (protectedTarget) {
-          e.preventDefault();
-          showToast('Right-click inspection is disabled on ShaktiQ to protect exam content.', 'warning');
-        }
-      });
+      // Question text selection and mouse copying (contextmenu / right-click) are explicitly enabled
+      // for student study, active recall, notes, and revision.
 
-      // 2. Block Copy Shortcut (Ctrl+C / Cmd+C) on Question Content
-      document.addEventListener('copy', function(e) {
-        const sel = window.getSelection();
-        if (sel && sel.anchorNode && sel.anchorNode.parentElement) {
-          const protectedTarget = sel.anchorNode.parentElement.closest('#page-bpsc-pyq-view, #active-test-view, #test-review-modal, #modalQuestionContent, .question-card, .pyq-card');
-          if (protectedTarget) {
-            e.preventDefault();
-            if (e.clipboardData) {
-              e.clipboardData.setData('text/plain', 'Questions and test materials are protected under copyright. Practise online at https://shaktiq.com');
-            }
-            showToast('Copying question content is restricted on ShaktiQ.', 'warning');
-          }
-        }
-      });
-
-      // 3. Block Inspection & Source View Shortcuts (F12, Ctrl+U, Ctrl+Shift+I, Ctrl+S)
+      // Developer Tools Shortcut Safeguards (F12, Ctrl+U, Ctrl+Shift+I)
       document.addEventListener('keydown', function(e) {
         if (
           e.key === 'F12' ||
           ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) ||
           ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) ||
           ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) ||
-          ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c'))
+          ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j'))
         ) {
           e.preventDefault();
-          showToast('Keyboard shortcuts are disabled to protect examination integrity.', 'warning');
+          showToast('Inspection shortcuts are disabled.', 'warning');
         }
       });
     

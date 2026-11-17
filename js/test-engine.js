@@ -2483,6 +2483,77 @@ Practice 2,800+ Official BPSC PYQs & 22 Full Mocks at https://shaktiq.com`;
       showToast("Returned to BPSC Mock Test Series.", "info");
     }
 
+
+    function ttCopyCurrentQuestion() {
+      if (!currentMockQuestions || !currentMockQuestions[currentMockIndex]) return;
+      const q = currentMockQuestions[currentMockIndex];
+      const isHi = (typeof ShaktiQBilingualEngine !== 'undefined' && ShaktiQBilingualEngine.currentLang === 'hi');
+      let qText = q.q;
+      let opts = q.options ? [...q.options] : [];
+      if (isHi && typeof ShaktiQBilingualEngine !== 'undefined') {
+        const cached = ShaktiQBilingualEngine.getCachedQuestion(q.id || q.q);
+        if (cached) {
+          if (cached.q) qText = cached.q;
+          if (cached.options && cached.options.length) opts = cached.options;
+        }
+      }
+      const optsFormatted = (opts || []).map((o, idx) => {
+        const letter = String.fromCharCode(65 + idx);
+        const text = typeof o === 'string' ? o : (o.text || '');
+        return letter + '. ' + (typeof stripOptionPrefix === 'function' ? stripOptionPrefix(text) : text);
+      }).join('\n');
+      const textToCopy = `[Mock Test | Question ${currentMockIndex + 1}]\n${typeof cleanQuestionStem === 'function' ? cleanQuestionStem(qText) : qText}\n${optsFormatted}`;
+      if (typeof copyTextSafe === 'function') {
+        copyTextSafe(textToCopy);
+      } else {
+        fallbackCopyText(textToCopy);
+      }
+      const btn = document.getElementById('tt-copy-q-btn');
+      if (btn) {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span class="text-emerald-700 font-bold">✓ Copied</span>';
+        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+      }
+      showToast('Question copied to clipboard!', 'success');
+    }
+    window.ttCopyCurrentQuestion = ttCopyCurrentQuestion;
+
+    function solCopyCurrentQuestion() {
+      if (!reviewMockQuestions || !reviewMockQuestions[currentReviewIndex]) return;
+      const q = reviewMockQuestions[currentReviewIndex];
+      const isHi = (typeof ShaktiQBilingualEngine !== 'undefined' && ShaktiQBilingualEngine.currentLang === 'hi');
+      let qText = q.q;
+      let opts = q.options ? [...q.options] : [];
+      let expText = q.exp || '';
+      if (isHi && typeof ShaktiQBilingualEngine !== 'undefined') {
+        const cached = ShaktiQBilingualEngine.getCachedQuestion(q.id || q.q);
+        if (cached) {
+          if (cached.q) qText = cached.q;
+          if (cached.options && cached.options.length) opts = cached.options;
+          if (cached.exp) expText = cached.exp;
+        }
+      }
+      const optsFormatted = (opts || []).map((o, idx) => {
+        const letter = String.fromCharCode(65 + idx);
+        const text = typeof o === 'string' ? o : (o.text || '');
+        return letter + '. ' + (typeof stripOptionPrefix === 'function' ? stripOptionPrefix(text) : text);
+      }).join('\n');
+      const textToCopy = `[Mock Test Solution | Question ${currentReviewIndex + 1}]\n${typeof cleanQuestionStem === 'function' ? cleanQuestionStem(qText) : qText}\n${optsFormatted}\n\nCorrect Answer: Option ${q.ans}\nExplanation: ${expText}`;
+      if (typeof copyTextSafe === 'function') {
+        copyTextSafe(textToCopy);
+      } else {
+        fallbackCopyText(textToCopy);
+      }
+      const btn = document.getElementById('sol-copy-q-btn');
+      if (btn) {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span class="text-emerald-700 font-bold">✓ Copied</span>';
+        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+      }
+      showToast('Question & solution copied to clipboard!', 'success');
+    }
+    window.solCopyCurrentQuestion = solCopyCurrentQuestion;
+
     function backToTestResultModal() {
       document.getElementById('test-solution-workspace').classList.add('hidden');
       document.getElementById('tt-result-modal').classList.remove('hidden');
@@ -2548,6 +2619,8 @@ if (typeof window !== 'undefined') {
   window.solPrevQuestion = solPrevQuestion;
   window.exitTestSolutionReview = exitTestSolutionReview;
   window.backToTestResultModal = backToTestResultModal;
+  window.ttCopyCurrentQuestion = ttCopyCurrentQuestion;
+  window.solCopyCurrentQuestion = solCopyCurrentQuestion;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
