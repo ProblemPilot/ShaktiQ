@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v14';
+const CACHE_VERSION = 'v15';
 const CACHE_NAME = `shaktiq-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `shaktiq-data-${CACHE_VERSION}`;
 
