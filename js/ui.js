@@ -296,8 +296,18 @@ function initIcons() {
       } else if (window.location.hash === '#mistakes') {
         openPyqBankMode();
         if (typeof toggleMistakesFilter === 'function') toggleMistakesFilter(true);
-      } else if (window.location.hash === '#pyq-bank' || window.location.hash === '#practice-bpsc-pyq') {
+      } else if (window.location.hash.startsWith('#pyq-bank') || window.location.hash.startsWith('#practice-bpsc-pyq')) {
         openPyqBankMode();
+        const hash = window.location.hash;
+        const match = hash.match(/[?&]subject=([^&]+)/i);
+        if (match && match[1]) {
+          const decoded = decodeURIComponent(match[1]);
+          setTimeout(() => {
+            if (typeof selectSubjectPractice === 'function') {
+              selectSubjectPractice(decoded, { autoScroll: true });
+            }
+          }, 150);
+        }
       } else if ((window.location.hash || '').toLowerCase().includes('#admin')) {
         openPyqBankMode();
         switchView('manage');
@@ -393,9 +403,13 @@ function switchRevisionTab(tabKey) {
     function jumpToSubjectPractice(subjectName) {
       openPyqBankMode();
       setTimeout(() => {
-        const pill = document.querySelector(`[data-subject="${subjectName}"]`);
-        if (pill) pill.click();
-      }, 200);
+        if (typeof selectSubjectPractice === 'function') {
+          selectSubjectPractice(subjectName, { autoScroll: true });
+        } else {
+          const pill = document.querySelector(`[data-subject="${subjectName}"]`);
+          if (pill) pill.click();
+        }
+      }, 150);
     }
 
     // Daily Abhyas Goal & Progress Tracker (Genuine 24-Hour Cycle with Midnight Reset)

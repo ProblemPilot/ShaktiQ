@@ -1638,3 +1638,25 @@ summary:focus-visible,
 #sol-palette-grid::-webkit-scrollbar-thumb:hover {
   background: #10402D;
 }
+
+/* Auto-scroll target highlighting for unattempted resume */
+@keyframes resumeTargetPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 64, 45, 0.45);
+    border-color: #10402D;
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(16, 64, 45, 0.2);
+    border-color: #10402D;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 64, 45, 0);
+    border-color: #DCE6DF;
+  }
+}
+
+.resume-target-highlight {
+  animation: resumeTargetPulse 1.8s ease-in-out 2;
+  border-color: #10402D !important;
+}
+

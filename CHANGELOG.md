@@ -246,3 +246,29 @@ Karpathy loop execution log: every unit, attempt, measurement, check result, and
   - All 38/38 automated regression tests passed (100%).
   - Zero JavaScript syntax errors across all modules.
   - Question bank SHA-256 data checksums byte-identical.
+
+---
+
+## Feature: Auto-Scroll and Resume at First Unticked Question by Subject
+- **Status**: PASSED
+- **User Problem Addressed**: When students study a subject (e.g. Physics or Economics) toward a 5-day or 10-day target (solving ~20 questions per day), returning the next day showed previously completed questions ticked, but required tedious manual scrolling through all answered questions to reach Question 21 (or the first unattended question).
+- **Changes Implemented**:
+  1. *Automatic Scroll on Subject Selection*:
+     - Implemented `selectSubjectPractice(subjectName, { autoScroll: true })` in `js/question-bank.js`.
+     - When navigating to any subject (via subject pill, landing page topic links `jumpToSubjectPractice('Physics')`, or `#pyq-bank?subject=...`), ShaktiQ automatically identifies the first unattended question index (`firstUnattendedIndex`).
+     - Smoothly auto-scrolls down to that question with proper `scroll-mt-28` offset so the question top and badges sit cleanly below the sticky navigation header without occlusion.
+     - Dynamic pagination handling: if the first pending question is beyond `displayLimit` (e.g. Question 76 when `displayLimit` was 60), `displayLimit` is automatically expanded so the card is rendered immediately in the DOM without requiring manual "Show More Questions" clicks.
+  2. *Visual Indicator & Resume Target Highlight*:
+     - The first unattended question card receives a subtle brand-green focus ring pulse (`resume-target-highlight`) and a clear badge: `[📍 Next to Solve • Q21]`.
+     - In-place option selections and answer reviews remain anchored at their current scroll position without jarring auto-scroll.
+  3. *Live Subject Strip "⚡ Resume at Q..." Quick Jump Button*:
+     - Added `#btnResumeNextUnattended` inside `#subjectProgressStrip` in `index.html`.
+     - Whenever a subject with pending questions is active, this button displays the next question number (`⚡ Resume at Q21`) and enables 1-tap scrolling directly to it from anywhere on the page.
+  4. *Service Worker & Cache Freshness*:
+     - Bumped `CACHE_VERSION` in `sw.js` to `v16` (`shaktiq-cache-v16`, `shaktiq-data-v16`) for instant client-side cache refresh.
+- **Verification**:
+  - Full verification suite passed (5/5 suites, 0 failures).
+  - Headless E2E test added (`TEST 16: Auto-Scroll & Resume at First Unticked Question`) passing for Physics (Q21) and Economics (Q36).
+  - Checksum test verified byte-identical SHA-256 for question dataset.
+  - Zero console errors logged across navigation.
+

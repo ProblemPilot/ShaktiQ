@@ -1450,7 +1450,73 @@ async function runE2ETests() {
     console.log('[PASS] E2E: Preparation for More Exam Packs (BSSC, TRE 4.0) verified: clean modular registry, dropInPackData schema validation, BSSC clean placeholder card with strict 0-invented-question guarantee, and bilingual synchronization.');
 
     // ----------------------------------------------------
-    // TEST 16: Console Errors Check
+    // TEST 16: Auto-Scroll & Resume at First Unticked Question (Physics & Economics)
+    // ----------------------------------------------------
+    const autoScrollAudit = await page.evaluate(async () => {
+      openPyqBankMode();
+      
+      // Select Physics and mark first 20 questions as attempted
+      const physicsQuestions = getAllQuestions().filter(q => q.subject === 'Physics');
+      for (let i = 0; i < 20; i++) {
+        userAttempts[physicsQuestions[i].id] = physicsQuestions[i].ans || 'A';
+      }
+
+      // Trigger selectSubjectPractice for Physics
+      selectSubjectPractice('Physics', { autoScroll: true });
+
+      // Verify question 21 is rendered and has the resume target attributes
+      const q21Item = physicsQuestions[20];
+      const q21Card = document.getElementById('qcard-' + q21Item.id);
+      const resumeBtn = document.getElementById('btnResumeNextUnattended');
+      const resumeBadge = document.getElementById('resumeQNumBadge');
+
+      const physicsCheck = {
+        cardExists: !!q21Card,
+        cardIndex: q21Card ? q21Card.getAttribute('data-index') : null,
+        resumeBtnVisible: resumeBtn ? !resumeBtn.classList.contains('hidden') : false,
+        resumeBadgeText: resumeBadge ? resumeBadge.textContent.trim() : null,
+        hasResumeBadge: q21Card ? q21Card.innerHTML.includes('Next to Solve • Q21') : false
+      };
+
+      // Select Economics and mark first 35 questions as attempted
+      const econQuestions = getAllQuestions().filter(q => q.subject === 'Economics');
+      for (let i = 0; i < 35; i++) {
+        userAttempts[econQuestions[i].id] = econQuestions[i].ans || 'B';
+      }
+
+      selectSubjectPractice('Economics', { autoScroll: true });
+
+      const q36Item = econQuestions[35];
+      const q36Card = document.getElementById('qcard-' + q36Item.id);
+
+      const econCheck = {
+        cardExists: !!q36Card,
+        cardIndex: q36Card ? q36Card.getAttribute('data-index') : null,
+        resumeBtnVisible: resumeBtn ? !resumeBtn.classList.contains('hidden') : false,
+        resumeBadgeText: resumeBadge ? resumeBadge.textContent.trim() : null,
+        hasResumeBadge: q36Card ? q36Card.innerHTML.includes('Next to Solve • Q36') : false
+      };
+
+      // Clean up simulated attempts
+      for (let i = 0; i < 20; i++) delete userAttempts[physicsQuestions[i].id];
+      for (let i = 0; i < 35; i++) delete userAttempts[econQuestions[i].id];
+      selectSubjectPractice('ALL', { autoScroll: false });
+
+      return { physicsCheck, econCheck };
+    });
+
+    if (!autoScrollAudit.physicsCheck.cardExists || autoScrollAudit.physicsCheck.cardIndex !== '21' || !autoScrollAudit.physicsCheck.resumeBtnVisible || autoScrollAudit.physicsCheck.resumeBadgeText !== 'Q21') {
+      throw new Error(`Physics auto-scroll resume failed: ${JSON.stringify(autoScrollAudit.physicsCheck)}`);
+    }
+
+    if (!autoScrollAudit.econCheck.cardExists || autoScrollAudit.econCheck.cardIndex !== '36' || !autoScrollAudit.econCheck.resumeBtnVisible || autoScrollAudit.econCheck.resumeBadgeText !== 'Q36') {
+      throw new Error(`Economics auto-scroll resume failed: ${JSON.stringify(autoScrollAudit.econCheck)}`);
+    }
+
+    console.log('[PASS] E2E: Auto-Scroll to First Unticked Question verified (Physics Q21, Economics Q36, Resume badges & jump strip buttons intact).');
+
+    // ----------------------------------------------------
+    // TEST 17: Console Errors Check
     // ----------------------------------------------------
     if (consoleErrors.length > 0) {
       console.warn(`[WARN] Console errors logged during test run:\n${consoleErrors.join('\n')}`);

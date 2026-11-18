@@ -658,7 +658,11 @@ let currentMockQuestions = [];
       renderSubjectPills();
       updateSubjectProgressUI();
       renderQuestions();
-      window.scrollTo({ top: 320, behavior: 'smooth' });
+      if (typeof selectSubjectPractice === 'function') {
+        selectSubjectPractice(subject, { autoScroll: true });
+      } else {
+        window.scrollTo({ top: 320, behavior: 'smooth' });
+      }
     }
 
     function switchStudentAccount() {

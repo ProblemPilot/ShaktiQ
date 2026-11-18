@@ -3146,6 +3146,10 @@
           </div>
         </div>
         <div class="flex items-center gap-2 shrink-0 flex-wrap">
+          <button type="button" onclick="scrollToNextUnattendedQuestion()" id="btnResumeNextUnattended" class="hidden px-3.5 py-1.5 rounded-xl font-bold text-xs bg-[#10402D] hover:bg-[#17593F] text-white transition cursor-pointer shadow-2xs flex items-center gap-1.5" title="Jump directly to first unattended question">
+            <span>⚡ Resume at</span>
+            <span id="resumeQNumBadge" class="bg-white/20 text-white px-1.5 py-0.5 rounded-md text-[10px] font-mono">Q21</span>
+          </button>
           <button type="button" onclick="setPracticeStatusFilter('all')" id="filterStatusBtn-all" class="px-3 py-1.5 rounded-xl font-bold text-xs bg-[#10402D] text-white transition cursor-pointer shadow-2xs">
             All Questions
           </button>

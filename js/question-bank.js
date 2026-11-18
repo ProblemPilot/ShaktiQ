@@ -1093,11 +1093,8 @@
 
       container.querySelectorAll(".subject-pill").forEach(btn => {
         btn.addEventListener("click", () => {
-          selectedSubject = btn.getAttribute("data-subject");
-          displayLimit = 60;
-          renderSubjectPills();
-          updateSubjectProgressUI();
-          renderQuestions();
+          const subj = btn.getAttribute("data-subject");
+          selectSubjectPractice(subj, { autoScroll: true });
         });
       });
 
@@ -1140,6 +1137,19 @@
       if (unattEl) unattEl.textContent = `${unattempted} Unattempted`;
       if (totEl) totEl.textContent = `(${total} Total Questions • ${pct}% Completed)`;
       if (barEl) barEl.style.width = `${pct}%`;
+
+      const resumeBtn = document.getElementById('btnResumeNextUnattended');
+      const resumeBadge = document.getElementById('resumeQNumBadge');
+      if (resumeBtn) {
+        const filtered = getFilteredQuestions();
+        const firstUnattIdx = filtered.findIndex(item => !userAttempts[item.id]);
+        if (firstUnattIdx > 0 && currentSubj !== 'ALL') {
+          resumeBtn.classList.remove('hidden');
+          if (resumeBadge) resumeBadge.textContent = `Q${firstUnattIdx + 1}`;
+        } else {
+          resumeBtn.classList.add('hidden');
+        }
+      }
 
       const btnAll = document.getElementById('filterStatusBtn-all');
       const btnUnatt = document.getElementById('filterStatusBtn-unattempted');
@@ -1271,7 +1281,7 @@
       return item.type === "Mains" || item.ans === "Mains" || !Array.isArray(item.options) || item.options.length === 0;
     }
 
-    function buildQuestionCardHtml(item, idx) {
+    function buildQuestionCardHtml(item, idx, isResumeTarget = false) {
       const displayIndex = (typeof idx === 'number' && !isNaN(idx)) ? (idx + 1) : 1;
       const subjBadgeClass = SUBJECT_COLORS[item.subject] || "bg-slate-100 text-slate-800 border-slate-200";
       const isBookmarked = !!bookmarkedIds[item.id];
@@ -1364,7 +1374,7 @@
 
       const langToggleLabel = useHindi ? 'English' : 'हिन्दी';
 
-      return `<article class="question-card bg-white rounded-2xl shadow-sm border border-[#DCE6DF] p-4 sm:p-6 transition hover:border-[#10402D] text-[#111C15]">
+      return `<article id="qcard-${escapeHtml(item.id)}" data-qid="${escapeHtml(item.id)}" data-index="${displayIndex}" data-attempted="${isAttempted ? '1' : '0'}" class="question-card bg-white rounded-2xl shadow-sm border border-[#DCE6DF] p-4 sm:p-6 transition hover:border-[#10402D] text-[#111C15] scroll-mt-28 ${isResumeTarget ? 'ring-2 ring-[#10402D]' : ''}">
         <!-- Top Metadata Badges: Uniform Dark Green Background with White Text -->
         <div class="flex items-center justify-between gap-2 flex-wrap mb-2.5">
           <div class="flex items-center gap-2 flex-wrap">
@@ -1382,6 +1392,11 @@
               <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${userChoice === item.ans ? 'bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]' : 'bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]'} flex items-center gap-1 shadow-2xs">
                 <i data-lucide="${userChoice === item.ans ? 'check-circle' : 'alert-circle'}" class="w-3.5 h-3.5"></i>
                 <span>Previously Attempted (Selected ${userChoice}) • ${userChoice === item.ans ? 'Correct' : 'Needs Review'}</span>
+              </span>
+            ` : ''}
+            ${isResumeTarget ? `
+              <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] flex items-center gap-1 shadow-2xs">
+                <span>📍 Next to Solve • Q${displayIndex}</span>
               </span>
             ` : ''}
           </div>
@@ -1492,7 +1507,8 @@
       attachQuestionCardListeners();
     }
 
-    function renderQuestions() {
+    function renderQuestions(renderOpts = {}) {
+      const autoScroll = !!(renderOpts && renderOpts.autoScrollToPending);
       const filtered = getFilteredQuestions();
       const countLabel = document.getElementById("filteredCountLabel");
       if (countLabel) countLabel.textContent = filtered.length;
@@ -1587,6 +1603,17 @@
         </div>`;
       }
 
+      // Find index of first unattempted question in this filtered list
+      const firstUnattendedIndex = filtered.findIndex(item => !userAttempts[item.id]);
+
+      // If auto-scroll is requested and the target question is beyond current displayLimit,
+      // expand displayLimit so that the card is rendered in the DOM
+      if (autoScroll && selectedSubject !== "ALL" && firstUnattendedIndex > 0) {
+        if (firstUnattendedIndex >= displayLimit) {
+          displayLimit = Math.max(displayLimit, Math.ceil((firstUnattendedIndex + 1) / 60) * 60);
+        }
+      }
+
       const sliced = filtered.slice(0, displayLimit);
 
       if (groupBySubject && selectedSubject === "ALL") {
@@ -1649,7 +1676,7 @@
         container.innerHTML = mistakeBannerHtml + sectionsHtml;
       } else {
         if (jumpBar) jumpBar.classList.add("hidden");
-        container.innerHTML = mistakeBannerHtml + `<div class="space-y-3.5">${sliced.map((item, i) => buildQuestionCardHtml(item, i)).join("")}</div>`;
+        container.innerHTML = mistakeBannerHtml + `<div class="space-y-3.5">${sliced.map((item, i) => buildQuestionCardHtml(item, i, i === firstUnattendedIndex && firstUnattendedIndex > 0)).join("")}</div>`;
       }
 
       if (loadMoreWrapper) {
@@ -1665,6 +1692,67 @@
       }
 
       attachQuestionCardListeners();
+
+      if (autoScroll && selectedSubject !== "ALL" && firstUnattendedIndex > 0) {
+        scrollToNextUnattendedQuestion(true);
+      }
+    }
+
+    function scrollToNextUnattendedQuestion(smooth = true) {
+      const filtered = getFilteredQuestions();
+      if (!filtered || filtered.length === 0) return false;
+
+      const firstUnattendedIndex = filtered.findIndex(item => !userAttempts[item.id]);
+      if (firstUnattendedIndex === -1) {
+        if (typeof showToast === 'function') {
+          const subjName = selectedSubject === 'ALL' ? 'Question Bank' : selectedSubject;
+          showToast(`All questions in ${subjName} completed! 🎉`, 'success');
+        }
+        return false;
+      }
+
+      if (firstUnattendedIndex >= displayLimit) {
+        displayLimit = Math.max(displayLimit, Math.ceil((firstUnattendedIndex + 1) / 60) * 60);
+        renderQuestions({ autoScrollToPending: false });
+      }
+
+      const targetItem = filtered[firstUnattendedIndex];
+      if (!targetItem) return false;
+
+      setTimeout(() => {
+        const el = document.getElementById('qcard-' + targetItem.id) || document.querySelector(`[data-qid="${targetItem.id}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+          el.classList.remove('resume-target-highlight');
+          void el.offsetWidth;
+          el.classList.add('resume-target-highlight');
+          setTimeout(() => {
+            el.classList.remove('resume-target-highlight');
+          }, 3600);
+
+          if (firstUnattendedIndex > 0 && typeof showToast === 'function') {
+            const qNum = firstUnattendedIndex + 1;
+            const subjName = selectedSubject === 'ALL' ? 'Questions' : selectedSubject;
+            showToast(`📍 Scrolled to Q${qNum} in ${subjName} (First unattended question)`, 'info');
+          }
+        }
+      }, 100);
+
+      return true;
+    }
+
+    function selectSubjectPractice(subjectName, options = {}) {
+      selectedSubject = subjectName || 'ALL';
+      if (selectedSubject !== 'ALL') {
+        try {
+          localStorage.setItem('shaktiq_last_subject', selectedSubject);
+        } catch (e) {}
+      }
+      displayLimit = 60;
+      renderSubjectPills();
+      updateSubjectProgressUI();
+      const autoScroll = options.autoScroll !== undefined ? options.autoScroll : true;
+      renderQuestions({ autoScrollToPending: autoScroll });
     }
 
     function attachQuestionCardListeners() {
@@ -1838,11 +1926,9 @@
 
         grid.querySelectorAll("[data-jump-subject]").forEach(btn => {
           btn.addEventListener("click", () => {
-            selectedSubject = btn.getAttribute("data-jump-subject");
-            displayLimit = 100;
+            const subj = btn.getAttribute("data-jump-subject");
             switchView("bank");
-            renderSubjectPills();
-            renderQuestions();
+            selectSubjectPractice(subj, { autoScroll: true });
           });
         });
       }
@@ -2191,6 +2277,8 @@ if (typeof window !== 'undefined') {
   window.populateExamDropdowns = populateExamDropdowns;
   window.isMainsDescriptiveQuestion = isMainsDescriptiveQuestion;
   window.buildQuestionCardHtml = buildQuestionCardHtml;
+  window.selectSubjectPractice = selectSubjectPractice;
+  window.scrollToNextUnattendedQuestion = scrollToNextUnattendedQuestion;
   window.togglePyqCardLang = togglePyqCardLang;
   window.renderPyqCardOptions = renderPyqCardOptions;
   window.renderQuestions = renderQuestions;
@@ -2213,6 +2301,8 @@ if (typeof module !== 'undefined' && module.exports) {
     getAllQuestions,
     renderQuestions,
     renderSubjectPills,
+    selectSubjectPractice,
+    scrollToNextUnattendedQuestion,
     SUBJECT_ORDER,
     SUBJECT_COLORS,
     isAdminMode
