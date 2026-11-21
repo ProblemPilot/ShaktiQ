@@ -683,22 +683,153 @@
           </a>
         </div>
       </section>
+      <!-- 4. KEY PLATFORM STATS & TRUST STRIP -->
+      <section class="sq-stats-section" aria-label="Platform Highlights">
+        <div class="sq-stats-grid">
+          <div class="sq-stat-card">
+            <div class="sq-stat-num">2,809</div>
+            <div class="sq-stat-label">Authentic Past Questions</div>
+            <div class="sq-stat-sub">Strictly from official BPSC &amp; Bihar exams</div>
+          </div>
+          <div class="sq-stat-card">
+            <div class="sq-stat-num">22</div>
+            <div class="sq-stat-label">Full 150-Q Mocks</div>
+            <div class="sq-stat-sub">120-minute timed official simulation</div>
+          </div>
+          <div class="sq-stat-card">
+            <div class="sq-stat-num">10-Min</div>
+            <div class="sq-stat-label">Rapid Speed Drills</div>
+            <div class="sq-stat-sub">15 questions under official negative marking</div>
+          </div>
+          <div class="sq-stat-card">
+            <div class="sq-stat-num">100% Free</div>
+            <div class="sq-stat-label">Zero Commercial Paywalls</div>
+            <div class="sq-stat-sub">DPDP 2023 compliant &amp; offline ready</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. WHY ASPIRANTS TRUST SHAKTIQ -->
+      <section class="sq-features-section" aria-labelledby="sq-features-title">
+        <div class="sq-features-header">
+          <span class="sq-features-pill">BUILT FOR ACTIVE RECALL</span>
+          <h2 id="sq-features-title" class="sq-features-title">Everything you need for Bihar Prelims mastery</h2>
+          <p class="sq-features-subtitle">Zero fluff, no commercial coaching courses—just genuine papers, precise marking, and calm, distraction-free practice.</p>
+        </div>
+        
+        <div class="sq-features-grid">
+          <div class="sq-feature-card">
+            <div class="sq-feature-icon-box">
+              <i data-lucide="award" class="w-5 h-5 text-[#10402D]"></i>
+            </div>
+            <h3 class="sq-feature-name">Official BPSC Marking</h3>
+            <p class="sq-feature-desc">+1.0 mark for correct answers, -1/3 negative deduction, and 5-option format with Option E safe-skip simulation.</p>
+          </div>
+
+          <div class="sq-feature-card">
+            <div class="sq-feature-icon-box">
+              <i data-lucide="book-open" class="w-5 h-5 text-[#10402D]"></i>
+            </div>
+            <h3 class="sq-feature-name">Active Recall Question Bank</h3>
+            <p class="sq-feature-desc">Test your recall first before unlocking verified official explanations, subject filters, and distractor breakdowns.</p>
+          </div>
+
+          <div class="sq-feature-card">
+            <div class="sq-feature-icon-box">
+              <i data-lucide="sparkles" class="w-5 h-5 text-[#10402D]"></i>
+            </div>
+            <h3 class="sq-feature-name">Shakti AI Study Companion</h3>
+            <p class="sq-feature-desc">Instant conceptual breakdowns, option elimination logic, and memorable exam hooks available in English, Hinglish, and Hindi.</p>
+          </div>
+
+          <div class="sq-feature-card">
+            <div class="sq-feature-icon-box">
+              <i data-lucide="wifi-off" class="w-5 h-5 text-[#10402D]"></i>
+            </div>
+            <h3 class="sq-feature-name">Complete Offline PWA</h3>
+            <p class="sq-feature-desc">Continue your mocks and revision on trains or in study rooms without internet. Data persists safely on your device.</p>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <!-- 4. HUMBLE, DIGNIFIED FOOTER -->
+    <!-- 6. COMPREHENSIVE, TRUSTWORTHY FOOTER -->
     <footer class="sq-footer">
-      <div class="sq-footer-inner">
-        <div class="sq-footer-links">
-          <button type="button" onclick="openLegalModal('privacy')" class="sq-footer-link" data-home-i18n="footer_privacy">Privacy &amp; DPDP</button>
-          <button type="button" onclick="openLegalModal('terms')" class="sq-footer-link" data-home-i18n="footer_terms">Terms</button>
-          <a href="/predictor.html" class="sq-footer-link" data-home-i18n="nav_predictor">Predictor</a>
-          <button type="button" onclick="openLegalModal('contact')" class="sq-footer-link" data-home-i18n="footer_contact">Contact</button>
-          <button type="button" onclick="openAspirantRegModal()" class="sq-footer-link" data-home-i18n="nav_profile">Aspirant Profile</button>
+      <div class="sq-footer-container">
+        <!-- Top Grid: Brand & Mission + 3 Navigation Columns -->
+        <div class="sq-footer-grid">
+          
+          <!-- Column 1: Brand & Mission -->
+          <div class="sq-footer-col sq-footer-brand-col">
+            <a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" class="inline-block" aria-label="ShaktiQ Home">
+              <picture>
+                <source srcset="/logo.webp" type="image/webp">
+                <img src="/logo.png" alt="ShaktiQ Logo" width="144" height="48" class="h-8 w-auto">
+              </picture>
+            </a>
+            <p class="sq-footer-tagline">
+              A serene, free sanctuary for Bihar competitive exam mastery. Built strictly from genuine past papers, verified official keys, and timed full-length simulations.
+            </p>
+            <div class="sq-footer-badges">
+              <span class="sq-footer-pill">100% Free Forever</span>
+              <span class="sq-footer-pill">DPDP 2023 Compliant</span>
+              <span class="sq-footer-pill">Offline Ready PWA</span>
+            </div>
+          </div>
+
+          <!-- Column 2: Exams Covered -->
+          <div class="sq-footer-col">
+            <h3 class="sq-footer-col-title">Bihar Examinations</h3>
+            <ul class="sq-footer-menu">
+              <li><button type="button" onclick="openExamGateway('BPSC_CCE')" class="sq-footer-menu-link">71st &amp; 72nd BPSC CCE</button></li>
+              <li><button type="button" onclick="openExamGateway('BSSC')" class="sq-footer-menu-link">BSSC CGL 4 (Secretariat)</button></li>
+              <li><button type="button" onclick="openExamGateway('AEDO')" class="sq-footer-menu-link">BPSC AEDO Papers</button></li>
+              <li><button type="button" onclick="openExamGateway('TRE')" class="sq-footer-menu-link">BPSC Teacher TRE 4.0</button></li>
+              <li><button type="button" onclick="openPyqBankMode()" class="sq-footer-menu-link">Bihar Special &amp; Current Affairs</button></li>
+            </ul>
+          </div>
+
+          <!-- Column 3: Practice & Tools -->
+          <div class="sq-footer-col">
+            <h3 class="sq-footer-col-title">Preparation Suite</h3>
+            <ul class="sq-footer-menu">
+              <li><button type="button" onclick="openPyqBankMode()" class="sq-footer-menu-link">2,800+ Question Bank</button></li>
+              <li><button type="button" onclick="openTestSeriesMode()" class="sq-footer-menu-link">22 Full-Length Mock Tests</button></li>
+              <li><button type="button" onclick="openSpeedDrills()" class="sq-footer-menu-link">10-Minute Speed Drills</button></li>
+              <li><a href="/predictor.html" class="sq-footer-menu-link">Predictor 2027 Papers</a></li>
+              <li><button type="button" onclick="if(window.ShaktiAI) window.ShaktiAI.open();" class="sq-footer-menu-link">Shakti AI Study Companion</button></li>
+            </ul>
+          </div>
+
+          <!-- Column 4: Student Support & Legal -->
+          <div class="sq-footer-col">
+            <h3 class="sq-footer-col-title">Legal &amp; Support</h3>
+            <ul class="sq-footer-menu">
+              <li><button type="button" onclick="openLegalModal('privacy')" class="sq-footer-menu-link" data-home-i18n="footer_privacy">Privacy Policy (DPDP 2023)</button></li>
+              <li><button type="button" onclick="openLegalModal('terms')" class="sq-footer-menu-link" data-home-i18n="footer_terms">Terms of Use</button></li>
+              <li><button type="button" onclick="openLegalModal('contact')" class="sq-footer-menu-link" data-home-i18n="footer_contact">Support &amp; Grievance</button></li>
+              <li><button type="button" onclick="openAspirantRegModal()" class="sq-footer-menu-link" data-home-i18n="nav_profile">Aspirant Profile</button></li>
+              <li><a href="https://bpsc.bihar.gov.in" target="_blank" rel="noopener noreferrer" class="sq-footer-menu-link external">Official BPSC Portal ↗</a></li>
+            </ul>
+          </div>
+
         </div>
 
-        <p class="sq-footer-disclaimer" data-home-i18n="footer_disclaimer">
-          Independent educational platform · Not affiliated with BPSC, BSSC, or the Government of Bihar.
-        </p>
+        <!-- Divider Line -->
+        <div class="sq-footer-divider"></div>
+
+        <!-- Bottom Bar: Copyright & Strict Disclaimer -->
+        <div class="sq-footer-bottom">
+          <p class="sq-footer-copyright" data-home-i18n="footer_copyright">
+            &copy; 2026 ShaktiQ (shaktiq.com). All rights reserved.
+          </p>
+          <p class="sq-footer-disclaimer" data-home-i18n="footer_disclaimer">
+            Independent educational platform · Not affiliated with, endorsed by, or connected to BPSC, BSSC, or the Government of Bihar. All trademarks and exam names belong to their respective authorities.
+          </p>
+          <p class="sq-footer-dedication" data-home-i18n="footer_dedication">
+            Made with dedication for the competitive exam aspirants of Bihar.
+          </p>
+        </div>
       </div>
     </footer>
 
@@ -2133,6 +2264,7 @@
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex flex-wrap items-center gap-3">
             <picture><source srcset="/logo.webp" type="image/webp"><img src="/logo.png" width="96" height="32" loading="lazy" decoding="async" alt="ShaktiQ Logo" class="h-7 w-auto object-contain shrink-0" style="flex-shrink: 0 !important;"></picture>
+            <span class="text-[11px] text-[#526056] font-semibold">&copy; 2026 ShaktiQ. All rights reserved.</span>
           </div>
           <div class="flex flex-wrap items-center gap-3">
             <button type="button" onclick="openLegalModal('privacy')" class="font-semibold text-[#10402D] hover:underline cursor-pointer">Privacy &amp; DPDP</button>

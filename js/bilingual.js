@@ -174,11 +174,12 @@ const OPTION_PREFIX_REGEX = /^\s*(?:\((?:[A-Ea-e1-5१-५]|ए|बी|सी|�
         tag_pyqs: '2,800+ subject-wise questions',
         title_predictor: 'Predictor',
         tag_predictor: '25 curated 2027 questions',
-        footer_dedication: 'Free Forever for Every Learner',
-        footer_privacy: 'Privacy & DPDP',
-        footer_terms: 'Terms',
-        footer_contact: 'Contact',
-        footer_disclaimer: 'Independent educational platform · Not affiliated with BPSC, BSSC, or the Government of Bihar.'
+        footer_copyright: '© 2026 ShaktiQ (shaktiq.com). All rights reserved.',
+        footer_dedication: 'Made with dedication for the competitive exam aspirants of Bihar.',
+        footer_privacy: 'Privacy Policy (DPDP 2023)',
+        footer_terms: 'Terms of Use',
+        footer_contact: 'Support & Grievance',
+        footer_disclaimer: 'Independent educational platform · Not affiliated with, endorsed by, or connected to BPSC, BSSC, or the Government of Bihar.'
       },
       hi: {
         brand_title: 'Shakti Question Bank',
@@ -200,10 +201,11 @@ const OPTION_PREFIX_REGEX = /^\s*(?:\((?:[A-Ea-e1-5१-५]|ए|बी|सी|�
         tag_pyqs: '2,800+ विषयवार विगत प्रश्न',
         title_predictor: 'प्रेडिक्टर',
         tag_predictor: '25 संभावित 2027 प्रश्न',
-        footer_dedication: 'प्रत्येक विद्यार्थी के लिए सदैव निःशुल्क',
-        footer_privacy: 'गोपनीयता एवं DPDP',
-        footer_terms: 'शर्तें',
-        footer_contact: 'संपर्क',
+        footer_copyright: '© 2026 ShaktiQ (shaktiq.com). सर्वाधिकार सुरक्षित।',
+        footer_dedication: 'बिहार के प्रतियोगी परीक्षा अभ्यर्थियों के लिए पूर्णतः समर्पित।',
+        footer_privacy: 'गोपनीयता नीति (DPDP 2023)',
+        footer_terms: 'उपयोग की शर्तें',
+        footer_contact: 'सहायता एवं शिकायत निवारण',
         footer_disclaimer: 'स्वतंत्र शैक्षणिक मंच · BPSC, BSSC या बिहार सरकार से संबद्ध नहीं।'
       }
     };

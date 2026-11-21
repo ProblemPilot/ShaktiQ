@@ -394,11 +394,15 @@
         display: flex;
         flex-direction: column;
         transform: translateX(100%);
-        transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+        visibility: hidden;
+        pointer-events: none;
+        transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.24s ease;
         font-family: "Plus Jakarta Sans", "Noto Sans Devanagari", system-ui, -apple-system, sans-serif;
       }
       .shakti-ai-drawer.open {
         transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
       }
 
       @media (max-width: 639.98px) {
@@ -414,10 +418,14 @@
           border-top: 1px solid #DCE6DF;
           border-radius: 1.25rem 1.25rem 0 0;
           transform: translateY(100%);
+          visibility: hidden;
+          pointer-events: none;
           box-shadow: 0 -14px 36px -8px rgba(16, 64, 45, 0.2);
         }
         .shakti-ai-drawer.open {
           transform: translateY(0);
+          visibility: visible;
+          pointer-events: auto;
         }
       }
 
