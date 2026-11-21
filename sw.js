@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v19';
+const CACHE_VERSION = 'v20';
 const CACHE_NAME = `shaktiq-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `shaktiq-data-${CACHE_VERSION}`;
 
@@ -11,6 +11,7 @@ const STATIC_ASSETS = [
   './js/bilingual.js',
   './js/test-engine.js',
   './js/question-bank.js',
+  './js/ask-ai.js',
   './js/ui.js',
   './js/app.js',
   './logo.webp',

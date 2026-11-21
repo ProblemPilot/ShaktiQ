@@ -164,7 +164,145 @@ export default {
       });
     }
 
-    // 6. Pass through all other requests to GitHub Pages
+    // 6. Ask AI Route: POST /api/ask-ai
+    if (url.pathname === '/api/ask-ai' && request.method === 'POST') {
+      const geminiApiKey = env.GEMINI_API_KEY;
+      if (!geminiApiKey) {
+        return jsonResponse(
+          {
+            error: 'Server-side AI key not configured on Cloudflare.',
+            fallbackToClient: true,
+          },
+          503
+        );
+      }
+
+      try {
+        const body = await request.json().catch(() => ({}));
+        const message = typeof body.message === 'string' ? body.message.trim() : '';
+        if (!message) {
+          return jsonResponse({ error: 'Please enter a study question or topic.' }, 400);
+        }
+
+        const language = ['en', 'hinglish', 'hi'].includes(body.language) ? body.language : 'en';
+        const context = body.context && typeof body.context === 'object' ? body.context : null;
+        const history = Array.isArray(body.history) ? body.history : [];
+
+        const systemInstruction = buildWorkerSystemInstruction(language);
+        const prompt = buildWorkerPrompt(message, context, history);
+
+        const models = ['gemini-2.5-flash', 'gemini-1.5-flash'];
+        let lastError = null;
+
+        for (const model of models) {
+          try {
+            const geminiRes = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  systemInstruction: { parts: [{ text: systemInstruction }] },
+                  contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                  generationConfig: {
+                    temperature: 0.35,
+                    maxOutputTokens: 800,
+                  },
+                }),
+              }
+            );
+
+            if (geminiRes.ok) {
+              const geminiData = await geminiRes.json();
+              const answer = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (answer && answer.trim()) {
+                return jsonResponse({
+                  answer: answer.trim(),
+                  language,
+                  model,
+                });
+              }
+            } else {
+              const errBody = await geminiRes.text().catch(() => '');
+              lastError = new Error(`Gemini API returned ${geminiRes.status}: ${errBody}`);
+            }
+          } catch (e) {
+            lastError = e;
+          }
+        }
+
+        return jsonResponse(
+          {
+            error: 'Could not get an answer from Gemini API right now.',
+            details: lastError ? lastError.message : undefined,
+            fallbackToClient: true,
+          },
+          502
+        );
+      } catch (err) {
+        return jsonResponse(
+          {
+            error: err.message || 'Internal AI processing error',
+            fallbackToClient: true,
+          },
+          500
+        );
+      }
+    }
+
+    // 7. Pass through all other requests to GitHub Pages
     return fetch(request);
   },
 };
+
+function buildWorkerSystemInstruction(language) {
+  const langRule = language === 'hi'
+    ? 'Respond ONLY in clear, scholarly, natural Hindi (Devanagari script). Keep official English exam terms, Acts, Articles, and option letters (A, B, C, D, E) in brackets where helpful.'
+    : language === 'hinglish'
+      ? 'Respond in authentic, conversational Hinglish — write the explanation sentences primarily in natural Roman-script Hindi (e.g., "23 April 1858 ko Veer Kunwar Singh ne Captain Le Grand ko haraya tha, isliye Bihar mein Vijayotsav manaya jata hai") while keeping official exam terms, Acts, and option letters in English. Use strictly Latin/Roman alphabet only (never mix Devanagari letters inside Roman words).'
+      : 'Respond in clear, calm, scholarly English suitable for serious Bihar competitive exam aspirants.';
+
+  return [
+    'You are Shakti AI, the calm, focused study companion on ShaktiQ (shaktiq.com) for Bihar competitive exams (BPSC CCE, BSSC CGL 4, AEDO, TRE, and Bihar Special GS).',
+    langRule,
+    'Keep every explanation accurate to NCERT, standard reference texts, and published BPSC/BSSC answer keys. Never invent facts; if a date or provision is uncertain, state that honestly.',
+    'Keep tone humble, encouraging, scholarly, and free of filler, hype, or emojis.',
+    'Structure your reply cleanly using these exact markdown headings when answering a question or concept:',
+    '**Core Concept:** One crisp line summarizing the exact fact or principle.',
+    '**Option Breakdown / Why Others Fail:** Concise bullet points explaining the correct choice and why distractors or common exam traps fail (or key dimensions if it is a general topic).',
+    '**Quick Exam Memory Hook:** One memorable, high-yield recall line or mnemonic for the exam hall.',
+    'Keep total length concise (around 120–220 words) so students can revise effortlessly on mobile.'
+  ].join('\n');
+}
+
+function buildWorkerPrompt(message, context, history) {
+  const parts = [];
+  if (context && typeof context === 'object') {
+    const ctxLines = [];
+    if (context.exam) ctxLines.push(`Exam: ${String(context.exam).slice(0, 140)}`);
+    if (context.subject) ctxLines.push(`Subject: ${String(context.subject).slice(0, 100)}`);
+    if (context.question) ctxLines.push(`Question:\n${String(context.question).slice(0, 2000)}`);
+    if (Array.isArray(context.options) && context.options.length > 0) {
+      ctxLines.push(`Options:\n${context.options.slice(0, 6).map(o => String(o).slice(0, 300)).join('\n')}`);
+    }
+    if (context.correctAnswer) ctxLines.push(`Official Answer: ${String(context.correctAnswer).slice(0, 240)}`);
+    if (context.explanation) ctxLines.push(`Official Explanation: ${String(context.explanation).slice(0, 1500)}`);
+    if (ctxLines.length > 0) {
+      parts.push('--- ACTIVE QUESTION CONTEXT ---\n' + ctxLines.join('\n') + '\n--- END CONTEXT ---');
+    }
+  }
+
+  if (Array.isArray(history) && history.length > 0) {
+    const recent = history.slice(-6).map(turn => {
+      const role = turn && turn.role === 'assistant' ? 'Tutor' : 'Student';
+      const text = turn && turn.text ? String(turn.text).slice(0, 700) : '';
+      return text ? `${role}: ${text}` : '';
+    }).filter(Boolean);
+    if (recent.length > 0) {
+      parts.push('Recent conversation:\n' + recent.join('\n'));
+    }
+  }
+
+  parts.push(`Student question: ${String(message).trim().slice(0, 1200)}`);
+  return parts.join('\n\n');
+}

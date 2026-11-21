@@ -11,6 +11,7 @@
     : '/api/ask-ai';
 
   const STORAGE_LANG_KEY = 'shaktiq_ai_lang_v1';
+  const STORAGE_API_KEY = 'shaktiq_gemini_api_key';
 
   const STARTER_CHIPS = [
     'Give me a memory trick for this',
@@ -24,13 +25,22 @@
     language: 'en',
     context: null,
     messages: [],
-    lastSubmitAt: 0
+    lastSubmitAt: 0,
+    apiKey: '',
+    showKeyPanel: false
   };
 
   try {
     const savedLang = localStorage.getItem(STORAGE_LANG_KEY);
     if (savedLang && ['en', 'hinglish', 'hi'].includes(savedLang)) {
       state.language = savedLang;
+    }
+  } catch (_) {}
+
+  try {
+    const savedKey = localStorage.getItem(STORAGE_API_KEY);
+    if (savedKey && typeof savedKey === 'string') {
+      state.apiKey = savedKey.trim();
     }
   } catch (_) {}
 
@@ -82,6 +92,223 @@
 
     if (inList) html += '</ul>';
     return html || '<p>' + formatInline(safe) + '</p>';
+  }
+
+  function isGreeting(text) {
+    const norm = String(text || '').trim().toLowerCase().replace(/[^\w\s\u0900-\u097F]/g, '');
+    const singleWords = [
+      'hi', 'hello', 'hey', 'namaste', 'namaskar', 'pranam', 'pranaam', 'kya kar sakte ho',
+      'who are you', 'help', 'start', 'intro', 'kya hai', 'namaskaar', 'good morning', 'good evening',
+      'नमस्ते', 'प्रणाम', 'नमस्कार', 'हेलो', 'हाय', 'मदद', 'तुम कौन हो', 'आप कौन हैं'
+    ];
+    if (singleWords.includes(norm)) return true;
+    return /^(hi+|hello+|hey+|namaste+|namaskar+|pranam+|नमस्ते|प्रणाम|नमस्कार)(\s|$)/i.test(norm) ||
+      norm === 'who are you' || norm === 'what can you do' || norm === 'help';
+  }
+
+  const GREETING_REPLIES = {
+    en: [
+      '**Hello! I am Shakti AI**, your dedicated study companion for BPSC, BSSC, and Bihar competitive examinations.',
+      '',
+      '**How I can assist your preparation:**',
+      '- **Instant PYQ Breakdown:** Click **Ask AI** under any question card in the Question Bank or Mock Test review to receive the verified official explanation, distractor elimination, and exam memory hook.',
+      '- **Concept & Topic Doubts:** Ask me about any Bihar syllabus topic — 1857 Revolt in Bihar, Article 356, Bihar soil and river systems, budget allocations, or general science.',
+      '- **Bilingual Learning:** Toggle effortlessly between **English**, **Hinglish**, and **हिन्दी** anytime using the tabs above.',
+      '',
+      'What topic or question would you like to explore right now?'
+    ].join('\n'),
+
+    hinglish: [
+      '**Namaste! Main hoon Shakti AI**, aapka Bihar competitive examinations (BPSC, BSSC, TRE) ka dedicated study companion.',
+      '',
+      '**Main aapki preparation mein aise help kar sakta hoon:**',
+      '- **PYQ Deep Breakdown:** Kisi bhi question card ke neeche **Ask AI** click karein — aapko official explanation, option elimination logic, aur exam memory trick turant mil jayegi.',
+      '- **Concept & Doubts:** BPSC / BSSC ka koi bhi topic poochiye — jaise Veer Kunwar Singh 1858, Article 356, Bihar rivers & geography, ya science formulas.',
+      '- **Medium Selection:** Upar diye gaye tabs se kabhi bhi **English**, **Hinglish**, ya **हिन्दी** switch kar sakte hain.',
+      '',
+      'Aap abhi kaun sa topic ya question practice karna chahte hain?'
+    ].join('\n'),
+
+    hi: [
+      '**नमस्ते! मैं हूँ Shakti AI**, बिहार प्रतियोगी परीक्षाओं (BPSC, BSSC, TRE) के लिए आपका समर्पित अध्ययन साथी।',
+      '',
+      '**मैं आपकी तैयारी में इस प्रकार सहायता कर सकता हूँ:**',
+      '- **PYQ का संपूर्ण विश्लेषण:** प्रश्न बैंक या मॉक टेस्ट के किसी भी प्रश्न कार्ड पर **Ask AI** क्लिक करें — आपको आधिकारिक व्याख्या, गलत विकल्पों का खंडन (Elimination Logic) और Memory Hook तुरंत मिलेगा।',
+      '- **अवधारणा एवं संदेह समाधान:** BPSC/BSSC का कोई भी विषय पूछें — जैसे 1857 की क्रांति में बिहार की भूमिका, अनुच्छेद 356, बिहार का भूगोल या विज्ञान के नियम।',
+      '- **माध्यम का चयन:** ऊपर दिए गए विकल्पों से आप कभी भी **English**, **Hinglish**, या **हिन्दी** चुन सकते हैं।',
+      '',
+      'आज आप किस प्रश्न या विषय का अभ्यास करना चाहते हैं?'
+    ].join('\n')
+  };
+
+  function extractOptionLetter(str) {
+    const m = String(str || '').trim().match(/^\(?([A-Ea-e])[\)\.\s]/);
+    return m ? m[1].toUpperCase() : '';
+  }
+
+  function extractAnswerLetter(str) {
+    const m = String(str || '').trim().match(/([A-Ea-e])/);
+    return m ? m[1].toUpperCase() : '';
+  }
+
+  function formatContextExplanation(ctx, language) {
+    const isHi = language === 'hi';
+    const isHing = language === 'hinglish';
+    const parts = [];
+
+    if (ctx.subject || ctx.exam) {
+      parts.push(`**${[ctx.subject, ctx.exam].filter(Boolean).join(' · ')}**`);
+      parts.push('');
+    }
+
+    if (ctx.correctAnswer) {
+      const ansLabel = isHi ? '**आधिकारिक सही उत्तर:** ' : '**Official Answer:** ';
+      const ansVal = ctx.correctAnswer.startsWith('Option') ? ctx.correctAnswer : 'Option ' + ctx.correctAnswer;
+      parts.push(`${ansLabel}${ansVal}`);
+      parts.push('');
+    }
+
+    const coreHeading = isHi ? '**मुख्य अवधारणा (Core Concept):**' : '**Core Concept:**';
+    parts.push(coreHeading);
+    if (ctx.explanation && ctx.explanation.trim()) {
+      parts.push(ctx.explanation.trim());
+    } else {
+      parts.push(isHi
+        ? 'यह प्रश्न BPSC/BSSC के आधिकारिक पाठ्यक्रम और मानक NCERT संदर्भ पर आधारित है।'
+        : 'This question tests core factual concepts per the official Bihar examination syllabus and NCERT reference texts.');
+    }
+    parts.push('');
+
+    if (Array.isArray(ctx.options) && ctx.options.length > 0) {
+      const optHeading = isHi ? '**विकल्प विश्लेषण (Option Analysis):**' : '**Option Breakdown:**';
+      parts.push(optHeading);
+      const ansLetter = extractAnswerLetter(ctx.correctAnswer);
+      ctx.options.forEach((opt) => {
+        const optStr = String(opt).trim();
+        const optLetter = extractOptionLetter(optStr);
+        const isCorrect = Boolean(optLetter && ansLetter && optLetter === ansLetter);
+        if (isCorrect) {
+          parts.push(`- **${optStr}** — ${isHi ? 'यह आधिकारिक रूप से सही उत्तर है।' : 'Verified correct choice per official BPSC answer key.'}`);
+        } else {
+          parts.push(`- ${optStr} — ${isHi ? 'यह विकल्प सही नहीं है।' : 'Incorrect distractor.'}`);
+        }
+      });
+      parts.push('');
+    }
+
+    const hookHeading = isHi ? '**परीक्षा स्मृति सूत्र (Exam Memory Hook):**' : '**Quick Exam Memory Hook:**';
+    parts.push(hookHeading);
+    const defaultHook = isHi
+      ? `स्मरण रखें: ${ctx.subject || 'इस विषय'} में BPSC सीधे तथ्यात्मक प्रावधानों और उन्मूलन विधि (Elimination Method) का परीक्षण करता है। इस मुख्य बिंदु को परीक्षा कक्ष के लिए कंठस्थ रखें।`
+      : isHing
+        ? `Revision Tip: ${ctx.subject || 'Is subject'} mein BPSC direct factual key points test karta hai. Is point ko exam hall ke liye commit kar lijiye.`
+        : `Revision Tip: For ${ctx.subject || 'this topic'}, BPSC tests precise factual provisions and direct elimination. Commit this official key point to memory for the exam hall.`;
+    parts.push(defaultHook);
+
+    return parts.join('\n');
+  }
+
+  function buildClientSystemInstruction(language) {
+    const langRule = language === 'hi'
+      ? 'Respond ONLY in clear, scholarly, natural Hindi (Devanagari script). Keep official English exam terms, Acts, Articles, and option letters (A, B, C, D, E) in brackets where helpful.'
+      : language === 'hinglish'
+        ? 'Respond in authentic, conversational Hinglish — write the explanation sentences primarily in natural Roman-script Hindi (e.g., "23 April 1858 ko Veer Kunwar Singh ne Captain Le Grand ko haraya tha, isliye Bihar mein Vijayotsav manaya jata hai") while keeping official exam terms, Acts, and option letters in English. Use strictly Latin/Roman alphabet only (never mix Devanagari letters inside Roman words).'
+        : 'Respond in clear, calm, scholarly English suitable for serious Bihar competitive exam aspirants.';
+
+    return [
+      'You are Shakti AI, the calm, focused study companion on ShaktiQ (shaktiq.com) for Bihar competitive exams (BPSC CCE, BSSC CGL 4, AEDO, TRE, and Bihar Special GS).',
+      langRule,
+      'Keep every explanation accurate to NCERT, standard reference texts, and published BPSC/BSSC answer keys. Never invent facts; if a date or provision is uncertain, state that honestly.',
+      'Keep tone humble, encouraging, scholarly, and free of filler, hype, or emojis.',
+      'Structure your reply cleanly using these exact markdown headings when answering a question or concept:',
+      '**Core Concept:** One crisp line summarizing the exact fact or principle.',
+      '**Option Breakdown / Why Others Fail:** Concise bullet points explaining the correct choice and why distractors or common exam traps fail (or key dimensions if it is a general topic).',
+      '**Quick Exam Memory Hook:** One memorable, high-yield recall line or mnemonic for the exam hall.',
+      'Keep total length concise (around 120–220 words) so students can revise effortlessly on mobile.'
+    ].join('\n');
+  }
+
+  function buildClientUserPrompt(message, context, history) {
+    const parts = [];
+    if (context && typeof context === 'object') {
+      const ctxLines = [];
+      if (context.exam) ctxLines.push(`Exam: ${String(context.exam).slice(0, 140)}`);
+      if (context.subject) ctxLines.push(`Subject: ${String(context.subject).slice(0, 100)}`);
+      if (context.question) ctxLines.push(`Question:\n${String(context.question).slice(0, 2000)}`);
+      if (Array.isArray(context.options) && context.options.length > 0) {
+        ctxLines.push(`Options:\n${context.options.slice(0, 6).map((o) => String(o).slice(0, 300)).join('\n')}`);
+      }
+      if (context.correctAnswer) ctxLines.push(`Official Answer: ${String(context.correctAnswer).slice(0, 240)}`);
+      if (context.explanation) ctxLines.push(`Official Explanation: ${String(context.explanation).slice(0, 1500)}`);
+      if (ctxLines.length > 0) {
+        parts.push('--- ACTIVE QUESTION CONTEXT ---\n' + ctxLines.join('\n') + '\n--- END CONTEXT ---');
+      }
+    }
+
+    if (Array.isArray(history) && history.length > 0) {
+      const recent = history.slice(-6).map((turn) => {
+        const role = turn && turn.role === 'assistant' ? 'Tutor' : 'Student';
+        const text = turn && turn.text ? String(turn.text).slice(0, 700) : '';
+        return text ? `${role}: ${text}` : '';
+      }).filter(Boolean);
+      if (recent.length > 0) {
+        parts.push('Recent conversation:\n' + recent.join('\n'));
+      }
+    }
+
+    parts.push(`Student question: ${String(message).trim().slice(0, 1200)}`);
+    return parts.join('\n\n');
+  }
+
+  async function callDirectGemini(apiKey, message, language, context, history) {
+    const systemInstruction = buildClientSystemInstruction(language);
+    const userPrompt = buildClientUserPrompt(message, context, history);
+
+    const models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
+    let lastError = null;
+
+    for (const model of models) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey.trim())}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+            contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+            generationConfig: {
+              temperature: 0.35,
+              maxOutputTokens: 800
+            }
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const answer = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (answer && answer.trim()) {
+            return answer.trim();
+          }
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          const errMsg = errData?.error?.message || `HTTP ${res.status}`;
+          lastError = new Error(errMsg);
+          if (res.status === 400 && errMsg.includes('API_KEY_INVALID')) {
+            throw new Error('Your Google Gemini API Key appears to be invalid. Please check your key from Google AI Studio.');
+          }
+          if (res.status === 403) {
+            throw new Error('Your Google Gemini API Key does not have permission. Please check your key permissions.');
+          }
+        }
+      } catch (err) {
+        if (err.message && (err.message.includes('invalid') || err.message.includes('permission'))) {
+          throw err;
+        }
+        lastError = err;
+      }
+    }
+
+    throw lastError || new Error('Could not reach Google Gemini API.');
   }
 
   function injectStylesIfNeeded() {
@@ -262,6 +489,151 @@
         background: #EBF3E6;
         border-color: #C6DEC0;
         color: #10402D;
+      }
+      .shakti-ai-icon-btn.active-key {
+        border-color: #10402D;
+        background: #EBF3E6;
+        color: #10402D;
+      }
+
+      /* Slide-down Key Panel */
+      .shakti-ai-key-panel {
+        background: #FFFFFF;
+        border-bottom: 1px solid #DCE6DF;
+        padding: 0.75rem 1rem;
+        flex-shrink: 0;
+        animation: shaktiAiSlideDown 0.2s ease-out;
+      }
+      @keyframes shaktiAiSlideDown {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .shakti-ai-key-panel-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .shakti-ai-key-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.76rem;
+        font-weight: 800;
+        color: #111C15;
+      }
+      .shakti-ai-key-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.15rem 0.45rem;
+        border-radius: 9999px;
+        background: #EBF3E6;
+        color: #10402D;
+      }
+      .shakti-ai-key-badge.active {
+        background: #10402D;
+        color: #FCE27B;
+      }
+      .shakti-ai-key-hint {
+        font-size: 0.7rem;
+        color: #526056;
+        line-height: 1.4;
+        margin: 0;
+      }
+      .shakti-ai-key-hint a {
+        color: #10402D;
+        font-weight: 700;
+        text-decoration: underline;
+      }
+      .shakti-ai-key-input-row {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-top: 0.2rem;
+      }
+      .shakti-ai-key-input {
+        flex: 1 1 auto;
+        min-height: 34px;
+        padding: 0.35rem 0.6rem;
+        border-radius: 0.5rem;
+        border: 1px solid #DCE6DF;
+        background: #F8FAF7;
+        font-size: 0.75rem;
+        font-family: inherit;
+        color: #111C15;
+      }
+      .shakti-ai-key-input:focus {
+        outline: none;
+        border-color: #10402D;
+        background: #FFFFFF;
+      }
+      .shakti-ai-key-action-btn {
+        min-height: 34px;
+        padding: 0 0.75rem;
+        border-radius: 0.5rem;
+        border: none;
+        background: #10402D;
+        color: #FFFFFF;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+      }
+      .shakti-ai-key-action-btn:hover {
+        background: #17593F;
+      }
+      .shakti-ai-key-action-btn.secondary {
+        background: #FFF5F5;
+        border: 1px solid #FECACA;
+        color: #991B1B;
+      }
+      .shakti-ai-key-action-btn.secondary:hover {
+        background: #FEE2E2;
+      }
+      .shakti-ai-key-feedback {
+        font-size: 0.68rem;
+        font-weight: 600;
+        margin-top: 0.2rem;
+      }
+      .shakti-ai-key-feedback.success {
+        color: #10402D;
+      }
+      .shakti-ai-key-feedback.error {
+        color: #991B1B;
+      }
+
+      /* Inline key prompt card inside chat when general doubt is asked without keys */
+      .shakti-ai-key-card {
+        background: #FFFFFF;
+        border: 1px solid #C6DEC0;
+        border-radius: 0.95rem;
+        padding: 0.85rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .shakti-ai-key-card-title {
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: #10402D;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+      .shakti-ai-key-card-desc {
+        font-size: 0.76rem;
+        color: #36443A;
+        line-height: 1.5;
+        margin: 0;
+      }
+      .shakti-ai-key-card-desc a {
+        color: #10402D;
+        font-weight: 700;
+        text-decoration: underline;
+      }
+      .shakti-ai-key-card-row {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
       }
 
       .shakti-ai-lang-bar {
@@ -623,6 +995,9 @@
     if (type === 'send') {
       return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
     }
+    if (type === 'key') {
+      return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2l-2 2m-1-1l-3 3m-1-1l-2 2m-2-2l-2 2a7 7 0 102 2l8-8z"/></svg>';
+    }
     return '';
   }
 
@@ -665,10 +1040,33 @@
             </div>
           </div>
           <div class="shakti-ai-header-actions">
+            <button type="button" id="shakti-ai-key-btn" class="shakti-ai-icon-btn" title="Configure Google Gemini API Key" aria-label="Configure Google Gemini API Key">
+              ${createIconSvg('key')}
+              <span id="shakti-ai-key-btn-text">Key</span>
+            </button>
             <button type="button" id="shakti-ai-clear-btn" class="shakti-ai-icon-btn" title="Clear conversation" aria-label="Clear conversation">Clear</button>
             <button type="button" id="shakti-ai-close-btn" class="shakti-ai-icon-btn" title="Close Shakti AI" aria-label="Close Shakti AI">${createIconSvg('close')}</button>
           </div>
         </div>
+
+        <div id="shakti-ai-key-panel" class="shakti-ai-key-panel" hidden>
+          <div class="shakti-ai-key-panel-inner">
+            <div class="shakti-ai-key-title">
+              <span>Google Gemini API Key</span>
+              <span class="shakti-ai-key-badge" id="shakti-ai-key-status">Optional</span>
+            </div>
+            <p class="shakti-ai-key-hint">
+              Get a free API key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>. Saved privately in your browser.
+            </p>
+            <div class="shakti-ai-key-input-row">
+              <input type="password" id="shakti-ai-key-input" class="shakti-ai-key-input" placeholder="Paste Gemini key (AIzaSy...)" autocomplete="off" spellcheck="false" />
+              <button type="button" id="shakti-ai-key-save-btn" class="shakti-ai-key-action-btn">Save</button>
+              <button type="button" id="shakti-ai-key-clear-btn" class="shakti-ai-key-action-btn secondary" hidden>Remove</button>
+            </div>
+            <div id="shakti-ai-key-feedback" class="shakti-ai-key-feedback" hidden></div>
+          </div>
+        </div>
+
         <div class="shakti-ai-lang-bar">
           <span class="shakti-ai-lang-label">Reply Language</span>
           <div class="shakti-ai-lang-tabs" role="tablist" aria-label="AI explanation language">
@@ -710,6 +1108,14 @@
       fab,
       backdrop,
       drawer,
+      keyBtn: drawer.querySelector('#shakti-ai-key-btn'),
+      keyBtnText: drawer.querySelector('#shakti-ai-key-btn-text'),
+      keyPanel: drawer.querySelector('#shakti-ai-key-panel'),
+      keyStatus: drawer.querySelector('#shakti-ai-key-status'),
+      keyInput: drawer.querySelector('#shakti-ai-key-input'),
+      keySaveBtn: drawer.querySelector('#shakti-ai-key-save-btn'),
+      keyClearBtn: drawer.querySelector('#shakti-ai-key-clear-btn'),
+      keyFeedback: drawer.querySelector('#shakti-ai-key-feedback'),
       clearBtn: drawer.querySelector('#shakti-ai-clear-btn'),
       closeBtn: drawer.querySelector('#shakti-ai-close-btn'),
       langTabs: Array.from(drawer.querySelectorAll('.shakti-ai-lang-tab')),
@@ -727,6 +1133,32 @@
     backdrop.addEventListener('click', () => closeDrawer());
     els.closeBtn.addEventListener('click', () => closeDrawer());
     els.clearBtn.addEventListener('click', () => clearChat());
+
+    els.keyBtn.addEventListener('click', () => {
+      toggleKeyPanel();
+    });
+
+    els.keySaveBtn.addEventListener('click', () => {
+      const val = (els.keyInput.value || '').trim();
+      if (!val) {
+        showKeyFeedback('Please paste a valid Gemini API key.', 'error');
+        return;
+      }
+      saveApiKey(val);
+      showKeyFeedback('Key saved securely in browser!', 'success');
+      setTimeout(() => {
+        if (state.showKeyPanel) toggleKeyPanel(false);
+      }, 1200);
+    });
+
+    els.keyClearBtn.addEventListener('click', () => {
+      removeApiKey();
+      showKeyFeedback('API key removed.', 'success');
+      setTimeout(() => {
+        if (state.showKeyPanel) toggleKeyPanel(false);
+      }, 1000);
+    });
+
     els.contextClear.addEventListener('click', () => {
       state.context = null;
       renderContextBar();
@@ -780,8 +1212,61 @@
       syncExamBarCollision();
     }
 
+    updateKeyUi();
     renderMessages();
     renderContextBar();
+  }
+
+  function toggleKeyPanel(forceState) {
+    if (!els.keyPanel) return;
+    state.showKeyPanel = typeof forceState === 'boolean' ? forceState : !state.showKeyPanel;
+    els.keyPanel.hidden = !state.showKeyPanel;
+    if (els.keyFeedback) els.keyFeedback.hidden = true;
+    if (state.showKeyPanel && els.keyInput) {
+      els.keyInput.focus();
+    }
+  }
+
+  function showKeyFeedback(text, type) {
+    if (!els.keyFeedback) return;
+    els.keyFeedback.hidden = false;
+    els.keyFeedback.className = 'shakti-ai-key-feedback ' + type;
+    els.keyFeedback.textContent = text;
+  }
+
+  function saveApiKey(key) {
+    const cleanKey = String(key || '').trim();
+    if (!cleanKey) return;
+    state.apiKey = cleanKey;
+    try { localStorage.setItem(STORAGE_API_KEY, cleanKey); } catch (_) {}
+    updateKeyUi();
+  }
+
+  function removeApiKey() {
+    state.apiKey = '';
+    try { localStorage.removeItem(STORAGE_API_KEY); } catch (_) {}
+    updateKeyUi();
+  }
+
+  function updateKeyUi() {
+    if (!els.keyBtn) return;
+    const hasKey = Boolean(state.apiKey);
+    if (els.keyBtnText) {
+      els.keyBtnText.textContent = hasKey ? 'Key ✓' : 'Key';
+    }
+    if (els.keyBtn) {
+      els.keyBtn.classList.toggle('active-key', hasKey);
+    }
+    if (els.keyStatus) {
+      els.keyStatus.textContent = hasKey ? 'Configured ✓' : 'Optional';
+      els.keyStatus.classList.toggle('active', hasKey);
+    }
+    if (els.keyInput) {
+      els.keyInput.value = hasKey ? state.apiKey : '';
+    }
+    if (els.keyClearBtn) {
+      els.keyClearBtn.hidden = !hasKey;
+    }
   }
 
   function autoResizeInput() {
@@ -834,32 +1319,75 @@
       const wrap = document.createElement('div');
       wrap.className = 'shakti-ai-msg ' + msg.role + (msg.isError ? ' error' : '');
 
-      const bubble = document.createElement('div');
-      bubble.className = 'shakti-ai-bubble';
-      if (msg.role === 'assistant') {
-        bubble.innerHTML = formatAiMarkdown(msg.text);
-      } else {
-        bubble.textContent = msg.text;
-      }
-      wrap.appendChild(bubble);
+      if (msg.isKeyPrompt) {
+        const card = document.createElement('div');
+        card.className = 'shakti-ai-key-card';
+        card.innerHTML = `
+          <div class="shakti-ai-key-card-title">
+            <span>🔑</span>
+            <span>Connect Free Google Gemini AI</span>
+          </div>
+          <p class="shakti-ai-key-card-desc">
+            To explore custom open-ended questions directly with Google AI, enter your free Google Gemini API key. Get one free from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>. Saved privately in your browser.
+          </p>
+          <div class="shakti-ai-key-card-row">
+            <input type="password" class="shakti-ai-key-input shakti-ai-card-key-input" placeholder="Paste free Gemini key (AIzaSy...)" autocomplete="off" />
+            <button type="button" class="shakti-ai-key-action-btn shakti-ai-card-save-btn">Save &amp; Continue</button>
+          </div>
+          <div class="shakti-ai-key-feedback" hidden></div>
+        `;
+        const cardInput = card.querySelector('.shakti-ai-card-key-input');
+        const cardSaveBtn = card.querySelector('.shakti-ai-card-save-btn');
+        const cardFeedback = card.querySelector('.shakti-ai-key-feedback');
 
-      if (msg.role === 'assistant' && !msg.isError) {
-        const meta = document.createElement('div');
-        meta.className = 'shakti-ai-msg-meta';
-        const copyBtn = document.createElement('button');
-        copyBtn.type = 'button';
-        copyBtn.className = 'shakti-ai-copy-btn';
-        copyBtn.textContent = 'Copy explanation';
-        copyBtn.addEventListener('click', () => {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(msg.text).then(() => {
-              copyBtn.textContent = 'Copied';
-              setTimeout(() => { copyBtn.textContent = 'Copy explanation'; }, 1600);
-            }).catch(() => {});
+        cardSaveBtn.addEventListener('click', () => {
+          const val = (cardInput.value || '').trim();
+          if (!val) {
+            cardFeedback.hidden = false;
+            cardFeedback.className = 'shakti-ai-key-feedback error';
+            cardFeedback.textContent = 'Please enter an API key.';
+            return;
           }
+          saveApiKey(val);
+          cardFeedback.hidden = false;
+          cardFeedback.className = 'shakti-ai-key-feedback success';
+          cardFeedback.textContent = 'Key saved! Answering your question...';
+          setTimeout(() => {
+            if (msg.retryText) {
+              sendMessage(msg.retryText);
+            }
+          }, 600);
         });
-        meta.appendChild(copyBtn);
-        wrap.appendChild(meta);
+
+        wrap.appendChild(card);
+      } else {
+        const bubble = document.createElement('div');
+        bubble.className = 'shakti-ai-bubble';
+        if (msg.role === 'assistant') {
+          bubble.innerHTML = formatAiMarkdown(msg.text);
+        } else {
+          bubble.textContent = msg.text;
+        }
+        wrap.appendChild(bubble);
+
+        if (msg.role === 'assistant' && !msg.isError) {
+          const meta = document.createElement('div');
+          meta.className = 'shakti-ai-msg-meta';
+          const copyBtn = document.createElement('button');
+          copyBtn.type = 'button';
+          copyBtn.className = 'shakti-ai-copy-btn';
+          copyBtn.textContent = 'Copy explanation';
+          copyBtn.addEventListener('click', () => {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(msg.text).then(() => {
+                copyBtn.textContent = 'Copied';
+                setTimeout(() => { copyBtn.textContent = 'Copy explanation'; }, 1600);
+              }).catch(() => {});
+            }
+          });
+          meta.appendChild(copyBtn);
+          wrap.appendChild(meta);
+        }
       }
 
       els.messages.appendChild(wrap);
@@ -931,31 +1459,55 @@
     if (!cleanText || state.isLoading) return;
 
     const now = Date.now();
-    if (now - state.lastSubmitAt < 450) return;
+    if (now - state.lastSubmitAt < 400) return;
     state.lastSubmitAt = now;
 
     buildDrawerDom();
 
     state.messages.push({ role: 'user', text: cleanText });
 
+    // 1. Instant offline check
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-      state.messages.push({
-        role: 'assistant',
-        isError: true,
-        text: 'You appear to be offline right now. Your PYQ Bank and saved notes work offline; reconnect briefly to ask Shakti AI.'
-      });
+      if (state.context && state.context.question) {
+        const explanation = formatContextExplanation(state.context, state.language);
+        state.messages.push({ role: 'assistant', text: explanation });
+      } else if (isGreeting(cleanText)) {
+        const reply = GREETING_REPLIES[state.language] || GREETING_REPLIES.en;
+        state.messages.push({ role: 'assistant', text: reply });
+      } else {
+        state.messages.push({
+          role: 'assistant',
+          isError: true,
+          text: 'You appear to be offline right now. Your PYQ Bank and saved notes work offline; reconnect briefly to ask Shakti AI.'
+        });
+      }
+      renderMessages();
+      return;
+    }
+
+    // 2. Instant Greetings: Immediate, zero latency, 100% reliable
+    if (isGreeting(cleanText)) {
+      const reply = GREETING_REPLIES[state.language] || GREETING_REPLIES.en;
+      state.messages.push({ role: 'assistant', text: reply });
       renderMessages();
       return;
     }
 
     setLoading(true);
 
+    let answerObtained = false;
+    let answerText = '';
+
+    // 3. Try Backend / Cloudflare Worker / Server endpoint first
     try {
       const historyPayload = state.messages
         .slice(0, -1)
-        .filter((m) => !m.isError)
+        .filter((m) => !m.isError && !m.isKeyPrompt)
         .slice(-6)
         .map((m) => ({ role: m.role, text: m.text }));
+
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
 
       const res = await fetch(AI_ENDPOINT, {
         method: 'POST',
@@ -965,24 +1517,67 @@
           language: state.language,
           context: state.context,
           history: historyPayload
-        })
-      });
+        }),
+        signal: controller ? controller.signal : undefined
+      }).catch(() => null);
 
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.answer) {
-        throw new Error(data.error || 'Could not get an answer right now. Please try again.');
+      if (timeoutId) clearTimeout(timeoutId);
+
+      if (res && res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (data && data.answer) {
+          answerText = data.answer;
+          answerObtained = true;
+        }
       }
+    } catch (_) {}
 
-      state.messages.push({ role: 'assistant', text: data.answer });
-    } catch (err) {
-      state.messages.push({
-        role: 'assistant',
-        isError: true,
-        text: (err && err.message) ? err.message : 'Unable to reach Shakti AI right now. Please try again shortly.'
-      });
-    } finally {
-      setLoading(false);
+    // 4. Try Direct Client Gemini API if key is saved
+    if (!answerObtained && state.apiKey) {
+      try {
+        const historyPayload = state.messages
+          .slice(0, -1)
+          .filter((m) => !m.isError && !m.isKeyPrompt)
+          .slice(-6);
+        const directAnswer = await callDirectGemini(state.apiKey, cleanText, state.language, state.context, historyPayload);
+        if (directAnswer) {
+          answerText = directAnswer;
+          answerObtained = true;
+        }
+      } catch (geminiErr) {
+        if (geminiErr.message && (geminiErr.message.includes('API Key') || geminiErr.message.includes('permission'))) {
+          state.messages.push({
+            role: 'assistant',
+            isError: true,
+            text: geminiErr.message
+          });
+          setLoading(false);
+          return;
+        }
+      }
     }
+
+    // 5. Active Question Context Fallback (Official verified explanation)
+    if (!answerObtained && state.context && state.context.question) {
+      answerText = formatContextExplanation(state.context, state.language);
+      answerObtained = true;
+    }
+
+    // 6. If answer obtained, display it!
+    if (answerObtained && answerText) {
+      state.messages.push({ role: 'assistant', text: answerText });
+      setLoading(false);
+      return;
+    }
+
+    // 7. Unhandled open query without API key: Show helpful key connection card
+    setLoading(false);
+    state.messages.push({
+      role: 'assistant',
+      isKeyPrompt: true,
+      retryText: cleanText
+    });
+    renderMessages();
   }
 
   function explainQuestion(ctx, autoPrompt) {
@@ -1020,6 +1615,8 @@
     explainQuestion,
     setLanguage,
     clearChat,
-    sendMessage
+    sendMessage,
+    saveApiKey,
+    removeApiKey
   };
 })();

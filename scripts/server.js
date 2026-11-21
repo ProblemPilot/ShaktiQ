@@ -5,14 +5,36 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
+const ROOT = path.resolve(__dirname, '..');
+
+// Load environment variables from .env if present
+const envPath = path.join(ROOT, '.env');
+if (fs.existsSync(envPath)) {
+  try {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split(/\r?\n/).forEach((line) => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) return;
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx > 0) {
+        const k = trimmed.substring(0, eqIdx).trim();
+        const v = trimmed.substring(eqIdx + 1).trim();
+        if (!process.env[k]) {
+          process.env[k] = v.replace(/^["']|["']$/g, '');
+        }
+      }
+    });
+  } catch (_) {}
+}
+
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const HOST = process.env.HOST || '0.0.0.0';
-const ROOT = path.resolve(__dirname, '..');
-const DEFAULT_AI_MODEL = process.env.SHAKTIQ_AI_MODEL || 'gemini-3.5-flash-lite';
+const DEFAULT_AI_MODEL = process.env.SHAKTIQ_AI_MODEL || 'gemini-2.5-flash';
 const AI_MODEL_FALLBACKS = Array.from(new Set([
   DEFAULT_AI_MODEL,
-  'gemini-3.1-flash-lite',
-  'gemini-4-hydrogen'
+  'gemini-1.5-flash',
+  'gemini-2.0-flash',
+  'gemini-2.5-flash-lite'
 ]));
 const MAX_AI_BODY_BYTES = 32 * 1024;
 
@@ -154,7 +176,10 @@ async function handleAskAi(req, res) {
   }
 
   if (!ai) {
-    sendJson(res, 503, { error: 'Shakti AI is temporarily unavailable while the study server finishes configuring.' });
+    sendJson(res, 503, {
+      error: 'Shakti AI is temporarily unavailable while the study server finishes configuring.',
+      fallbackToClient: true
+    });
     return;
   }
 
