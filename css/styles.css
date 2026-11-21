@@ -1453,6 +1453,8 @@ html.light #page-bpsc-pyq-view > header {
 .border-l-4 { border-left-width: 4px; }
 .hover\:bg-\[\#F6F7F2\]:hover { background-color: #F6F7F2 !important; }
 .hover\:bg-\[\#FCE27B\]:hover { background-color: #FCE27B !important; }
+.text-\[\#FCE27B\] { color: #FCE27B !important; }
+.fill-\[\#FCE27B\] { fill: #FCE27B !important; }
 .hover\:bg-\[\#F5DF8B\]:hover { background-color: #F5DF8B !important; }
 .hover\:bg-\[\#EBF3E6\]\/60:hover { background-color: rgba(235, 243, 230, 0.6) !important; }
 .from-\[\#ECF6E7\] { --tw-gradient-from: #ECF6E7; --tw-gradient-to: rgba(236, 246, 231, 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
