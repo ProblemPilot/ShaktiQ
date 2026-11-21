@@ -1,0 +1,8 @@
+{
+  "name": "ShaktiQ – Bihar Exam Prep",
+  "description": "Free Bihar competitive exam preparation portal featuring 2,800+ BPSC PYQs, 22 full-length mock tests, OMR simulation, rapid revision sheets, and Shakti AI Study Assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

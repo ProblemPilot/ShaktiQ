@@ -143,8 +143,76 @@ const OPTION_PREFIX_REGEX = /^\s*(?:\((?:[A-Ea-e1-5१-५]|ए|बी|सी|�
             btn.className = 'lang-switch-btn px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer font-bold text-[#223127] hover:text-[#10402D]';
           }
         });
+        document.querySelectorAll('.sq-lang-btn').forEach(btn => {
+          const btnLang = btn.getAttribute('data-lang-btn');
+          const active = btnLang === lang;
+          btn.classList.toggle('sq-lang-active', active);
+          btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        syncHomePageLanguage(lang);
       }
     };
+
+    const HOME_I18N_DICT = {
+      en: {
+        brand_title: 'Shakti Question Bank',
+        nav_practice: 'Practice',
+        nav_mocks: 'Mock Tests',
+        nav_drills: 'Speed Drills',
+        nav_predictor: 'Predictor',
+        nav_profile: 'Aspirant Profile',
+        hero_subtitle: 'A free, serene sanctuary for Bihar & competitive exam mastery.',
+        cta_practice: 'Start Practicing',
+        cta_mock: 'Take Mock Test',
+        gateway_heading: 'Choose Your Path',
+        tag_bpsc: '72nd & 73rd CCE mocks',
+        tag_bssc: 'Secretariat Assistant prep',
+        tag_aedo: '6 full 2-hour papers',
+        title_pyqs: 'PYQs',
+        tag_pyqs: '2,800+ subject-wise questions',
+        title_predictor: 'Predictor',
+        tag_predictor: '25 curated 2027 questions',
+        footer_dedication: 'Free Forever for Every Learner',
+        footer_privacy: 'Privacy & DPDP',
+        footer_terms: 'Terms',
+        footer_contact: 'Contact',
+        footer_disclaimer: 'Independent educational platform · Not affiliated with BPSC, BSSC, or the Government of Bihar.'
+      },
+      hi: {
+        brand_title: 'Shakti Question Bank',
+        nav_practice: 'अभ्यास',
+        nav_mocks: 'मॉक टेस्ट',
+        nav_drills: 'स्पीड ड्रिल',
+        nav_predictor: 'प्रेडिक्टर',
+        nav_profile: 'अभ्यर्थी प्रोफ़ाइल',
+        hero_subtitle: 'बिहार एवं प्रतियोगी परीक्षाओं की शांत, निःशुल्क अभ्यास स्थली।',
+        cta_practice: 'अभ्यास शुरू करें',
+        cta_mock: 'मॉक टेस्ट दें',
+        gateway_heading: 'अपना परीक्षा मार्ग चुनें',
+        tag_bpsc: '72वीं व 73वीं CCE मॉक टेस्ट',
+        tag_bssc: 'सचिवालय सहायक अभ्यास पैक',
+        tag_aedo: '6 पूर्ण 2-घंटे के प्रश्नपत्र',
+        title_pyqs: 'PYQ बैंक',
+        tag_pyqs: '2,800+ विषयवार विगत प्रश्न',
+        title_predictor: 'प्रेडिक्टर',
+        tag_predictor: '25 संभावित 2027 प्रश्न',
+        footer_dedication: 'प्रत्येक विद्यार्थी के लिए सदैव निःशुल्क',
+        footer_privacy: 'गोपनीयता एवं DPDP',
+        footer_terms: 'शर्तें',
+        footer_contact: 'संपर्क',
+        footer_disclaimer: 'स्वतंत्र शैक्षणिक मंच · BPSC, BSSC या बिहार सरकार से संबद्ध नहीं।'
+      }
+    };
+
+    function syncHomePageLanguage(lang) {
+      const dict = HOME_I18N_DICT[lang === 'hi' ? 'hi' : 'en'];
+      document.querySelectorAll('[data-home-i18n]').forEach(el => {
+        const key = el.getAttribute('data-home-i18n');
+        if (key && dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+    }
 
     function setGlobalAppLanguage(lang) {
       if (lang !== 'en' && lang !== 'hi') lang = 'en';
@@ -156,6 +224,10 @@ const OPTION_PREFIX_REGEX = /^\s*(?:\((?:[A-Ea-e1-5१-५]|ए|बी|सी|�
 
       document.documentElement.lang = ShaktiQBilingualEngine.currentLang;
       ShaktiQBilingualEngine.updateButtonsUI();
+
+      if (typeof window !== 'undefined' && window.ShaktiAI && typeof window.ShaktiAI.setLanguage === 'function') {
+        window.ShaktiAI.setLanguage(lang === 'hi' ? 'hi' : 'en');
+      }
 
       // If in Mock Test Taking view: re-render question immediately
       const testWs = document.getElementById('test-taking-workspace');

@@ -3,249 +3,434 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BPSC 2027 AI Exam Predictor — High-Yield Target Paper</title>
+  <title>BPSC 2027 Target Paper Predictor — ShaktiQ</title>
+  <meta name="description" content="Practice 25 high-yield original predicted BPSC CCE questions across History, Polity, Science, Geography, Economics, and Aptitude — 100% free on ShaktiQ.">
+  <meta name="theme-color" content="#10402D">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0f19;
-      --card-bg: #151d2f;
-      --border: #24324f;
-      --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.15);
-      --success: #10b981;
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --badge-bg: #1e293b;
+      --bg: #F8FAF7;
+      --surface: #FFFFFF;
+      --sage: #EBF3E6;
+      --sage-soft: #ECF6E7;
+      --brand: #10402D;
+      --brand-hover: #17593F;
+      --text: #111C15;
+      --heading: #1E2D23;
+      --muted: #36443A;
+      --border: #DCE6DF;
+      --border-strong: #C6DEC0;
+      --amber-bg: #FEF6D6;
+      --amber-text: #785600;
+      --amber-border: #F5DF8B;
+      --wrong-bg: #FFF5F5;
+      --wrong-border: #DC2626;
+      --wrong-text: #991B1B;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: "Plus Jakarta Sans", "Noto Sans Devanagari", system-ui, -apple-system, sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      line-height: 1.6;
-      padding: 24px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 5rem;
     }
-    .container {
-      max-width: 900px;
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid var(--brand);
+      outline-offset: 2px;
+      box-shadow: 0 0 0 4px rgba(252, 226, 123, 0.75);
+    }
+
+    /* Sticky Serene Top Bar */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .top-bar-inner {
+      max-width: 1080px;
       margin: 0 auto;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
     }
-    header {
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+    .brand-link img {
+      height: 44px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.9rem;
+      border-radius: 0.75rem;
+      background: var(--sage);
+      border: 1px solid var(--border-strong);
+      color: var(--brand);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      min-height: 40px;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .back-link:hover {
+      background: var(--brand);
+      color: #FFFFFF;
+      border-color: var(--brand);
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 1.75rem 1.25rem 0;
+    }
+
+    /* Hero Header */
+    .page-header {
       text-align: center;
-      margin-bottom: 32px;
-      padding-bottom: 24px;
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.5rem;
       border-bottom: 1px solid var(--border);
     }
     .badge-pill {
       display: inline-block;
-      padding: 4px 12px;
+      padding: 0.28rem 0.8rem;
       border-radius: 9999px;
-      background: var(--accent-glow);
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: var(--sage);
+      color: var(--brand);
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 0.7rem;
+      border: 1px solid var(--border-strong);
     }
     h1 {
-      font-size: 28px;
+      font-size: clamp(1.65rem, 3.2vw, 2.25rem);
       font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      text-wrap: balance;
     }
     p.subtitle {
-      color: var(--text-muted);
-      font-size: 15px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 640px;
+      margin: 0 auto;
     }
+
+    /* Toolbar & Filters */
     .toolbar {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 24px;
+      gap: 0.55rem;
+      margin-bottom: 1.15rem;
       justify-content: space-between;
       align-items: center;
-      background: var(--card-bg);
-      padding: 16px;
-      border-radius: 12px;
+      background: var(--surface);
+      padding: 0.7rem 0.85rem;
+      border-radius: 1rem;
       border: 1px solid var(--border);
     }
     .filters {
       display: flex;
-      gap: 8px;
+      gap: 0.3rem;
       flex-wrap: wrap;
     }
     button.filter-btn {
-      background: var(--badge-bg);
-      color: var(--text-muted);
+      background: var(--bg);
+      color: var(--heading);
       border: 1px solid var(--border);
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    button.filter-btn:hover, button.filter-btn.active {
-      background: var(--accent);
-      color: #000;
-      border-color: var(--accent);
+      padding: 0.36rem 0.6rem;
+      border-radius: 0.6rem;
+      font-family: inherit;
+      font-size: 0.76rem;
       font-weight: 600;
+      cursor: pointer;
+      min-height: 36px;
+      white-space: nowrap;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    button.filter-btn:hover {
+      background: var(--sage);
+      border-color: var(--border-strong);
+      color: var(--brand);
+    }
+    button.filter-btn.active {
+      background: var(--brand);
+      color: #FFFFFF;
+      border-color: var(--brand);
+      font-weight: 700;
     }
     .controls {
       display: flex;
-      gap: 10px;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
     .btn-toggle {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
+      background: var(--brand);
+      color: #FFFFFF;
+      border: 1px solid var(--brand);
+      padding: 0.4rem 0.8rem;
+      border-radius: 0.6rem;
+      font-family: inherit;
+      font-size: 0.76rem;
+      font-weight: 700;
       cursor: pointer;
-      transition: opacity 0.2s;
+      min-height: 36px;
+      white-space: nowrap;
+      transition: background-color 0.15s ease;
     }
-    .btn-toggle:hover { opacity: 0.9; }
-    .question-card {
-      background: var(--card-bg);
+    .btn-toggle:hover {
+      background: var(--brand-hover);
+    }
+
+    /* Status & Tabular Score Row */
+    .stats-row {
+      margin-bottom: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .count-indicator {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .score-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: 0.65rem;
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px;
-      margin-bottom: 20px;
-      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--heading);
+    }
+    .score-correct { color: var(--brand); }
+    .score-wrong { color: var(--wrong-border); }
+
+    /* Question Cards */
+    .question-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.35rem 1.4rem;
+      margin-bottom: 1.15rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .question-card:hover {
-      border-color: #3b82f6;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      border-color: var(--border-strong);
+      box-shadow: 0 6px 20px -10px rgba(16, 64, 45, 0.1);
     }
     .card-meta {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.9rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 1px solid #E5ECE6;
     }
     .q-number {
       font-weight: 800;
-      font-size: 16px;
-      color: var(--accent);
+      font-size: 0.82rem;
+      color: var(--brand);
+      background: var(--sage);
+      border: 1px solid var(--border-strong);
+      padding: 0.22rem 0.65rem;
+      border-radius: 0.5rem;
+      font-variant-numeric: tabular-nums;
     }
-    .badges {
-      display: flex;
-      gap: 6px;
-    }
-    .badge {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 6px;
+    .meta-subtext {
+      font-size: 0.76rem;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: var(--muted);
     }
-    .badge-sub { background: #334155; color: #cbd5e1; }
-    .badge-fmt { background: #1e3a8a; color: #93c5fd; }
     .q-text {
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 18px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1.05rem;
       white-space: pre-line;
-      line-height: 1.65;
+      line-height: 1.7;
     }
     .options-grid {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 18px;
+      gap: 0.55rem;
+      margin-bottom: 0.85rem;
     }
     .option-item {
-      background: var(--badge-bg);
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text);
       border: 1px solid var(--border);
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 14.5px;
+      padding: 0.75rem 0.95rem;
+      border-radius: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
+      min-height: 46px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
       display: flex;
-      align-items: flex-start;
-      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
     }
     .option-item:hover {
-      background: #25334d;
-      border-color: #475569;
+      background: var(--sage);
+      border-color: var(--brand);
     }
     .option-item.correct {
-      background: rgba(16, 185, 129, 0.15);
-      border-color: var(--success);
-      color: #6ee7b7;
-      font-weight: 600;
+      background: var(--sage-soft);
+      border-color: var(--brand);
+      color: var(--brand);
+      font-weight: 700;
     }
+    .option-item.wrong {
+      background: var(--wrong-bg);
+      border-color: var(--wrong-border);
+      color: var(--wrong-text);
+      font-weight: 700;
+    }
+    .option-status {
+      font-size: 0.74rem;
+      font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Explanation Box */
     .explanation-box {
-      background: #0f172a;
-      border-left: 4px solid var(--accent);
-      padding: 16px;
-      border-radius: 0 8px 8px 0;
-      font-size: 14px;
-      margin-top: 14px;
+      background: var(--sage-soft);
+      border: 1px solid var(--border-strong);
+      border-left: 3px solid var(--brand);
+      padding: 1rem 1.1rem;
+      border-radius: 0.85rem;
+      font-size: 0.875rem;
+      color: var(--heading);
+      margin-top: 0.85rem;
       display: none;
     }
     .explanation-box.show { display: block; }
+    .exp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.55rem;
+    }
     .exp-title {
-      font-weight: 700;
-      color: var(--accent);
-      margin-bottom: 6px;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-weight: 800;
+      color: var(--brand);
+      font-size: 0.8rem;
+      letter-spacing: 0.02em;
+    }
+    .exp-body {
+      line-height: 1.65;
+      color: var(--heading);
     }
     .rationale-box {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px dashed #334155;
-      font-size: 13px;
-      color: #cbd5e1;
+      margin-top: 0.75rem;
+      padding-top: 0.7rem;
+      border-top: 1px dashed var(--border-strong);
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.6;
     }
     .rationale-tag {
-      color: #f59e0b;
+      color: var(--amber-text);
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      padding: 0.12rem 0.45rem;
+      border-radius: 0.4rem;
       font-weight: 700;
+      margin-right: 0.35rem;
+      font-size: 0.72rem;
     }
-    .count-indicator {
-      font-size: 13px;
-      color: var(--text-muted);
+
+    @media (max-width: 639.98px) {
+      .container { padding: 1.25rem 0.9rem 0; }
+      .question-card { padding: 1.05rem; }
+      .brand-link img { height: 38px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div style="margin-bottom: 16px;"><a href="/" aria-label="ShaktiQ Home"><img src="/logo-white.png" alt="ShaktiQ Logo" style="height: 52px; width: auto; object-fit: contain;"></a></div>
+  <nav class="top-bar" aria-label="Predictor navigation">
+    <div class="top-bar-inner">
+      <a href="/" class="brand-link" aria-label="ShaktiQ Home">
+        <picture>
+          <source srcset="/logo.webp" type="image/webp">
+          <img src="/logo.png" alt="ShaktiQ Logo" width="144" height="44">
+        </picture>
+      </a>
+      <a href="/" class="back-link">&larr; Back to ShaktiQ Home</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="page-header">
       <div class="badge-pill">71st / 72nd BPSC CCE Target Predictor</div>
       <h1>Predicted 2027 Exam Paper</h1>
-      <p class="subtitle">100% Unseen, original questions engineered from BPSC's 2023–2026 statistical examination DNA</p>
+      <p class="subtitle">25 original high-yield practice questions modeled on recent BPSC Prelims multi-statement, assertion-reason, and Bihar Special patterns.</p>
     </header>
 
     <div class="toolbar">
-      <div class="filters" id="subjectFilters">
-        <button class="filter-btn active" data-sub="ALL">All Subjects</button>
-        <button class="filter-btn" data-sub="History">History</button>
-        <button class="filter-btn" data-sub="Polity">Polity</button>
-        <button class="filter-btn" data-sub="Biology">Biology</button>
-        <button class="filter-btn" data-sub="Physics">Physics</button>
-        <button class="filter-btn" data-sub="Chemistry">Chemistry</button>
-        <button class="filter-btn" data-sub="Geography">Geography</button>
-        <button class="filter-btn" data-sub="Economics">Economics</button>
-        <button class="filter-btn" data-sub="Reasoning">Aptitude</button>
+      <div class="filters" id="subjectFilters" role="tablist" aria-label="Filter predicted questions by subject">
+        <button type="button" class="filter-btn active" role="tab" aria-selected="true" data-sub="ALL">All Subjects</button>
+        <button type="button" class="filter-btn" role="tab" aria-selected="false" data-sub="History">History</button>
+        <button type="button" class="filter-btn" role="tab" aria-selected="false" data-sub="Polity">Polity</button>
+        <button type="button" class="filter-btn" role="tab" aria-selected="false" data-sub="Biology">Biology</button>
+        <button type="button" class="filter-btn" role="tab" aria-selected="false" data-sub="Physics">Physics</button>
+        <button type="button" class="filter-btn" role="tab" aria-selected="false" data-sub="Chemistry">Chemistry</button>
+        <button type="button" class="filter-btn" role="tab" aria-selected="false" data-sub="Geography">Geography</button>
+        <button type="button" class="filter-btn" role="tab" aria-selected="false" data-sub="Economics">Economics</button>
+        <button type="button" class="filter-btn" role="tab" aria-selected="false" data-sub="Reasoning">Aptitude</button>
       </div>
       <div class="controls">
-        <button class="btn-toggle" id="toggleAnswersBtn">Show All Explanations</button>
+        <button type="button" class="btn-toggle" id="toggleAnswersBtn">Show All Explanations</button>
       </div>
     </div>
 
-    <div style="margin-bottom: 16px; display: flex; justify-content: space-between;">
-      <span class="count-indicator" id="showingCount">Showing 25 questions</span>
+    <div class="stats-row">
+      <span class="count-indicator" id="showingCount">Showing 25 predicted questions</span>
+      <div class="score-pill" id="predictorScorePill" aria-live="polite">
+        <span>Attempted: <strong id="predAttempted">0</strong></span>
+        <span class="score-correct">Correct: <strong id="predCorrect">0</strong></span>
+        <span class="score-wrong">Wrong: <strong id="predWrong">0</strong></span>
+      </div>
     </div>
 
     <div id="questionsContainer"></div>
-  </div>
+  </main>
 
   <script>
     const questionsData = [
@@ -777,11 +962,32 @@
 ];
     let activeSubject = 'ALL';
     let showAllExplanations = false;
+    const selectedAnswers = {};
 
     const container = document.getElementById('questionsContainer');
     const showingCount = document.getElementById('showingCount');
     const toggleBtn = document.getElementById('toggleAnswersBtn');
     const filterButtons = document.querySelectorAll('.filter-btn');
+    const predAttemptedEl = document.getElementById('predAttempted');
+    const predCorrectEl = document.getElementById('predCorrect');
+    const predWrongEl = document.getElementById('predWrong');
+
+    function updatePredictorScore() {
+      let attempted = 0;
+      let correct = 0;
+      let wrong = 0;
+      questionsData.forEach(q => {
+        const picked = selectedAnswers[q.id];
+        if (picked) {
+          attempted++;
+          if (picked === q.ans) correct++;
+          else wrong++;
+        }
+      });
+      if (predAttemptedEl) predAttemptedEl.textContent = String(attempted);
+      if (predCorrectEl) predCorrectEl.textContent = String(correct);
+      if (predWrongEl) predWrongEl.textContent = String(wrong);
+    }
 
     function renderQuestions() {
       container.innerHTML = '';
@@ -793,18 +999,16 @@
 
       showingCount.textContent = `Showing ${filtered.length} predicted questions`;
 
-      filtered.forEach((q, idx) => {
-        const card = document.createElement('div');
+      filtered.forEach((q) => {
+        const card = document.createElement('article');
         card.className = 'question-card';
+        card.setAttribute('data-qid', q.id);
 
         const meta = document.createElement('div');
         meta.className = 'card-meta';
         meta.innerHTML = `
-          <span class="q-number">${q.qno} &bull; ${q.subject}</span>
-          <div class="badges">
-            <span class="badge badge-sub">${q.subtopic}</span>
-            <span class="badge badge-fmt">${q._formatType || 'MCQ'}</span>
-          </div>
+          <span class="q-number">${q.qno} &middot; ${q.subject}</span>
+          <span class="meta-subtext">${q.subtopic} &middot; ${q._formatType || 'MCQ'}</span>
         `;
 
         const qText = document.createElement('div');
@@ -814,33 +1018,85 @@
         const optionsGrid = document.createElement('div');
         optionsGrid.className = 'options-grid';
 
-        q.options.forEach(opt => {
-          const optDiv = document.createElement('div');
-          optDiv.className = 'option-item';
-          optDiv.textContent = opt;
-
-          const optLetter = opt.trim().charAt(1);
-          if (showAllExplanations && optLetter === q.ans) {
-            optDiv.classList.add('correct');
-          }
-
-          optDiv.addEventListener('click', () => {
-            optDiv.classList.toggle('correct');
-            expBox.classList.toggle('show');
-          });
-
-          optionsGrid.appendChild(optDiv);
-        });
+        const userChoice = selectedAnswers[q.id] || null;
+        const shouldReveal = showAllExplanations || Boolean(userChoice);
 
         const expBox = document.createElement('div');
-        expBox.className = 'explanation-box' + (showAllExplanations ? ' show' : '');
-        expBox.innerHTML = `
-          <div class="exp-title">Official Answer: ${q.ansText}</div>
-          <p>${q.exp}</p>
-          <div class="rationale-box">
-            <span class="rationale-tag">Prediction Rationale:</span> ${q.predictionRationale || 'Calibrated from 2023-2026 PYQ recurrence.'}
-          </div>
-        `;
+        expBox.className = 'explanation-box' + (shouldReveal ? ' show' : '');
+
+        const expHeader = document.createElement('div');
+        expHeader.className = 'exp-header';
+        const expTitle = document.createElement('div');
+        expTitle.className = 'exp-title';
+        expTitle.textContent = `Official Answer: ${q.ansText}`;
+
+        const aiBtn = document.createElement('button');
+        aiBtn.type = 'button';
+        aiBtn.className = 'shakti-explain-ai-btn';
+        aiBtn.textContent = 'Explain with AI';
+        aiBtn.addEventListener('click', () => {
+          if (window.ShaktiAI && typeof window.ShaktiAI.explainQuestion === 'function') {
+            window.ShaktiAI.explainQuestion({
+              exam: q.exam,
+              subject: q.subject,
+              question: q.q,
+              options: q.options,
+              correctAnswer: q.ansText,
+              explanation: q.exp
+            });
+          }
+        });
+
+        expHeader.appendChild(expTitle);
+        expHeader.appendChild(aiBtn);
+
+        const expBody = document.createElement('p');
+        expBody.className = 'exp-body';
+        expBody.textContent = q.exp;
+
+        const rationaleBox = document.createElement('div');
+        rationaleBox.className = 'rationale-box';
+        rationaleBox.innerHTML = `<span class="rationale-tag">Prediction Rationale</span>${q.predictionRationale || 'Calibrated from 2023–2026 PYQ recurrence.'}`;
+
+        expBox.appendChild(expHeader);
+        expBox.appendChild(expBody);
+        expBox.appendChild(rationaleBox);
+
+        q.options.forEach(opt => {
+          const optBtn = document.createElement('button');
+          optBtn.type = 'button';
+          optBtn.className = 'option-item';
+
+          const optLetter = opt.trim().charAt(1);
+          const textSpan = document.createElement('span');
+          textSpan.textContent = opt;
+          optBtn.appendChild(textSpan);
+
+          const statusSpan = document.createElement('span');
+          statusSpan.className = 'option-status';
+
+          if (shouldReveal) {
+            if (optLetter === q.ans) {
+              optBtn.classList.add('correct');
+              statusSpan.textContent = userChoice === optLetter ? '✓ Correct' : '✓ Answer';
+            } else if (userChoice === optLetter && optLetter !== q.ans) {
+              optBtn.classList.add('wrong');
+              statusSpan.textContent = '✗ Incorrect';
+            }
+          }
+
+          if (statusSpan.textContent) {
+            optBtn.appendChild(statusSpan);
+          }
+
+          optBtn.addEventListener('click', () => {
+            selectedAnswers[q.id] = optLetter;
+            updatePredictorScore();
+            renderQuestions();
+          });
+
+          optionsGrid.appendChild(optBtn);
+        });
 
         card.appendChild(meta);
         card.appendChild(qText);
@@ -852,8 +1108,12 @@
 
     filterButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        filterButtons.forEach(b => b.classList.remove('active'));
+        filterButtons.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
         activeSubject = btn.dataset.sub;
         renderQuestions();
       });
@@ -865,7 +1125,9 @@
       renderQuestions();
     });
 
+    updatePredictorScore();
     renderQuestions();
   </script>
+  <script src="./js/ask-ai.js" defer></script>
 </body>
 </html>

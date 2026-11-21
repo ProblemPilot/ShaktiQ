@@ -2625,6 +2625,23 @@ if (typeof window !== 'undefined') {
   window.backToTestResultModal = backToTestResultModal;
   window.ttCopyCurrentQuestion = ttCopyCurrentQuestion;
   window.solCopyCurrentQuestion = solCopyCurrentQuestion;
+
+  function solExplainWithAi() {
+    if (!window.ShaktiAI || typeof window.ShaktiAI.explainQuestion !== 'function') return;
+    if (!Array.isArray(currentReviewQuestions) || !currentReviewQuestions.length) return;
+    const q = currentReviewQuestions[currentReviewIndex];
+    if (!q) return;
+    const cleanStem = (typeof cleanQuestionStem === 'function') ? cleanQuestionStem(q.q) : q.q;
+    window.ShaktiAI.explainQuestion({
+      question: cleanStem,
+      options: Array.isArray(q.options) ? q.options : [],
+      correctAnswer: q.ansText || (q.ans ? 'Option ' + q.ans : ''),
+      explanation: q.exp || '',
+      subject: q.subject || '',
+      exam: (currentActiveTest && currentActiveTest.title) ? currentActiveTest.title : (q.exam || 'BPSC Mock Test')
+    });
+  }
+  window.solExplainWithAi = solExplainWithAi;
 }
 
 if (typeof module !== 'undefined' && module.exports) {

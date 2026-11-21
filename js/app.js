@@ -72,6 +72,63 @@
       });
     }
 
+    function openExamGateway(category) {
+      openTestSeriesMode();
+      if (category && typeof filterTestSeries === 'function') {
+        setTimeout(() => {
+          filterTestSeries(category);
+        }, 120);
+      }
+    }
+
+    function updateHomeResumeStrip() {
+      const strip = document.getElementById('home-resume-strip');
+      const btn = document.getElementById('home-resume-btn');
+      const label = document.getElementById('home-resume-text');
+      if (!strip || !btn || !label) return;
+
+      // 1. Check for an unfinished mock test draft first
+      let latestDraft = null;
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('draft_')) {
+            const parsed = JSON.parse(localStorage.getItem(k) || 'null');
+            if (parsed && parsed.examTitle && (!latestDraft || (parsed.savedAt || 0) > (latestDraft.savedAt || 0))) {
+              latestDraft = parsed;
+            }
+          }
+        }
+      } catch (_) {}
+
+      if (latestDraft) {
+        const answeredCount = latestDraft.answers ? Object.keys(latestDraft.answers).length : 0;
+        label.textContent = answeredCount > 0
+          ? `Resume unfinished test · ${latestDraft.examTitle} (${answeredCount} answered)`
+          : `Resume unfinished test · ${latestDraft.examTitle}`;
+        btn.onclick = () => openTestSeriesMode();
+        strip.classList.remove('hidden');
+        return;
+      }
+
+      // 2. Otherwise check for active PYQ practice progress
+      let practicedCount = 0;
+      try {
+        const prefix = typeof getStudentStoragePrefix === 'function' ? getStudentStoragePrefix() : 'guest';
+        const attempts = JSON.parse(localStorage.getItem(prefix + '_practice') || localStorage.getItem('bpsc_practice_attempts_v1') || '{}');
+        practicedCount = attempts && typeof attempts === 'object' ? Object.keys(attempts).length : 0;
+      } catch (_) {}
+
+      if (practicedCount > 0) {
+        label.textContent = `Continue practice · ${practicedCount} question${practicedCount === 1 ? '' : 's'} solved`;
+        btn.onclick = () => openPyqBankMode();
+        strip.classList.remove('hidden');
+        return;
+      }
+
+      strip.classList.add('hidden');
+    }
+
     function openPyqBankMode() {
       const portal = document.getElementById('page-portal-view');
       const qb = document.getElementById('page-bpsc-pyq-view');
@@ -855,21 +912,18 @@
 
         if (navContainer) {
           navContainer.innerHTML = `
-            <button type="button" onclick="openStudentProfileModal()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] hover:bg-[#DCE9D5] border border-[#C6DEC0] shadow-sm transition-all cursor-pointer" title="View Student Profile & Performance Records">
-              <span class="w-2 h-2 rounded-full bg-[#10402D]"></span>
-              <i data-lucide="user-check" class="w-3.5 h-3.5 text-[#10402D]"></i>
-              <span class="font-bold text-[#111C15]">${escapeHtml(firstName)}</span>
-              <span class="text-[10px] text-[#10402D] font-mono px-1.5 py-0.5 rounded bg-white border border-[#C5DEC0] hidden lg:inline">(${escapeHtml(targetShort)})</span>
+            <button type="button" onclick="openStudentProfileModal()" class="sq-profile-chip" title="View Student Profile & Performance Records">
+              <span class="sq-profile-chip-dot"></span>
+              <span>${escapeHtml(firstName)}</span>
             </button>
           `;
         }
 
         if (mobileNavContainer) {
           mobileNavContainer.innerHTML = `
-            <button type="button" onclick="openStudentProfileModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#10402D] bg-[#EBF3E6] border border-[#C6DEC0] cursor-pointer">
-              <span class="w-2 h-2 rounded-full bg-[#10402D]"></span>
-              <i data-lucide="user-check" class="w-3 h-3 text-[#10402D]"></i>
-              <span class="font-bold text-[#111C15]">${escapeHtml(firstName)}</span>
+            <button type="button" onclick="openStudentProfileModal()" class="sq-profile-chip sq-signin-btn-compact" title="View Student Profile">
+              <span class="sq-profile-chip-dot"></span>
+              <span>${escapeHtml(firstName)}</span>
             </button>
           `;
         }
@@ -884,15 +938,13 @@
         }
       } else {
         const signInBtnHtml = `
-          <button type="button" onclick="openAspirantRegModal('Sign in with your name, email, and mobile number to unlock the PYQ Bank and Mock Tests.')" class="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#0A3826] hover:bg-[#145239] shadow-sm transition-all cursor-pointer" id="nav-signin-btn">
-            <i data-lucide="user" class="w-4 h-4 text-[#FCE27B]"></i>
+          <button type="button" onclick="openAspirantRegModal('Sign in with your name, email, and mobile number to unlock the PYQ Bank and Mock Tests.')" class="sq-signin-btn" id="nav-signin-btn">
             <span>Sign In</span>
           </button>
         `;
 
         const mobileSignInBtnHtml = `
-          <button type="button" onclick="openAspirantRegModal('Sign in with your name, email, and mobile number to unlock the PYQ Bank and Mock Tests.')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#0A3826] cursor-pointer">
-            <i data-lucide="user" class="w-3.5 h-3.5 text-[#FCE27B]"></i>
+          <button type="button" onclick="openAspirantRegModal('Sign in with your name, email, and mobile number to unlock the PYQ Bank and Mock Tests.')" class="sq-signin-btn sq-signin-btn-compact">
             <span>Sign In</span>
           </button>
         `;
@@ -1227,6 +1279,7 @@
       setupFaq();
       setupPracticeWorkspace();
       initShaktiQExtras();
+      updateHomeResumeStrip();
 
             // Restore saved PYQ attempts per student
       try {
@@ -1292,17 +1345,11 @@
             });
           }).catch(() => {});
 
-          let refreshing = false;
           navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (!refreshing) {
-              if (typeof activeMockTest !== 'undefined' && activeMockTest) {
-                if (typeof showToast === 'function') {
-                  showToast("Update ready — will apply automatically after your test.", "info");
-                }
-                return;
+            if (typeof activeMockTest !== 'undefined' && activeMockTest) {
+              if (typeof showToast === 'function') {
+                showToast("Update ready — will apply automatically after your test.", "info");
               }
-              refreshing = true;
-              window.location.reload();
             }
           });
         });
@@ -1426,6 +1473,8 @@ window.exportLeads = function() { if (typeof exportAllAspirantsCSV === "function
 if (typeof window !== 'undefined') {
   window.openTestSeriesMode = openTestSeriesMode;
   window.openSpeedDrills = openSpeedDrills;
+  window.openExamGateway = openExamGateway;
+  window.updateHomeResumeStrip = updateHomeResumeStrip;
   window.openPyqBankMode = openPyqBankMode;
   window.switchMainMode = switchMainMode;
   window.getSubjectInHindi = getSubjectInHindi;

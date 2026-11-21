@@ -3,6 +3,8 @@
   "version": "1.2.0",
   "description": "ShaktiQ - Bihar Exam Prep Web Portal and Cloudflare Auth Gate",
   "scripts": {
+    "dev": "node scripts/server.js",
+    "start": "node scripts/server.js",
     "verify": "node test/verify.js",
     "serve": "node scripts/server.js",
     "login": "wrangler login",
@@ -14,5 +16,8 @@
     "puppeteer-core": "^25.17.0",
     "sharp": "^0.35.5",
     "wrangler": "^4.160.0"
+  },
+  "dependencies": {
+    "@google/genai": "^3.6.1"
   }
 }

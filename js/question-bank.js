@@ -1321,15 +1321,18 @@
         `;
 
         answerBoxHtml = `
-          <div id="ansbox-${escapeHtml(item.id)}" class="${showAllAnswers ? '' : 'hidden'} mt-3.5 pt-3 border-t border-[#C5DEC0] bg-[#ECF6E7] rounded-xl p-4 text-xs sm:text-sm space-y-2 text-[#111C15]">
+          <div id="ansbox-${escapeHtml(item.id)}" class="${showAllAnswers ? '' : 'hidden'} mt-3.5 pt-3 border-t border-[#C5DEC0] bg-[#ECF6E7] rounded-xl p-4 text-xs sm:text-sm space-y-2.5 text-[#111C15]">
             <div class="flex items-center justify-between flex-wrap gap-2">
               <div>
-                <span class="font-extrabold text-[#111C15]">Paper Structure & Marks:</span>
+                <span class="font-extrabold text-[#111C15]">Paper Structure &amp; Marks:</span>
                 <span class="font-bold text-[#10402D] ml-1">${escapeHtml(item.ansText || 'BPSC Mains Descriptive Paper')}</span>
               </div>
+              <button type="button" onclick="explainPyqWithAi('${escapeHtml(item.id)}')" class="shakti-explain-ai-btn no-print" title="Ask Shakti AI to explain this Mains question">
+                <span>Explain with AI</span>
+              </button>
             </div>
             <div class="text-[#1E2D23] leading-relaxed">
-              <span class="font-bold text-[#10402D]">Model Answer & Evaluation Framework:</span> ${escapeHtml(displayExp)}
+              <span class="font-bold text-[#10402D]">Model Answer &amp; Evaluation Framework:</span> ${escapeHtml(displayExp)}
             </div>
           </div>
         `;
@@ -1353,18 +1356,21 @@
 
           optionsHtml += `<button type="button" data-qid="${escapeHtml(item.id)}" data-opt="${letter}" class="option-btn text-left px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm ${stateClass} flex items-start justify-between gap-2 cursor-pointer">
             <span>${escapeHtml(optText)}</span>
-            ${(revealAnswer && letter === item.ans) ? '<span class="text-emerald-700 font-extrabold shrink-0">✓</span>' : ''}
+            ${(revealAnswer && letter === item.ans) ? '<span class="text-[#10402D] font-extrabold shrink-0">✓</span>' : ''}
           </button>`;
         });
         optionsHtml += `</div>`;
 
-        answerBoxHtml = `${!revealAnswer ? `<div class="mt-2.5 text-xs font-semibold text-[#36443A] italic bg-[#F8FAF7] border border-dashed border-[#DCE6DF] rounded-xl px-3 py-2 flex items-center justify-between"><span>💡 Select an option above to test yourself and unlock the solution &amp; explanation</span><button type="button" data-toggle-ans="${escapeHtml(item.id)}" class="text-xs font-bold text-[#10402D] hover:underline cursor-pointer">Reveal Key Directly</button></div>` : ''}
-        <div id="ansbox-${escapeHtml(item.id)}" class="${revealAnswer ? '' : 'hidden'} mt-3.5 pt-3 border-t border-[#C5DEC0] bg-[#ECF6E7] rounded-xl p-4 text-xs sm:text-sm space-y-1.5 text-[#111C15]">
+        answerBoxHtml = `${!revealAnswer ? `<div class="mt-2.5 text-xs font-semibold text-[#36443A] bg-[#F8FAF7] border border-[#DCE6DF] rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-2 flex-wrap"><span>Select an option above to test your recall and unlock the solution</span><button type="button" data-toggle-ans="${escapeHtml(item.id)}" class="text-xs font-bold text-[#10402D] hover:underline cursor-pointer">Reveal Key Directly</button></div>` : ''}
+        <div id="ansbox-${escapeHtml(item.id)}" class="${revealAnswer ? '' : 'hidden'} mt-3.5 pt-3 border-t border-[#C5DEC0] bg-[#ECF6E7] rounded-xl p-4 text-xs sm:text-sm space-y-2 text-[#111C15]">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
               <span class="font-extrabold text-[#111C15]">Published Key / Answer:</span>
               <span class="font-bold text-[#10402D] ml-1">${escapeHtml(item.ansText)}</span>
             </div>
+            <button type="button" onclick="explainPyqWithAi('${escapeHtml(item.id)}')" class="shakti-explain-ai-btn no-print" title="Ask Shakti AI to explain this question">
+              <span>Explain with AI</span>
+            </button>
           </div>
           <div class="text-[#1E2D23] leading-relaxed">
             <span class="font-bold text-[#10402D]">Decoded Explanation:</span> ${escapeHtml(displayExp)}
@@ -1374,64 +1380,82 @@
 
       const langToggleLabel = useHindi ? 'English' : 'हिन्दी';
 
-      return `<article id="qcard-${escapeHtml(item.id)}" data-qid="${escapeHtml(item.id)}" data-index="${displayIndex}" data-attempted="${isAttempted ? '1' : '0'}" class="question-card bg-white rounded-2xl shadow-sm border border-[#DCE6DF] p-4 sm:p-6 transition hover:border-[#10402D] text-[#111C15] scroll-mt-28 ${isResumeTarget ? 'ring-2 ring-[#10402D]' : ''}">
-        <!-- Top Metadata Badges: Uniform Dark Green Background with White Text -->
-        <div class="flex items-center justify-between gap-2 flex-wrap mb-2.5">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">${escapeHtml(item.subject)}</span>
-            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">${escapeHtml(item.exam)}</span>
-            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">📅 ${escapeHtml(item.date)} (${escapeHtml(item.year)})</span>
-            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] shadow-2xs">${isMains ? 'Descriptive Mains' : escapeHtml(item.type)}</span>
-            ${item.custom ? '<span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#0A2E20] text-emerald-200 border border-[#17593F]">Custom Added</span>' : ''}
+      return `<article id="qcard-${escapeHtml(item.id)}" data-qid="${escapeHtml(item.id)}" data-index="${displayIndex}" data-attempted="${isAttempted ? '1' : '0'}" class="question-card bg-white rounded-2xl border border-[#DCE6DF] p-4 sm:p-6 transition text-[#111C15] scroll-mt-28 ${isResumeTarget ? 'ring-2 ring-[#10402D]' : ''}">
+        <!-- Calm Editorial Metadata Strip -->
+        <div class="flex items-center justify-between gap-2.5 flex-wrap mb-3 pb-2.5 border-b border-[#E5ECE6]">
+          <div class="pyq-meta-strip">
+            <span class="pyq-meta-subject">${escapeHtml(item.subject)}</span>
+            <span class="pyq-meta-dot" aria-hidden="true">&middot;</span>
+            <span class="pyq-meta-item">${escapeHtml(item.exam)}</span>
+            <span class="pyq-meta-dot" aria-hidden="true">&middot;</span>
+            <span class="pyq-meta-item tabular-nums">${escapeHtml(item.date)} (${escapeHtml(item.year)})</span>
+            ${isMains ? '<span class="pyq-meta-dot" aria-hidden="true">&middot;</span><span class="pyq-meta-item text-[#785600]">Descriptive Mains</span>' : ''}
+            ${item.custom ? '<span class="text-xs font-bold px-2 py-0.5 rounded-md bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]">Custom</span>' : ''}
             ${mistakeEntry ? `
-              <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${mistakeEntry.consecutiveCorrect === 1 ? 'bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]' : 'bg-[#FFF5F5] text-rose-800 border border-rose-300'} flex items-center gap-1 shadow-2xs">
-                <span>${mistakeEntry.consecutiveCorrect === 1 ? '⚡ 1/2 Correct (Needs 1 more to clear)' : '❌ Mistake Register (' + (mistakeEntry.wrongCount || 1) + ' wrong)'}</span>
+              <span class="text-xs font-bold px-2.5 py-0.5 rounded-md ${mistakeEntry.consecutiveCorrect === 1 ? 'bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]' : 'bg-[#FFF5F5] text-rose-800 border border-rose-300'} inline-flex items-center gap-1">
+                <span>${mistakeEntry.consecutiveCorrect === 1 ? '1/2 Correct (1 more to clear)' : 'Mistake Register (' + (mistakeEntry.wrongCount || 1) + ' wrong)'}</span>
               </span>
             ` : ''}
             ${isAttempted ? `
-              <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${userChoice === item.ans ? 'bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]' : 'bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]'} flex items-center gap-1 shadow-2xs">
+              <span class="text-xs font-bold px-2.5 py-0.5 rounded-md ${userChoice === item.ans ? 'bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0]' : 'bg-[#FEF6D6] text-[#785600] border border-[#F5DF8B]'} inline-flex items-center gap-1">
                 <i data-lucide="${userChoice === item.ans ? 'check-circle' : 'alert-circle'}" class="w-3.5 h-3.5"></i>
-                <span>Previously Attempted (Selected ${userChoice}) • ${userChoice === item.ans ? 'Correct' : 'Needs Review'}</span>
+                <span>Selected ${userChoice} &middot; ${userChoice === item.ans ? 'Correct' : 'Needs Review'}</span>
               </span>
             ` : ''}
             ${isResumeTarget ? `
-              <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#10402D] text-white border border-[#17593F] flex items-center gap-1 shadow-2xs">
-                <span>📍 Next to Solve • Q${displayIndex}</span>
+              <span class="text-xs font-bold px-2.5 py-0.5 rounded-md bg-[#10402D] text-white inline-flex items-center gap-1">
+                <span>Next to Solve &middot; Q${displayIndex}</span>
               </span>
             ` : ''}
           </div>
 
           <div class="flex items-center gap-1.5 no-print flex-wrap">
             <!-- 1-Tap Bilingual Toggle for this Question -->
-            <button type="button" onclick="togglePyqCardLang('${escapeHtml(item.id)}')" id="btn-lang-${escapeHtml(item.id)}" title="Switch Language / भाषा बदलें" class="text-xs font-bold px-2.5 py-1 rounded-lg border border-[#C6DEC0] bg-[#EBF3E6] text-[#10402D] hover:bg-[#DCE9D5] transition cursor-pointer flex items-center gap-1">
+            <button type="button" onclick="togglePyqCardLang('${escapeHtml(item.id)}')" id="btn-lang-${escapeHtml(item.id)}" title="Switch Language / भाषा बदलें" class="text-xs font-bold px-2.5 py-1.5 rounded-lg border border-[#C6DEC0] bg-[#EBF3E6] text-[#10402D] hover:bg-[#DCE9D5] transition cursor-pointer flex items-center gap-1">
               <i data-lucide="languages" class="w-3.5 h-3.5"></i>
               <span>${langToggleLabel}</span>
             </button>
-            <button type="button" data-toggle-ans="${escapeHtml(item.id)}" class="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 transition cursor-pointer">
+            <button type="button" data-toggle-ans="${escapeHtml(item.id)}" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-[#DCE6DF] text-[#223127] hover:bg-[#F8FAF7] transition cursor-pointer">
               ${(isMains ? showAllAnswers : revealAnswer) ? (isMains ? 'Hide Model Answer' : 'Hide Key') : (isMains ? 'Show Model Answer' : 'Show Key')}
             </button>
-            <button type="button" data-bookmark="${escapeHtml(item.id)}" title="Bookmark Question" class="text-xs font-bold px-2.5 py-1 rounded-lg border ${isBookmarked ? 'bg-amber-100 border-amber-300 text-amber-800' : 'border-slate-200 text-slate-600 hover:bg-slate-100'} transition cursor-pointer">
+            <button type="button" data-bookmark="${escapeHtml(item.id)}" title="Bookmark Question" class="text-xs font-bold px-2.5 py-1.5 rounded-lg border ${isBookmarked ? 'bg-[#FEF6D6] border-[#F5DF8B] text-[#785600]' : 'border-[#DCE6DF] text-[#36443A] hover:bg-[#F8FAF7]'} transition cursor-pointer">
               ${isBookmarked ? '★ Saved' : '☆ Save'}
             </button>
-            <button type="button" data-copy="${escapeHtml(item.id)}" title="Copy Question & Answer" class="text-xs font-medium px-2 py-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+            <button type="button" data-copy="${escapeHtml(item.id)}" title="Copy Question & Answer" class="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-[#DCE6DF] text-[#36443A] hover:bg-[#F8FAF7] transition cursor-pointer">
               Copy
             </button>
             ${item.custom ? `
-              <button type="button" data-edit="${escapeHtml(item.id)}" class="text-xs font-semibold px-2 py-1 rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-50 cursor-pointer">Edit</button>
-              <button type="button" data-delete="${escapeHtml(item.id)}" class="text-xs font-semibold px-2 py-1 rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 cursor-pointer">Delete</button>
+              <button type="button" data-edit="${escapeHtml(item.id)}" class="text-xs font-semibold px-2 py-1.5 rounded-lg border border-[#C6DEC0] text-[#10402D] hover:bg-[#EBF3E6] cursor-pointer">Edit</button>
+              <button type="button" data-delete="${escapeHtml(item.id)}" class="text-xs font-semibold px-2 py-1.5 rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 cursor-pointer">Delete</button>
             ` : ''}
           </div>
         </div>
 
         <!-- Question Text -->
         <h3 class="text-sm sm:text-base font-semibold text-[#111C15] leading-relaxed">
-          <span class="font-extrabold text-[#10402D] mr-1.5 shrink-0">${displayIndex}. </span><span id="pyq-qtext-${escapeHtml(item.id)}" data-lang="${useHindi ? 'hi' : 'en'}">${renderFormattedQuestionHtml(displayQText)}</span>
+          <span class="font-extrabold text-[#10402D] mr-1.5 shrink-0 tabular-nums">${displayIndex}. </span><span id="pyq-qtext-${escapeHtml(item.id)}" data-lang="${useHindi ? 'hi' : 'en'}">${renderFormattedQuestionHtml(displayQText)}</span>
         </h3>
 
         ${optionsHtml}
         ${answerBoxHtml}
       </article>`;
     }
+
+    function explainPyqWithAi(qid) {
+      if (!window.ShaktiAI || typeof window.ShaktiAI.explainQuestion !== 'function') return;
+      const allQ = (typeof getAllQuestions === 'function') ? getAllQuestions() : [];
+      const item = allQ.find(x => x.id === qid);
+      if (!item) return;
+      window.ShaktiAI.explainQuestion({
+        question: typeof cleanQuestionStem === 'function' ? cleanQuestionStem(item.q) : item.q,
+        options: Array.isArray(item.options) ? item.options : [],
+        correctAnswer: item.ansText || item.ans || '',
+        explanation: item.exp || '',
+        subject: item.subject || '',
+        exam: item.exam || ''
+      });
+    }
+    window.explainPyqWithAi = explainPyqWithAi;
 
     function togglePyqCardLang(qid) {
       const allQ = (typeof getAllQuestions === 'function') ? getAllQuestions() : [];

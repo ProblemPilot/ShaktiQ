@@ -251,10 +251,11 @@ function initIcons() {
         portal.classList.remove('hidden');
         safeScrollToTop();
         initIcons();
+        if (typeof updateHomeResumeStrip === 'function') updateHomeResumeStrip();
         try { history.pushState(null, null, '#'); } catch(e){}
       }
       updatePageMeta({
-        title: "ShaktiQ – Bihar Exam Prep | Decode Bihar's Toughest Exams",
+        title: "Shakti Question Bank – Bihar Exam Prep",
         description: "Practice 2800+ BPSC PYQs based on published answer keys, 22 full-length tests on BPSC pattern, rapid revision sheets, and exam mnemonics",
         url: "https://shaktiq.com/",
         image: "https://shaktiq.com/share-card.png"
@@ -312,7 +313,10 @@ function initIcons() {
         openPyqBankMode();
         switchView('manage');
       } else {
-        openPortalView();
+        const portal = document.getElementById('page-portal-view');
+        if (portal && portal.classList.contains('hidden')) {
+          openPortalView();
+        }
       }
       if (typeof updateAdminUI === 'function') updateAdminUI();
     });
