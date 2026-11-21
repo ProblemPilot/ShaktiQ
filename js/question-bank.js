@@ -1052,6 +1052,57 @@
       }
     }
 
+    const SUBJECT_CATEGORIES = [
+      {
+        id: "science",
+        label: "Science",
+        subjects: ["Physics", "Chemistry", "Biology"]
+      },
+      {
+        id: "gk_gs",
+        label: "GK / GS",
+        subjects: ["History", "Geography", "Economics", "Polity"]
+      },
+      {
+        id: "misc",
+        label: "Miscellaneous",
+        shortLabel: "Misc",
+        subjects: ["Current Affairs", "Bihar Special", "Environment"]
+      },
+      {
+        id: "aptitude",
+        label: "General Aptitude",
+        shortLabel: "Aptitude",
+        subjects: ["Mathematics", "Reasoning"]
+      }
+    ];
+
+    function closeAllSubjectDropdowns() {
+      document.querySelectorAll('.subject-dropdown-fixed-menu').forEach(m => {
+        m.style.display = 'none';
+      });
+      document.querySelectorAll('#subjectPillsContainer .dropdown-chevron').forEach(c => {
+        c.classList.remove('rotate-180');
+      });
+      document.querySelectorAll('.subject-category-btn').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    if (typeof window !== 'undefined' && !window._subjectDropdownGlobalListenersAttached) {
+      window._subjectDropdownGlobalListenersAttached = true;
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.subject-dropdown-container') && !e.target.closest('.subject-dropdown-fixed-menu')) {
+          closeAllSubjectDropdowns();
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeAllSubjectDropdowns();
+      });
+      window.addEventListener('scroll', closeAllSubjectDropdowns, { passive: true });
+      window.addEventListener('resize', closeAllSubjectDropdowns, { passive: true });
+    }
+
     function renderSubjectPills() {
       const all = getAllQuestions();
       const counts = { ALL: all.length };
@@ -1072,31 +1123,108 @@
       const allTot = counts.ALL || 0;
       const allLeft = Math.max(0, allTot - allAtt);
 
-      let html = `<button type="button" data-subject="ALL" class="subject-pill ${selectedSubject === 'ALL' ? 'subject-pill-active' : 'bg-[#F8FAF7] text-[#223127] hover:bg-[#EBF3E6] border-[#DCE6DF]'} border rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold transition flex items-center gap-1.5" title="${allAtt} attempted, ${allLeft} unattempted">
+      let html = `<button type="button" data-subject="ALL" class="subject-pill shrink-0 ${selectedSubject === 'ALL' ? 'subject-pill-active' : 'bg-[#F8FAF7] text-[#223127] hover:bg-[#EBF3E6] border-[#DCE6DF]'} border rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap" title="${allAtt} attempted, ${allLeft} unattempted">
         <span>All Subjects</span>
         <span class="px-2 py-0.5 text-xs rounded-full ${selectedSubject === 'ALL' ? 'bg-white/20 text-white' : 'bg-black/10 text-[#111C15]'}">${allAtt > 0 ? `${allAtt}/${allTot}` : allTot}</span>
       </button>`;
 
-      SUBJECT_ORDER.forEach(subj => {
-        const isActive = selectedSubject === subj;
-        const count = counts[subj] || 0;
-        const att = attemptedCounts[subj] || 0;
-        const unatt = Math.max(0, count - att);
-        const countLabel = att > 0 ? `${att}/${count}` : count;
-        html += `<button type="button" data-subject="${escapeHtml(subj)}" class="subject-pill ${isActive ? 'subject-pill-active' : 'bg-white text-[#223127] hover:bg-[#EBF3E6] border-[#DCE6DF]'} border rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5" title="${att} attempted, ${unatt} unattempted remaining">
-          <span>${escapeHtml(subj)}</span>
-          <span class="px-1.5 py-0.5 text-xs rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-[#EBF3E6] text-[#10402D] font-bold'}">${countLabel}</span>
-        </button>`;
+      SUBJECT_CATEGORIES.forEach(cat => {
+        const activeSubj = cat.subjects.find(s => s === selectedSubject);
+        const isCatActive = Boolean(activeSubj);
+        const catTot = cat.subjects.reduce((sum, s) => sum + (counts[s] || 0), 0);
+        const catAtt = cat.subjects.reduce((sum, s) => sum + (attemptedCounts[s] || 0), 0);
+
+        let displayLabel = `<span>${escapeHtml(cat.label)}</span>`;
+        if (isCatActive) {
+          displayLabel = `<span>${escapeHtml(cat.label)}: ${escapeHtml(activeSubj)}</span>`;
+        }
+
+        const countBadgeText = isCatActive
+          ? (attemptedCounts[activeSubj] > 0 ? `${attemptedCounts[activeSubj]}/${counts[activeSubj]}` : counts[activeSubj])
+          : (catAtt > 0 ? `${catAtt}/${catTot}` : catTot);
+
+        const menuItemsHtml = cat.subjects.map(subj => {
+          const isSelected = selectedSubject === subj;
+          const count = counts[subj] || 0;
+          const att = attemptedCounts[subj] || 0;
+          const countLabel = att > 0 ? `${att}/${count}` : count;
+          return `
+            <button type="button"
+              data-subject="${escapeHtml(subj)}"
+              data-subject-pill="${escapeHtml(subj)}"
+              class="subject-dropdown-item ${isSelected ? 'is-selected' : ''}"
+              role="menuitem">
+              <span class="flex items-center gap-2">
+                ${isSelected ? '<svg class="w-4 h-4 text-[#10402D] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>' : '<span class="w-4 inline-block shrink-0"></span>'}
+                <span>${escapeHtml(subj)}</span>
+              </span>
+              <span class="px-2 py-0.5 text-xs rounded-full ${isSelected ? 'bg-[#10402D] text-white font-bold' : 'bg-[#F6F7F2] text-[#526056] border border-[#DCE6DF] font-semibold'}">${countLabel}</span>
+            </button>
+          `;
+        }).join('');
+
+        html += `
+          <div class="relative inline-block subject-dropdown-container shrink-0" data-cat-id="${cat.id}">
+            <button type="button" class="subject-category-btn subject-pill shrink-0 ${isCatActive ? 'subject-pill-active' : 'bg-[#F8FAF7] text-[#223127] hover:bg-[#EBF3E6] border-[#DCE6DF]'} border rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap" aria-expanded="false" aria-haspopup="true">
+              <span>${displayLabel}</span>
+              <span class="px-2 py-0.5 text-xs rounded-full ${isCatActive ? 'bg-white/20 text-white' : 'bg-[#EBF3E6] text-[#10402D] font-bold'}">${countBadgeText}</span>
+              <svg class="dropdown-chevron w-3.5 h-3.5 transition-transform duration-200 ${isCatActive ? 'text-white' : 'text-[#526056]'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div class="subject-dropdown-fixed-menu" id="menu-${cat.id}" role="menu">
+              ${menuItemsHtml}
+            </div>
+          </div>
+        `;
       });
 
       container.innerHTML = html;
 
-      container.querySelectorAll(".subject-pill").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const subj = btn.getAttribute("data-subject");
+      // Dropdown toggle handlers
+      container.querySelectorAll('.subject-category-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const dropdownContainer = btn.closest('.subject-dropdown-container');
+          const menu = dropdownContainer ? dropdownContainer.querySelector('.subject-dropdown-fixed-menu') : null;
+          const chevron = btn.querySelector('.dropdown-chevron');
+          const isCurrentlyOpen = menu && menu.style.display === 'block';
+
+          closeAllSubjectDropdowns();
+
+          if (!isCurrentlyOpen && menu) {
+            const rect = btn.getBoundingClientRect();
+            const menuWidth = 230;
+            let left = rect.left;
+            if (left + menuWidth > window.innerWidth - 12) {
+              left = Math.max(12, window.innerWidth - menuWidth - 12);
+            }
+            menu.style.top = `${rect.bottom + 6}px`;
+            menu.style.left = `${left}px`;
+            menu.style.display = 'block';
+            if (chevron) chevron.classList.add('rotate-180');
+            btn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+
+      // Dropdown item selection handlers
+      container.querySelectorAll('.subject-dropdown-item').forEach(itemBtn => {
+        itemBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const subj = itemBtn.getAttribute('data-subject');
+          closeAllSubjectDropdowns();
           selectSubjectPractice(subj, { autoScroll: true });
         });
       });
+
+      // All Subjects click handler
+      const allBtn = container.querySelector('[data-subject="ALL"]');
+      if (allBtn) {
+        allBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeAllSubjectDropdowns();
+          selectSubjectPractice('ALL', { autoScroll: true });
+        });
+      }
 
       updateSubjectProgressUI();
     }
