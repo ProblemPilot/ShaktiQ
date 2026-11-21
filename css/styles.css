@@ -2761,55 +2761,6 @@ html.light #aedo-segment:hover {
   border-radius: 4px;
 }
 
-/* Home Stats Section */
-.sq-stats-section {
-  max-width: 1120px;
-  margin: 2.5rem auto 0;
-  padding: 0 1.25rem;
-}
-
-.sq-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.85rem;
-}
-
-@media (min-width: 768px) {
-  .sq-stats-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.25rem;
-  }
-}
-
-.sq-stat-card {
-  background-color: #FFFFFF;
-  border: 1px solid #DCE6DF;
-  border-radius: 1rem;
-  padding: 1.25rem 1rem;
-  text-align: center;
-  box-shadow: 0 1px 3px rgba(16, 64, 45, 0.04);
-}
-
-.sq-stat-num {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #10402D;
-  line-height: 1.2;
-}
-
-.sq-stat-label {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #111C15;
-  margin-top: 0.3rem;
-}
-
-.sq-stat-sub {
-  font-size: 0.7rem;
-  color: #526056;
-  margin-top: 0.15rem;
-  line-height: 1.35;
-}
 
 /* Home Features Section */
 .sq-features-section {
