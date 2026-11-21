@@ -449,18 +449,22 @@
               <img src="/logo.png" alt="ShaktiQ Logo" width="168" height="56" fetchpriority="high" decoding="async" class="sq-brand-logo-img">
             </picture>
           </a>
+        </div>
 
-          <span class="sq-header-divider" aria-hidden="true"></span>
-
-          <div class="sq-nav-links">
-            <button type="button" onclick="openPyqBankMode()" class="sq-nav-link" data-home-i18n="nav_practice">Practice</button>
-            <button type="button" onclick="openTestSeriesMode()" class="sq-nav-link" data-home-i18n="nav_mocks">Mock Tests</button>
-            <button type="button" onclick="openSpeedDrills()" class="sq-nav-link" data-home-i18n="nav_drills">Speed Drills</button>
-            <a href="/predictor.html" class="sq-nav-link" data-home-i18n="nav_predictor">Predictor</a>
-          </div>
+        <div class="sq-nav-center">
+          <button type="button" onclick="openPyqBankMode()" class="sq-nav-link" data-home-i18n="nav_practice">Practice</button>
+          <button type="button" onclick="openTestSeriesMode()" class="sq-nav-link" data-home-i18n="nav_mocks">Mock Tests</button>
+          <button type="button" onclick="openSpeedDrills()" class="sq-nav-link" data-home-i18n="nav_drills">Speed Drills</button>
+          <a href="/predictor.html" class="sq-nav-link" data-home-i18n="nav_predictor">Predictor</a>
         </div>
 
         <div class="sq-header-right">
+          <!-- PWA Offline Status Badge -->
+          <div id="pwa-status-badge" class="sq-pwa-badge items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#EBF3E6] text-[#10402D] border border-[#C6DEC0] shadow-2xs transition-all cursor-pointer hover:bg-[#DCE9D5]" onclick="handlePwaBadgeClick()" role="status" aria-live="polite" title="Offline ready: ShaktiQ works without internet connection">
+            <span id="pwa-status-dot" class="w-2 h-2 rounded-full bg-[#10402D]"></span>
+            <span id="pwa-status-text">Offline ready</span>
+          </div>
+
           <div class="sq-lang-group" role="group" aria-label="Language selection">
             <button type="button" onclick="setGlobalAppLanguage('en')" data-lang-btn="en" aria-pressed="true" class="sq-lang-btn sq-lang-active">EN</button>
             <button type="button" onclick="setGlobalAppLanguage('hi')" data-lang-btn="hi" aria-pressed="false" class="sq-lang-btn">हिन्दी</button>
@@ -476,6 +480,11 @@
             <button type="button" onclick="openAspirantRegModal('Sign in with your name, email, and mobile number to unlock the PYQ Bank and Mock Tests.')" class="sq-signin-btn sq-signin-btn-compact">
               <span>Sign In</span>
             </button>
+          </div>
+
+          <div id="pwa-status-badge-mobile" class="hidden">
+            <span id="pwa-status-dot-mobile" class="hidden"></span>
+            <span id="pwa-status-text-mobile" class="hidden">Offline ready</span>
           </div>
 
           <button id="mobile-menu-btn" type="button" aria-label="Open navigation menu" class="sq-mobile-menu-btn">
@@ -504,6 +513,13 @@
             <span data-home-i18n="nav_predictor">Predictor</span>
             <span aria-hidden="true">→</span>
           </a>
+          <div id="drawer-pwa-status" class="mt-2 pt-2 border-t border-[#E5ECE6] flex items-center justify-between text-xs px-3 py-2 rounded-xl bg-[#F6F7F2] text-[#10402D] cursor-pointer" onclick="handlePwaBadgeClick()">
+            <span class="flex items-center gap-1.5 font-semibold">
+              <span id="drawer-pwa-dot" class="w-2 h-2 rounded-full bg-[#10402D]"></span>
+              <span id="drawer-pwa-text">Offline ready</span>
+            </span>
+            <span class="text-[11px] text-[#526056]">v15</span>
+          </div>
         </div>
       </div>
     </header>
