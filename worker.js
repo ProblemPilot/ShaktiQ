@@ -167,10 +167,12 @@ export default {
     // 6. Ask AI Route: POST /api/ask-ai
     if (url.pathname === '/api/ask-ai' && request.method === 'POST') {
       const geminiApiKey = env.GEMINI_API_KEY;
-      if (!geminiApiKey) {
+      const hasWorkersAi = Boolean(env.AI);
+
+      if (!geminiApiKey && !hasWorkersAi) {
         return jsonResponse(
           {
-            error: 'Server-side AI key not configured on Cloudflare.',
+            error: 'Server-side AI model or API key not yet configured on Cloudflare.',
             fallbackToClient: true,
           },
           503
@@ -191,50 +193,70 @@ export default {
         const systemInstruction = buildWorkerSystemInstruction(language);
         const prompt = buildWorkerPrompt(message, context, history);
 
-        const models = ['gemini-2.5-flash', 'gemini-1.5-flash'];
-        let lastError = null;
-
-        for (const model of models) {
+        // 1. Prioritize Cloudflare Workers AI (Serverless Open Source Meta Llama 3.2 3B) if bound
+        if (hasWorkersAi) {
           try {
-            const geminiRes = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`,
-              {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  systemInstruction: { parts: [{ text: systemInstruction }] },
-                  contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                  generationConfig: {
-                    temperature: 0.35,
-                    maxOutputTokens: 800,
-                  },
-                }),
-              }
-            );
+            const aiResponse = await env.AI.run('@cf/meta/llama-3.2-3b-instruct', {
+              messages: [
+                { role: 'system', content: systemInstruction },
+                { role: 'user', content: prompt }
+              ],
+              max_tokens: 650,
+              temperature: 0.35
+            });
 
-            if (geminiRes.ok) {
-              const geminiData = await geminiRes.json();
-              const answer = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (answer && answer.trim()) {
-                return jsonResponse({
-                  answer: answer.trim(),
-                  language,
-                  model,
-                });
-              }
-            } else {
-              const errBody = await geminiRes.text().catch(() => '');
-              lastError = new Error(`Gemini API returned ${geminiRes.status}: ${errBody}`);
+            const answer = aiResponse?.response;
+            if (answer && answer.trim()) {
+              return jsonResponse({
+                answer: answer.trim(),
+                language,
+                model: 'llama-3.2-3b-instruct'
+              });
             }
-          } catch (e) {
-            lastError = e;
+          } catch (cfAiErr) {
+            console.warn('[Worker] Cloudflare Workers AI call fallback:', cfAiErr);
+          }
+        }
+
+        // 2. Fallback to Gemini if API key configured on server
+        if (geminiApiKey) {
+          const models = ['gemini-2.5-flash', 'gemini-1.5-flash'];
+          for (const model of models) {
+            try {
+              const geminiRes = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    systemInstruction: { parts: [{ text: systemInstruction }] },
+                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                    generationConfig: {
+                      temperature: 0.35,
+                      maxOutputTokens: 800,
+                    },
+                  }),
+                }
+              );
+
+              if (geminiRes.ok) {
+                const geminiData = await geminiRes.json();
+                const answer = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (answer && answer.trim()) {
+                  return jsonResponse({
+                    answer: answer.trim(),
+                    language,
+                    model,
+                  });
+                }
+              }
+            } catch (_) {}
           }
         }
 
         return jsonResponse(
           {
-            error: 'Could not get an answer from Gemini API right now.',
-            details: lastError ? lastError.message : undefined,
+            error: 'AI service is currently indexing notes.',
             fallbackToClient: true,
           },
           502
