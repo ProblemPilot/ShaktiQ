@@ -156,6 +156,8 @@ const OPTION_PREFIX_REGEX = /^\s*(?:\((?:[A-Ea-e1-5१-५]|ए|बी|सी|�
     const HOME_I18N_DICT = {
       en: {
         brand_title: 'Shakti Question Bank',
+        nav_home: 'Home',
+        nav_exams: 'Exams',
         nav_practice: 'Practice',
         nav_mocks: 'Mock Tests',
         nav_drills: 'Speed Drills',
@@ -180,6 +182,8 @@ const OPTION_PREFIX_REGEX = /^\s*(?:\((?:[A-Ea-e1-5१-५]|ए|बी|सी|�
       },
       hi: {
         brand_title: 'Shakti Question Bank',
+        nav_home: 'होम',
+        nav_exams: 'परीक्षाएं',
         nav_practice: 'अभ्यास',
         nav_mocks: 'मॉक टेस्ट',
         nav_drills: 'स्पीड ड्रिल',

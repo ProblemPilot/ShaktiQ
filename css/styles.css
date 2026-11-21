@@ -1923,13 +1923,20 @@ html.light #aedo-segment:hover {
   display: none;
   align-items: center;
   justify-content: center;
-  gap: 1.75rem;
+  gap: 1.15rem;
   flex: 1;
 }
 
 @media (min-width: 768px) {
   .sq-nav-center {
     display: flex;
+    gap: 1.15rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .sq-nav-center {
+    gap: 1.6rem;
   }
 }
 

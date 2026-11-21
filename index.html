@@ -452,6 +452,66 @@
         </div>
 
         <div class="sq-nav-center">
+          <a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" class="sq-nav-link" data-home-i18n="nav_home">Home</a>
+
+          <!-- Exams Dropdown Trigger -->
+          <div class="relative" id="decoded-dropdown-container">
+            <button id="decoded-dropdown-btn" type="button" aria-expanded="false" aria-haspopup="true" class="sq-nav-link inline-flex items-center gap-1 cursor-pointer">
+              <span data-home-i18n="nav_exams">Exams</span>
+              <i data-lucide="chevron-down" id="decoded-dropdown-chevron" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="decoded-dropdown-menu" class="hidden absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-white border border-[#DCE6DF] rounded-2xl shadow-xl p-2 z-50 transform opacity-0 scale-95 transition-all duration-150">
+              <!-- Segment 1: BPSC -->
+              <button type="button" onclick="openExamGateway('BPSC_CCE')" class="w-full text-left flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#EBF3E6]/70 transition-colors cursor-pointer group">
+                <div class="w-8 h-8 rounded-lg bg-[#EBF3E6] border border-[#C6DEC0] flex items-center justify-center text-[#10402D] shrink-0 mt-0.5">
+                  <i data-lucide="compass" class="w-4 h-4"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-1">
+                    <span class="text-xs font-bold text-[#111C15] group-hover:text-[#10402D]">BPSC CCE</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#EBF3E6] text-[#10402D]">72nd/73rd</span>
+                  </div>
+                  <p class="text-[11px] text-[#526056] truncate">2,800+ PYQs &amp; 22 full mocks</p>
+                </div>
+              </button>
+
+              <!-- Segment 2: BSSC CGL 4 -->
+              <button type="button" onclick="openExamGateway('BSSC')" class="w-full text-left flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#EBF3E6]/70 transition-colors cursor-pointer group">
+                <div class="w-8 h-8 rounded-lg bg-[#FEF6D6] border border-[#F5DF8B] flex items-center justify-center text-[#8A6400] shrink-0 mt-0.5">
+                  <i data-lucide="book-open" class="w-4 h-4"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-1">
+                    <span class="text-xs font-bold text-[#111C15] group-hover:text-[#10402D]">BSSC CGL 4</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#FEF6D6] text-[#785600]">Grad Level</span>
+                  </div>
+                  <p class="text-[11px] text-[#526056] truncate">Secretariat Assistant science &amp; GS</p>
+                </div>
+              </button>
+
+              <!-- Segment 3: AEDO -->
+              <button type="button" onclick="openExamGateway('AEDO')" class="w-full text-left flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#EBF3E6]/70 transition-colors cursor-pointer group">
+                <div class="w-8 h-8 rounded-lg bg-[#EBF3E6] border border-[#C6DEC0] flex items-center justify-center text-[#10402D] shrink-0 mt-0.5">
+                  <i data-lucide="shield-check" class="w-4 h-4"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-1">
+                    <span class="text-xs font-bold text-[#111C15] group-hover:text-[#10402D]">AEDO</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#EBF3E6] text-[#10402D]">2-Hr Mocks</span>
+                  </div>
+                  <p class="text-[11px] text-[#526056] truncate">6 full 2-hour official papers</p>
+                </div>
+              </button>
+
+              <!-- View All Exams -->
+              <button type="button" onclick="document.getElementById('sq-gateway-section')?.scrollIntoView({behavior:'smooth'});" class="w-full text-center mt-1 pt-2 border-t border-[#DCE6DF] text-xs font-bold text-[#10402D] hover:underline cursor-pointer block">
+                View All Exams →
+              </button>
+            </div>
+          </div>
+
           <button type="button" onclick="openPyqBankMode()" class="sq-nav-link" data-home-i18n="nav_practice">Practice</button>
           <button type="button" onclick="openTestSeriesMode()" class="sq-nav-link" data-home-i18n="nav_mocks">Mock Tests</button>
           <button type="button" onclick="openSpeedDrills()" class="sq-nav-link" data-home-i18n="nav_drills">Speed Drills</button>
@@ -497,6 +557,14 @@
       <!-- Minimal Mobile Navigation Drawer (<768px) -->
       <div id="mobile-menu-drawer" class="hidden md:hidden sq-mobile-drawer">
         <div class="sq-mobile-drawer-list">
+          <a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" class="sq-mobile-drawer-item">
+            <span data-home-i18n="nav_home">Home</span>
+            <span aria-hidden="true">→</span>
+          </a>
+          <button type="button" onclick="document.getElementById('sq-gateway-section')?.scrollIntoView({behavior:'smooth'});" class="sq-mobile-drawer-item">
+            <span data-home-i18n="nav_exams">Exams</span>
+            <span aria-hidden="true">→</span>
+          </button>
           <button type="button" onclick="openPyqBankMode()" class="sq-mobile-drawer-item">
             <span data-home-i18n="nav_practice">Practice</span>
             <span aria-hidden="true">→</span>
@@ -570,7 +638,7 @@
       </section>
 
       <!-- 3. CLEAN EXAM GATEWAY -->
-      <section class="sq-gateway" aria-labelledby="sq-gateway-title">
+      <section class="sq-gateway" id="sq-gateway-section" aria-labelledby="sq-gateway-title">
         <h2 id="sq-gateway-title" class="sq-gateway-heading" data-home-i18n="gateway_heading">Choose Your Path</h2>
 
         <div class="sq-gateway-grid">
